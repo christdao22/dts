@@ -114,7 +114,9 @@ class DocumentController extends Controller
 
     public function incoming()
     {
+        $documentTrackings = [];
         $terminal = Terminal::where('user_id', auth()->user()->id)->first();
+
         if($terminal==null) return view('document.incoming',compact('documentTrackings'));
 
         $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
