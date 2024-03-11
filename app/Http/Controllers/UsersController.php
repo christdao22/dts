@@ -98,7 +98,6 @@ class UsersController extends Controller
             'password'          => 'required|confirmed|max:50',
             'terminal_name'     => 'required|max:50',
         ]);
-
         try {
             DB::beginTransaction();
 
@@ -136,5 +135,66 @@ class UsersController extends Controller
             return back()->withInput()->with('exception', 'Please try again');
         }
 
+    }
+
+    public function profile() {
+        $offices = Offices::get()->sortBy('office_name');
+        $user = User::where('id', auth()->user()->id)->with('terminal')->first();
+        return view('profile', compact('user', 'offices'));
+    }
+
+    public function updateProfile(Request $request) {
+
+        $validated = $this->validate($request, [
+            'first_name'        => 'required|max:50',
+            'middle_name'       => 'nullable|max:50',
+            'last_name'         => 'required|max:50',
+            'office_id'         => 'required',
+            'email'             => 'required|email|max:50',
+            'password'          => 'required|confirmed|max:50',
+            'terminal_name'     => 'required|max:50',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            DB::table('users')
+                ->where('id', auth()->user()->id)
+                ->update([
+                    'first_name'      => $validated['first_name'],
+                    'middle_name'     => $validated['middle_name'],
+                    'last_name'       => $validated['last_name'],
+                    'office_id'       => $validated['office_id'],
+                    'email'           => $validated['email'],
+                    'password'        => $validated['password'],
+                    'updated_at'      => date('Y-m-d H:i:s'),
+                    'is_active'       => $request->is_active == 'on'? 1:0,
+                ]);
+
+            $terminal_id = Terminal::where('user_id', auth()->user()->id)->pluck('id')->first();
+            DB::table('terminals')
+                ->where('id', $terminal_id)
+                ->update([
+                    'terminal_name' => $validated['terminal_name'],
+                    'updated_at'    => date('Y-m-d H:i:s')
+                ]);
+
+            DB::table('office_terminals')
+                ->where('terminal_id', $terminal_id)
+                ->update([
+                    'office_id'     => $validated['office_id'],
+                    'updated_at'    => date('Y-m-d H:i:s')
+                ]);
+
+            DB::commit();
+
+            toast('Successfully updated...','success');
+
+            return redirect()->back()->with('success');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withInput()->with('exception', 'Please try again');
+        }
     }
 }

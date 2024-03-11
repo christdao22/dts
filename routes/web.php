@@ -32,6 +32,12 @@ Route::get('search',[DocumentController::class, 'find2'])->name('web.find2');
 Route::get('dts',[DocumentController::class, 'dts'])->name('dts');
 
 Route::middleware(['auth'])->group(function () {
+    // Profile
+    Route::prefix('user')->group(function () {
+        Route::get('profile', [UsersController::class, 'profile'])->name('user.profile');
+        Route::patch('updateProfile', [UsersController::class, 'updateProfile'])->name('user.updateProfile');
+    });
+
     Route::prefix('document')->group(function () {
         Route::get('/all', [DocumentController::class, 'create'])->name('document.create');
         Route::get('/completed', [DocumentController::class, 'completed'])->name('document.completed');
@@ -65,5 +71,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('document', [DocumentController::class, 'store'])->name('document.store');
 });
 
-    // For registration only
-    Route::post('/guestStore', [UsersController::class, 'guestStore'])->name('guestStore');
+// For registration only
+Route::post('/guestStore', [UsersController::class, 'guestStore'])->name('guestStore');

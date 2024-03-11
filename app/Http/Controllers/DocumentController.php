@@ -100,7 +100,11 @@ class DocumentController extends Controller
     public function received()
     {
         $documentTrackings = [];
-        $terminals = Terminal::get();
+
+        $terminals = Terminal::whereHas('user', function($query) {
+            return $query->where('is_active', 1);
+        })->get();
+
         $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
         if($terminal != null){
             $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
@@ -183,7 +187,9 @@ class DocumentController extends Controller
         $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category');
         if(!auth()->user()->can_view_all) $documents->where('user_id', auth()->user()->id);
         $documents = $documents->get()->sortBy('created_by');
-        $terminals = Terminal::get();
+        $terminals = Terminal::whereHas('user', function($query) {
+            return $query->where('is_active', 1);
+        })->get();
         $categories = DocumentCategory::get()->sortBy('category_name');
         return view('document.create',compact('documents', 'terminals', 'categories'));
     }
@@ -362,9 +368,6 @@ class DocumentController extends Controller
         return redirect()->back();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $detail = DocumentDetail::find($id);
