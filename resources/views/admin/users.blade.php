@@ -10,7 +10,7 @@
     /* You can use nth-child(1), nth-child(2), etc., to target specific columns */
     /* For this example, let's adjust the width of the first and second columns */
     td:nth-child(1) {
-        width: 25%;
+        width: 20%;
     }
 
     td:nth-child(2) {
@@ -22,10 +22,14 @@
     }
 
     td:nth-child(4) {
-        width: 25%;
+        width: 20%;
     }
 
     td:nth-child(5) {
+        width: 10%;
+    }
+
+    td:nth-child(6) {
         width: 10%;
     }
 </style>
@@ -62,6 +66,7 @@
                                 <th><strong>Office</strong></th>
                                 <th><strong>Role</strong></th>
                                 <th><strong>Email</strong></th>
+                                <th><strong>Status</strong></th>
                                 <th><i class=" ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="Action"></i></th>
                             </tr>
@@ -76,6 +81,7 @@
                                 <td>{{ $user->is_admin == 1? 'Admin':($user->is_dm==1? 'Decision Maker':'Office Terminal') }}
                                 </td>
                                 <td>{{ $user->email }}</td>
+                                <td>{!! $user->is_active? '<span class="text-success">Active</span>':'<span class="text-danger">Inactive</span>' !!}</td>
                                 <td class="text-center d-flex gap-1">
                                     <button class="btn btn-info edit_btn" id="{{ $user->id }}"><i
                                             class="ri-edit-2-fill" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -133,7 +139,7 @@
                         <div class="mb-4 d-flex flex-column gap-3">
                             <div class="form-check form-switch ps-0">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <label class="form-check-label" for="can_create">Can create document</label>
+                                    <label class="form-check-label d-flex gap-2 align-items-center" for="can_create"><i class="ri-folder-add-line" style="font-size: 20px;"></i> Can create document</label>
                                     <input class="form-check-input" type="checkbox" name="can_create" id="can_create" style="width: 3.5em; height: 1.5em;">
                                 </div>
                                 @error('can_create')
@@ -142,7 +148,7 @@
                             </div>
                             <div class="form-check form-switch ps-0">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <label class="form-check-label" for="can_view_all">Can view all document</label>
+                                    <label class="form-check-label d-flex gap-2 align-items-center" for="can_view_all"><i class="ri-book-open-line" style="font-size: 20px;"></i></i> Can view all document</label>
                                     <input class="form-check-input" type="checkbox" name="can_view_all" id="can_view_all" style="width: 3.5em; height: 1.5em;">
                                 </div>
                                 @error('can_view_all')

@@ -104,7 +104,7 @@
                             </div>
                             <div class="form-group mt-2 mb-0 row">
                                 <div class="col-12 mt-3 text-center">
-                                    <a href="{{ route('register') }}" class="text-muted">Don't have account?</a>
+                                    <a href="{{ route('register') }}" class="text-muted">Register</a>
                                 </div>
                             </div>
 

@@ -38,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('updateProfile', [UsersController::class, 'updateProfile'])->name('user.updateProfile');
     });
 
+    // Document
     Route::prefix('document')->group(function () {
         Route::get('/all', [DocumentController::class, 'create'])->name('document.create');
         Route::get('/completed', [DocumentController::class, 'completed'])->name('document.completed');
@@ -58,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resources([ 'document_category' => DocumentCategoryController::class ]);
     });
 
+    // Admin
     Route::prefix('admin')->group(function () {
         Route::resources([
             'office' => OfficeController::class,
