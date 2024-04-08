@@ -5,10 +5,8 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UsersController;
-use App\Models\DocumentCategory;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,7 +42,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/completed', [DocumentController::class, 'completed'])->name('document.completed');
         Route::get('/received', [DocumentController::class, 'received'])->name('document.received');
         Route::get('/incoming', [DocumentController::class, 'incoming'])->name('document.incoming');
-        Route::get('/rejected', [DocumentController::class, 'rejected'])->name('document.rejected');
         Route::get('/outgoing', [DocumentController::class, 'outgoing'])->name('document.outgoing');
         Route::get('/received/history', [DocumentController::class, 'receivedHistory'])->name('document.receivedHistory');
         Route::get('/tracked', [DocumentController::class, 'tracked'])->name('document.tracked');

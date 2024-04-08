@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DocumentCategory;
 use Illuminate\Http\Request;
 use App\Models\DocumentDetail;
+use App\Models\User;
 use App\Models\DocumentTrace;
 use App\Models\DocumentTracking;
 use App\Models\Outgoing;
@@ -88,18 +89,26 @@ class DocumentController extends Controller
         // return $pdf->stream();
     }
 
-    public function allDocuments()
+    public function allDocuments(Request $request)
     {
+       // ** use to get the data for filters dropdown
+        $filters = $this->getFilters();
+
         $documentTrackings = DocumentTracking::where('terminal_id', auth()->user()->office_id)
         ->where('status', 'received')
-        ->with('user','documentDetail')
-        ->get();
-        return view('document.received',compact('documentTrackings'));
+        ->with('user','documentDetail');
+
+        $documentTrackings = $this->filter($request, $documentTrackings);
+        $documentTrackings = $documentTrackings->get();
+
+        return view('document.received',compact('documentTrackings', 'filters'));
     }
 
-    public function received()
+    public function received(Request $request)
     {
         $documentTrackings = [];
+       // ** use to get the data for filters dropdown
+        $filters = $this->getFilters();
 
         $terminals = Terminal::whereHas('user', function($query) {
             return $query->where('is_active', 1);
@@ -109,15 +118,20 @@ class DocumentController extends Controller
         if($terminal != null){
             $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
             ->where('status', 'received')
-            ->with('user','documentDetail', 'remark')
-            ->get();
+            ->with('user','documentDetail', 'remark');
+
+            $documentTrackings = $this->filter($request, $documentTrackings);
+            $documentTrackings = $documentTrackings->get();
         }
 
-        return view('document.received',compact('documentTrackings', 'terminals'));
+        return view('document.received',compact('documentTrackings', 'terminals', 'filters'));
     }
 
-    public function incoming()
+    public function incoming(Request $request)
     {
+       // ** use to get the data for filters dropdown
+        $filters = $this->getFilters();
+
         $documentTrackings = [];
         $terminal = Terminal::where('user_id', auth()->user()->id)->first();
 
@@ -125,40 +139,44 @@ class DocumentController extends Controller
 
         $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
             ->where('status', 'incoming')
-            ->with('user','documentDetail.document_category', 'remark')
-            ->get();
-        return view('document.incoming',compact('documentTrackings'));
+            ->with('user','documentDetail.document_category', 'remark');
+
+        $documentTrackings = $this->filter($request, $documentTrackings);
+        $documentTrackings = $documentTrackings->get();
+
+        return view('document.incoming',compact('documentTrackings', 'filters'));
     }
 
-    public function receivedHistory()
+    public function receivedHistory(Request $request)
     {
-        $receivedHistories = ReceivedHistory::with('user.terminal','documentDetail.document_category', 'remark')->get()
-        ->filter(function ($r){
+       // ** use to get the data for filters dropdown
+        $filters = $this->getFilters();
+        $receivedHistories = ReceivedHistory::with('user.terminal','documentDetail.document_category', 'remark');
+        $receivedHistories = $this->filter($request, $receivedHistories);
+        $receivedHistories = $receivedHistories->get();
+
+        $receivedHistories = $receivedHistories->filter(function ($r){
             return $r->user->office_id == auth()->user()->office_id;
         });
 
-        return view('document.received_histories',compact('receivedHistories'));
+        return view('document.received_histories',compact('receivedHistories', 'filters'));
     }
 
-    public function outgoing()
+    public function outgoing(Request $request)
     {
-        $documentTrackings = Outgoing::with('user.terminal','documentDetail', 'terminal', 'remark')->get()
-        ->filter(function ($o){
+       // ** use to get the data for filters dropdown
+        $filters = $this->getFilters();
+        $documentTrackings = Outgoing::with('user.terminal','documentDetail', 'terminal', 'remark');
+        $documentTrackings = $this->filter($request, $documentTrackings);
+        $documentTrackings = $documentTrackings->get();
+
+        $documentTrackings->filter(function ($o){
             return $o->user->office_id == auth()->user()->office_id;
         });
-        return view('document.outgoing',compact('documentTrackings'));
+        return view('document.outgoing',compact('documentTrackings', 'filters'));
     }
 
-    public function rejected()
-    {
-        $documentTrackings = DocumentTracking::where('terminal_id', auth()->user()->office_id)
-        ->where('status', 'rejected')
-        ->with('user','documentDetail')
-        ->get();
-        return view('document.rejected',compact('documentTrackings'));
-    }
-
-    public function completed()
+    public function completed(Request $request)
     {
         $documentTrackings = [];
         $terminals = Terminal::get();
@@ -166,11 +184,16 @@ class DocumentController extends Controller
         if($terminal != null){
             $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
             ->where('status', 'completed')
-            ->with('user','documentDetail', 'remark')
-            ->get();
+            ->with('remark', 'documentDetail', 'user');
+
+            $documentTrackings = $this->filter($request, $documentTrackings);
+            $documentTrackings = $documentTrackings->get();
         }
 
-        return view('document.completed',compact('documentTrackings', 'terminals'));
+       // ** use to get the data for filters dropdown
+        $filters = $this->getFilters();
+
+        return view('document.completed',compact('documentTrackings', 'terminals', 'filters'));
     }
 
     public function tracked()
@@ -182,16 +205,36 @@ class DocumentController extends Controller
         return view('document.tracked',compact('documentTrackings'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        // ** use to get the data for filters dropdown
+        $filters = $this->getFilters();
+
         $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category');
+
         if(!auth()->user()->can_view_all) $documents->where('user_id', auth()->user()->id);
+
+        if(isset($request->type) && $request->type != '')
+            $documents->where('document_category_id', '=', $request->type);
+
+        if((isset($request->date_from) && isset($request->date_to)) && ($request->date_from != '' && $request->date_to != ''))
+            $documents->whereDate('created_at', '>=', date($request->date_from))->whereDate('created_at', '<=', date($request->date_to));
+
+        if(isset($request->user) && $request->user != '') {
+            $documents->whereHas('documentTracking', function($q) use($request) {
+                $q->where('user_id', '=', $request->user);
+            });
+        }
+
         $documents = $documents->get()->sortBy('created_by');
+
         $terminals = Terminal::whereHas('user', function($query) {
             return $query->where('is_active', 1);
         })->get();
+
         $categories = DocumentCategory::get()->sortBy('category_name');
-        return view('document.create',compact('documents', 'terminals', 'categories'));
+
+        return view('document.create',compact('documents', 'terminals', 'categories', 'filters'));
     }
 
     public function store(Request $request)
@@ -389,6 +432,35 @@ class DocumentController extends Controller
     {
         $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category')->find($id);
         return response()->json(['documents'=>$documents]);
+    }
+
+    public function getFilters() {
+        $types = DocumentCategory::get();
+        $users = User::with('office')->get();
+
+        return compact('types', 'users');
+    }
+
+    public function filter($request, $object) {
+
+        if(isset($request->type) && $request->type != '') {
+            $object->whereHas('documentDetail', function($q) use($request) {
+                $q->where('document_category_id', '=', $request->type); });
+        }
+
+        if((isset($request->date_from) && isset($request->date_to)) && ($request->date_from != '' && $request->date_to != '')) {
+            $object->whereHas('documentDetail', function($q) use($request) {
+                $q->whereDate('created_at', '>=', date($request->date_from))->whereDate('created_at', '<=', date($request->date_to));
+            });
+        }
+
+        if(isset($request->user) && $request->user != '') {
+            $object->whereHas('user', function($q) use($request) {
+                $q->where('id', '=', $request->user);
+            });
+        }
+
+        return $object;
     }
 }
 

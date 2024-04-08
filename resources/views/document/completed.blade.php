@@ -42,6 +42,9 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="card-header w-100">
+                    <x-filter :$filters route='document.completed'/>
+                </div>
                 <div class="card-body">
                     <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">

@@ -41,6 +41,9 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="card-header w-100">
+                    <x-filter :$filters route='document.create'/>
+                </div>
                 <div class="card-body">
                     @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1)
                     <div class="d-flex flex-row-reverse">

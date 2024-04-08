@@ -38,6 +38,9 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="card-header w-100">
+                    <x-filter :$filters route='document.received'/>
+                </div>
                 <div class="card-body">
                     <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -150,7 +153,7 @@
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-success">Save</button>
+                                            <button type="submit" class="btn btn-success">Forward</button>
                                         </div>
                                     </div>
                                     </form>
