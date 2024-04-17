@@ -71,7 +71,6 @@
                                                             style="width: 4em; height: 2em;">
                                                     </div>
                                                 </div> --}}
-
                                                 <div class="form-group">
                                                     <label class="form-label" for="category_id"><b>Document Type
                                                         </b></label>
@@ -99,6 +98,13 @@
                                                     'label'       : 'Name Of Client',
                                                     'type'        : 'text',
                                                     'is_required' : true }" />
+
+                                                <x-form.input :$errors data="{
+                                                    'input_name'  : 'contact',
+                                                    'label'       : 'Contact No.',
+                                                    'type'        : 'text',
+                                                    'is_required' : false,
+                                                    'placeholder' : '09*********'}" />
 
                                                 <div class="form-group">
                                                     <label class="form-label" for="terminal"><b>Recipient </b></label>
@@ -155,11 +161,11 @@
                         <tbody>
                             @foreach ($documents as $document)
                             <tr>
-                                <td>{{ $document->document_code }}</td>
+                                <td><strong>{{ $document->document_code }}</strong></td>
                                 <td>{!! $document->document_category_id != null?
                                     $document->document_category->category_name : "<b>Others: </b>" . $document->type
                                     !!}</td>
-                                <td>{{ $document->name_of_client }}</td>
+                                <td>{{ $document->name_of_client }} <br> {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
                                 <td>{{ $document->description}}</td>
                                 <td>{{ $document->terminal->terminal_name}}</td>
                                 <td>{{ $document->created_at }}</td>
@@ -167,16 +173,16 @@
                                     @if ($document->documentTracking->status == 'completed')
                                     <span class="badge rounded-pill bg-success">Completed/Release</span>
                                     @elseif (!$document->documentTracking->is_received)
-                                    <span class="badge rounded-pill bg-secondary">Pending</span>
+                                    <span class="badge rounded-pill bg-secondary">Pending receive</span>
                                     @else
                                     <span class="badge rounded-pill bg-warning">In progress</span>
                                     @endif
                                 </td>
                                 <td>
                                     <div class="d-flex justify-content-end gap-1">
-                                        <a class="ri ri-printer-fill btn btn-warning" data-bs-toggle="tooltip"
+                                        {{-- <a class="ri ri-printer-fill btn btn-warning" data-bs-toggle="tooltip"
                                             data-bs-placement="top" title="Print"
-                                            href="{{ route('document.pdf_view',$document->id ) }}" target="_blank">
+                                            href="{{ route('document.pdf_view',$document->id ) }}" target="_blank"> --}}
                                             <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="Track"
                                                 href="{{ route('web.find', 'query='.$document->document_code) }}"><i
@@ -264,10 +270,15 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Name Of Client</label>
-                                <textarea id="editName_of_client" class="form-control" required
-                                    name="name_of_client"></textarea>
+                                <input id="editName_of_client" type="text" class="form-control" required
+                                    name="name_of_client" />
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label">Contact No.</label>
+                                <input id="editContact" type="text" class="form-control" placeholder="09*********"
+                                    name="contact" />
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Description</label>
                                 <textarea id="editDescription" cols="30" rows="5" class="form-control"
@@ -332,7 +343,7 @@
                     $('#editName_of_client').val(data.documents.name_of_client);
                     $('#editDescription').val(data.documents.description);
                     $('#editTerminal_id').val(data.documents.terminal_id);
-
+                    $('#editContact').val(data.documents.contact);
                     $('#editType').parent().toggleClass('d-none', data.documents
                         .document_category_id !== null);
                     $('#editModal').modal('show');
@@ -383,6 +394,7 @@
             $('#editCode').val();
             $('#editName_of_client').val();
             $('#editDescription').val();
+            $('#editContact').val();
             $('#terminal_id').val();
         });
 

@@ -249,8 +249,8 @@ class DocumentController extends Controller
                     'name_of_client'    => $request->name_of_client,
                     'description'       => $request->description,
                     'terminal_id'       => $request->terminal,
-                    'document_category_id'  => $request->category_id == 'others'? null: $request->category_id
-
+                    'document_category_id'  => $request->category_id == 'others'? null: $request->category_id,
+                    'contact'           => $request->contact
                     // 'is_check_by_dm'    => $request->is_check_by_dm == 'on'
                     // 'transaction_type'  =>  1, // to identify if simple, complex, highly technical
                     // 'is_verified'       => false // used to check if na verified na ba ni DM
@@ -399,6 +399,7 @@ class DocumentController extends Controller
                 $documentDetail->name_of_client = $request->name_of_client;
                 $documentDetail->description    = $request->description;
                 $documentDetail->terminal_id    = $request->terminal_id;
+                $documentDetail->contact        = $request->contact;
                 $documentDetail->document_category_id    = $request->category_id == 'others'? null: $request->category_id;
                 $documentDetail->save();
             });

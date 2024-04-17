@@ -45,6 +45,8 @@
                         Name of Client: <b>{{ $documentDetail->name_of_client }}</b>
                         <br>
                         Description: <b>{{ $documentDetail->description }}</b>
+                        <br>
+                        Contact No: <b>{{ $documentDetail->contact }}</b>
                     </div>
 
                     <section id="cd-timeline" class="cd-container">

@@ -67,12 +67,13 @@
                         <tbody>
                             @foreach ($documentTrackings as $documentTracking)
                             <tr>
-                                <td>{{ $documentTracking->documentDetail->document_code }}</td>
+                                <td><strong>{{ $documentTracking->documentDetail->document_code }}</strong></td>
                                 <td>{!! $documentTracking->documentDetail->document_category_id != null?
                                     $documentTracking->documentDetail->document_category->category_name : "<b>Others:
                                     </b>" . $documentTracking->documentDetail->type
                                     !!}</td>
-                                <td>{{ $documentTracking->documentDetail->name_of_client }}</td>
+                                <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
+
                                 <td>{{ $documentTracking->documentDetail->description }}</td>
                                 <td>
                                     {{ $documentTracking->user->is_admin? 'Admin' : strtoupper($documentTracking->user->terminal->terminal_name) }}<br>-
@@ -121,6 +122,8 @@
                                                             <p class="form-label"> <b>Name of Client:</b>
                                                                 {{ $documentTracking->documentDetail->name_of_client }}
                                                             </p>
+                                                            <p class="form-label"> <b>Contact No:</b>
+                                                                {{ $documentTracking->documentDetail->contact }} </p>
                                                             <p class="form-label"> <b>Description:</b>
                                                                 {{ $documentTracking->documentDetail->description }}</p>
                                                             <p class="form-label"> <b>Remarks:</b>

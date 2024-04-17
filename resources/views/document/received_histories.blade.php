@@ -74,11 +74,11 @@
                         <tbody>
                             @foreach ($receivedHistories as $receivedHistory)
                             <tr>
-                                <td>{{ $receivedHistory->documentDetail->document_code }}</td>
+                                <td><strong>{{ $receivedHistory->documentDetail->document_code }}</strong></td>
                                 <td>{!! $receivedHistory->documentDetail->document_category_id != null?
                                     $receivedHistory->documentDetail->document_category->category_name : "<b>Others: </b>" . $receivedHistory->documentDetail->type
                                     !!}</td>
-                                <td>{{ $receivedHistory->documentDetail->name_of_client }}</td>
+                                <td>{{ $receivedHistory->documentDetail->name_of_client }} <br> {{ $receivedHistory->documentDetail->contact != ''? '(' . $receivedHistory->documentDetail->contact . ')':'' }}</td>
                                 <td>{{ $receivedHistory->documentDetail->description }}</td>
                                 <td>{{ strtoupper($receivedHistory->user->terminal->terminal_name) }}<br>-
                                     {{ Str::ucfirst(strtolower($receivedHistory->user->first_name)) }}
