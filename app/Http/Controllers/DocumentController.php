@@ -112,7 +112,7 @@ class DocumentController extends Controller
 
         $terminals = Terminal::whereHas('user', function($query) {
             return $query->where('is_active', 1);
-        })->get();
+        })->orderBy('terminal_name')->get();
 
         $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
         if($terminal != null){
@@ -131,7 +131,6 @@ class DocumentController extends Controller
     {
        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
-
         $documentTrackings = [];
         $terminal = Terminal::where('user_id', auth()->user()->id)->first();
 
@@ -143,6 +142,8 @@ class DocumentController extends Controller
 
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->get();
+
+        
 
         return view('document.incoming',compact('documentTrackings', 'filters'));
     }
@@ -166,7 +167,7 @@ class DocumentController extends Controller
     {
        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
-        $documentTrackings = Outgoing::with('user.terminal','documentDetail', 'terminal', 'remark');
+        $documentTrackings = Outgoing::with('user.terminal','documentDetail', 'terminal', 'remark')->where('user_id', auth()->user()->id);
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->get();
 
@@ -230,7 +231,7 @@ class DocumentController extends Controller
 
         $terminals = Terminal::whereHas('user', function($query) {
             return $query->where('is_active', 1);
-        })->get();
+        })->orderBy('terminal_name')->get();
 
         $categories = DocumentCategory::get()->sortBy('category_name');
 
