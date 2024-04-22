@@ -105,4 +105,13 @@ function bgColorStatus($status) {
     return isset($bg[$status])? $bg[$status] : '';
 }
 
+
+function formatDateTime($date) {
+    $datetime = new DateTime($date);
+    $formattedDateTime = $datetime->format('F j, Y g:i A');
+
+    return $formattedDateTime;
+}
+
+
 ?>

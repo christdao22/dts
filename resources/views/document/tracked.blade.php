@@ -66,7 +66,7 @@
                                     {{ ucfirst($documentTrace->user->last_name) }} </p>
                                 <p class="mt-3">{!! isset($documentTrace->remark->remarks) ? '<b>Remarks: </b>' .
                                     $documentTrace->remark->remarks : '' !!}</p>
-                                <span class="cd-date">{{ $documentTrace->created_at }}</span>
+                                <span class="cd-date">{{ formatDateTime($documentTrace->created_at) }}</span>
                             </div> <!-- cd-timeline-content -->
                         </div> <!-- cd-timeline-block -->
                         @endforeach
@@ -86,7 +86,7 @@
                                     {{ Str::ucfirst($documentTracking->user->first_name) }}
                                     {{ strtoupper(substr($documentTracking->user->middle_name,0,1)) }}.
                                     {{ ucfirst($documentTracking->user->last_name) }} </p>
-                                <span class="cd-date">{{ $documentTracking->updated_at }}</span>
+                                <span class="cd-date">{{ formatDateTime($documentTracking->updated_at) }}</span>
                             </div> <!-- cd-timeline-content -->
                         </div> <!-- cd-timeline-block -->
                         @elseif ($documentTracking->status == "incoming")
@@ -99,7 +99,7 @@
                                 <p class="m-b-20 text-muted font-14">at
                                     {{ strtoupper(isset($documentTracking->terminal->terminal_name)? $documentTracking->terminal->terminal_name:'')  }}
                                 </p>
-                                <span class="cd-date">{{ $documentTracking->updated_at }}</span>
+                                <span class="cd-date">{{ formatDateTime($documentTracking->updated_at) }}</span>
                             </div> <!-- cd-timeline-content -->
                         </div> <!-- cd-timeline-block -->
                         @endif

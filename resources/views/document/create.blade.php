@@ -5,35 +5,35 @@
 
 <style>
     td:nth-child(1) {
-        width: 50px;
+        width: 10%;
     }
 
     td:nth-child(2) {
-        width: 150px;
+        width: 10%;
     }
 
     td:nth-child(3) {
-        width: 200px;
+        width: 15%;
     }
 
     td:nth-child(4) {
-        width: 300px;
+        width: 15%;
     }
 
     td:nth-child(5) {
-        width: 100px;
+        width: 10%;
     }
 
     td:nth-child(6) {
-        width: 50px;
+        width: 15%;
     }
 
     td:nth-child(7) {
-        width: 50px;
+        width: 10%;
     }
 
     td:nth-child(8) {
-        width: 200px;
+        width: 15%;
     }
 
 </style>
@@ -157,7 +157,6 @@
                                         title="Action"></i></th>
                             </tr>
                         </thead>
-
                         <tbody>
                             @foreach ($documents as $document)
                             <tr>
@@ -168,7 +167,7 @@
                                 <td>{{ $document->name_of_client }} <br> {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
                                 <td>{{ $document->description}}</td>
                                 <td>{{ $document->terminal->terminal_name}}</td>
-                                <td>{{ $document->created_at }}</td>
+                                <td>{{ formatDateTime($document->created_at) }}</td>
                                 <td>
                                     @if ($document->documentTracking->status == 'completed')
                                     <span class="badge rounded-pill bg-success">Completed/Release</span>

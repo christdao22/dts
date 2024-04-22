@@ -76,7 +76,7 @@
                                     {{ Str::ucfirst(strtolower($documentTracking->user->first_name)) }}
                                     {{ Str::ucfirst(strtolower(Str::substr($documentTracking->user->middle_name, 0, 1))) }}.
                                     {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}</td>
-                                <td>{{ $documentTracking->documentDetail->updated_at }}</td>
+                                <td>{{ formatDateTime($documentTracking->documentDetail->updated_at) }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
                                 <td>
                                     <a class="btn btn-info" href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"

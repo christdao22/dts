@@ -84,8 +84,8 @@
                                     {{ Str::ucfirst(strtolower($receivedHistory->user->first_name)) }}
                                     {{ Str::ucfirst(strtolower(Str::substr($receivedHistory->user->middle_name, 0, 1))) }}.
                                     {{ Str::ucfirst(strtolower($receivedHistory->user->last_name)) }}</td>
-                                <td>{{ $receivedHistory->documentDetail->created_at }}</i></td>
-                                <td>{{ $receivedHistory->created_at }}</td>
+                                <td>{{ formatDateTime($receivedHistory->documentDetail->created_at) }}</i></td>
+                                <td>{{ formatDateTime($receivedHistory->created_at) }}</td>
                                 <td>{{ $receivedHistory->remark->remarks }}</td>
                                 <td class="d-flex gap-1">
                                     <a class="btn btn-info" href="{{ route('web.find', 'query='.$receivedHistory->documentDetail->document_code) }}"><i class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"

@@ -3,11 +3,11 @@
         <div class="form-group col-md-6 col-sm-12 mb-2">
             <label for="type">Filter by type</label>
             <select name="type" id="typetype" class="form-select">
-                <option value="" disabled @readonly(true) selected>
-                    Search by type...
+                <option value="" selected>
+                    All
                 </option>
                 @foreach ($types as $type)
-                <option value="{{ $type->id }}">
+                <option value="{{ $type->id }}" {{ request()->get('type') ==  $type->id? 'selected':'' }}>
                     {{ Str::ucfirst(strtolower($type->category_name)) }}
                 </option>
                 @endforeach
@@ -16,11 +16,11 @@
         <div class="form-group col-md-6 col-sm-12 mb-2">
             <label for="user">Forwarded by</label>
             <select name="user" id="user" class="form-select">
-                <option value="" disabled @readonly(true) selected>
-                    Search by office...
+                <option value="" selected>
+                    All
                 </option>
                 @foreach ($users as $user)
-                <option value="{{ $user->id }}">
+                <option value="{{ $user->id }}" {{ request()->get('user') ==  $user->id? 'selected':'' }}>
                     {{ $user->is_admin? 'Admin' : strtoupper($user->office->office_name) }}<br>-
                     {{ Str::ucfirst(strtolower($user->first_name)) }}
                     {{ Str::ucfirst(strtolower(Str::substr($user->middle_name, 0, 1))) }}.
@@ -34,11 +34,11 @@
     <div class="row">
         <div class="form-group col-md-6 col-sm-12 mb-2">
             <label for="date_from">Date created from</label>
-            <input type="date" name="date_from" id="date_from" class="form-control">
+            <input type="date" name="date_from" id="date_from" value="{{ request()->get('date_from') != ''? request()->get('date_from'):'' }}" class="form-control">
         </div>
         <div class="form-group col-md-6 col-sm-12 mb-2">
             <label for="date_to">Date created to</label>
-            <input type="date" name="date_to" class="form-control">
+            <input type="date" name="date_to" class="form-control" value="{{ request()->get('date_to') != ''? request()->get('date_to'):'' }}">
         </div>
     </div>
     <div class="d-flex justify-content-end w-100 gap-2">
