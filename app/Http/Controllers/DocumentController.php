@@ -8,6 +8,7 @@ use App\Models\DocumentDetail;
 use App\Models\User;
 use App\Models\DocumentTrace;
 use App\Models\DocumentTracking;
+use App\Models\GeneratedCode;
 use App\Models\Outgoing;
 use App\Models\ReceivedHistory;
 use App\Models\Remark;
@@ -240,7 +241,7 @@ class DocumentController extends Controller
     public function store(Request $request)
     {
        try {
-            $document_code = $this->generateDocumentNumber();
+            $document_code = $request->document_code != ''? $request->document_code : $this->generateDocumentNumber();
             DB::transaction(function () use ($request,$document_code) {
                 $documentDetail = DocumentDetail::create([
                     'user_id'           => auth()->user()->id,
@@ -255,6 +256,8 @@ class DocumentController extends Controller
                     // 'transaction_type'  =>  1, // to identify if simple, complex, highly technical
                     // 'is_verified'       => false // used to check if na verified na ba ni DM
                 ]);
+
+                GeneratedCode::where('document_code', $document_code)->delete();
 
                 $remark = Remark::create([
                     'remarks'   => $request->remarks,
@@ -304,7 +307,7 @@ class DocumentController extends Controller
     }
 
     function documentNumberExists($code){
-        return DocumentDetail::where('document_code',$code)->exists();
+        return DocumentDetail::where('document_code',$code)->exists() || GeneratedCode::where('document_code',$code)->exists();
     }
 
     /**
@@ -462,6 +465,17 @@ class DocumentController extends Controller
         }
 
         return $object;
+    }
+
+    public function generateCode() {
+        $document_code = $this->generateDocumentNumber();
+
+        GeneratedCode::create([
+            'document_code' => $document_code,
+        ]);
+
+        Alert::success($document_code, 'Code Generated Successfully');
+        return redirect()->back();
     }
 }
 

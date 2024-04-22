@@ -46,9 +46,13 @@
                 </div>
                 <div class="card-body">
                     @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1)
-                    <div class="d-flex flex-row-reverse">
+                    <div class="d-flex flex-row-reverse gap-2">
                         <button class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#myModal">Create
                             Documents</button>
+                        <form action="{{ route('document.generateCode') }}" method="get">
+                            @csrf
+                            <button class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light" data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i> Generate Code</button>
+                        </form>
                     </div>
                     <div class="modal" id="myModal">
                         <div class="modal-dialog">
@@ -71,6 +75,16 @@
                                                             style="width: 4em; height: 2em;">
                                                     </div>
                                                 </div> --}}
+
+
+                                                <x-form.input :$errors data="{
+                                                    'input_name'  : 'document_code',
+                                                    'label'       : 'Document Code',
+                                                    'type'        : 'text',
+                                                    'is_required' : false,
+                                                    'placeholder' : '******',
+                                                    'small'        : 'Leave empty if you dont have document code'}" />
+
                                                 <div class="form-group">
                                                     <label class="form-label" for="category_id"><b>Document Type
                                                         </b></label>
@@ -309,6 +323,7 @@
         </div>
     </div>
 </div>
+
 <script>
     $(document).ready(function () {
         var id = $("#getID").val();

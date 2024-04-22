@@ -52,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/destroy/{id}', [DocumentController::class, 'destroy'])->name('document.destroy');
         Route::get('/getDocument/{id}', [DocumentController::class, 'getDocument'])->name('document.getDocument');
         Route::get('/dm', [DocumentController::class, 'decision_maker'])->name('document.decision_maker');
+        Route::get('/generateCode', [DocumentController::class, 'generateCode'])->name('document.generateCode');
+
 
         Route::resources([ 'document_category' => DocumentCategoryController::class ]);
     });
