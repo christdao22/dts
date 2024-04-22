@@ -90,8 +90,8 @@
                                     {{ Str::ucfirst(strtolower(Str::substr($documentTracking->user->middle_name, 0, 1))) }}.
                                     {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}</td>
                                 <td>{{ strtoupper($documentTracking->terminal->terminal_name) }}</td>
-                                <td>{{ $documentTracking->documentDetail->created_at }}</i></td>
-                                <td>{{ $documentTracking->created_at }}</i></td>
+                                <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</i></td>
+                                <td>{{ formatDateTime($documentTracking->created_at) }}</i></td>
                                 <td>{{ $documentTracking->remark->remarks }}</i></td>
                                 <td>
                                     <a class="btn btn-info"

@@ -61,7 +61,6 @@
                                             title="Action"></i></th>
                             </tr>
                         </thead>
-
                         <tbody>
                             @foreach ($terminals as $terminal)
                             <tr>

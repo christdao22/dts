@@ -23,14 +23,18 @@
     }
 
     td:nth-child(5) {
-        width: 20%;
-    }
-
-    td:nth-child(6) {
         width: 15%;
     }
 
+    td:nth-child(6) {
+        width: 10%;
+    }
+
     td:nth-child(7) {
+        width: 10%;
+    }
+
+    td:nth-child(8) {
         width: 10%;
     }
 
@@ -49,10 +53,10 @@
                         <thead>
                             <tr>
                                 <th>CODE</th>
-                                <th>NAME OF CLIENT</th>
+                                <th>CLIENT NAME</th>
+                                <th>DETAILS</th>
                                 <th>FORWARDED BY</th>
                                 <th>DATE/TIME</th>
-                                <th>DETAILS</th>
                                 <th>REMARKS</th>
                                 <th><i class=" ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top"
                                         title="Action"></i></th>
@@ -62,9 +66,13 @@
                         <tbody>
                             @foreach ($documentTrackings as $documentTracking)
                             <tr>
-                                <td><strong class="text-uppercase">{{ $documentTracking->documentDetail->document_code }}</strong></td>
+                                <td><strong>{{ $documentTracking->documentDetail->document_code }}</strong></td>
                                 
                                 <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
+
+                                <td>{{ $documentTracking->documentDetail->document_category_id != null?
+                                    $documentTracking->documentDetail->document_category->category_name : "<b>Others:
+                                    </b>" . $documentTracking->documentDetail->type }} <br> {{ $documentTracking->documentDetail->description }}</td>
                                 <td>
                                     {{ $documentTracking->user->is_admin? 'Admin' : strtoupper($documentTracking->user->terminal->terminal_name) }}<br>-
                                     {{ Str::ucfirst(strtolower($documentTracking->user->first_name)) }}
@@ -72,9 +80,6 @@
                                     {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}
                                 </td>
                                 <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</td>
-                                <td><strong>{{ $documentTracking->documentDetail->document_category_id != null?
-                                    $documentTracking->documentDetail->document_category->category_name : "<b>Others:
-                                    </b>" . $documentTracking->documentDetail->type }}</strong> <br> -{{ $documentTracking->documentDetail->description }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
                                 <td class="d-flex gap-1">
                                     <button class="ri ri-eye-fill btn btn-warning" data-bs-toggle="modal"

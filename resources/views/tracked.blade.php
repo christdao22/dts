@@ -78,7 +78,6 @@
                         </ol>
                     </div>
                 </div>
-
                 <div class="row justify-content-center" >
                     <div class="col-md-12">
                         <div class="card">
@@ -103,7 +102,7 @@
                                 </form>
                                 @if (isset($documentTraces))
                                 <div style="margin-top: 25px;">
-                                    Document Type: <b>{!! $documentDetail->document_category_id != null? $ $documentDetail->document_category->category_name : "<b>Others: </b>" . $documentDetail->type !!}</b>
+                                    Document Type: <b>{!! $documentDetail->document_category_id != null? $documentDetail->document_category->category_name : "<b>Others: </b>" . $documentDetail->type !!}</b>
                                     <br>
                                     Name of Client: <b>{{ $documentDetail->name_of_client }}</b>
                                     <br>
@@ -119,13 +118,17 @@
                                         <div class="cd-timeline-content">
                                             <h3>{{ strtoupper($documentTrace->status) }}</h3>
                                             <p class="mb-0 text-muted font-14">at
-                                                {{ strtoupper(isset($documentTracking->terminal->terminal_name)?$documentTracking->terminal->terminal_name:'')  }}
+                                                {{ strtoupper(isset($documentTrace->user->terminal->terminal_name)?$documentTrace->user->terminal->terminal_name:'')  }}
                                             </p>
                                             <p class="mb-0 text-muted font-14">by
                                                 {{ Str::ucfirst($documentTrace->user->first_name) }}
                                                 {{ strtoupper(substr($documentTrace->user->middle_name,0,1)) }}.
-                                                {{ ucfirst($documentTrace->user->last_name) }} </p>
-                                            <span class="cd-date">{{ $documentTrace->created_at }}</span>
+                                                {{ ucfirst($documentTrace->user->last_name) }} 
+                                            </p>
+                                            <p class="mt-3">{!! isset($documentTrace->remark->remarks) ? '<b>Remarks: </b>' .
+                                                $documentTrace->remark->remarks : '' !!}
+                                            </p>
+                                            <span class="cd-date">{{ formatDateTime($documentTrace->created_at) }}</span>
                                         </div> <!-- cd-timeline-content -->
                                     </div> <!-- cd-timeline-block -->
                                     @endforeach
@@ -149,7 +152,7 @@
                                                 {{ strtoupper(substr($documentTracking->user->middle_name,0,1)) }}.
                                                 {{ ucfirst($documentTracking->user->last_name) }} </p>
                                             {{-- <button type="button" class="btn btn-primary btn-rounded waves-effect waves-light m-t-5">See more detail</button> --}}
-                                            <span class="cd-date">{{ $documentTracking->updated_at }}</span>
+                                            <span class="cd-date">{{ formatDateTime($documentTracking->updated_at) }}</span>
                                         </div> <!-- cd-timeline-content -->
                                     </div> <!-- cd-timeline-block -->
 
@@ -165,7 +168,7 @@
                                                 {{ strtoupper(isset($documentTracking->terminal->terminal_name)?$documentTracking->terminal->terminal_name:'')  }}
                                             </p>
                                             {{-- <button type="button" class="btn btn-primary btn-rounded waves-effect waves-light m-t-5">See more detail</button> --}}
-                                            <span class="cd-date">{{ $documentTracking->updated_at }}</span>
+                                            <span class="cd-date">{{ formatDateTime($documentTracking->updated_at) }}</span>
                                         </div> <!-- cd-timeline-content -->
                                     </div> <!-- cd-timeline-block -->
                                     @endif

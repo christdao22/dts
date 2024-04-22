@@ -23,7 +23,7 @@ class DocumentController extends Controller
      */
     function find(Request $request){
       try {
-            $search_text = $request->input('query');
+            $search_text = $request->input('query'); 
 
             $documentDetail = DocumentDetail::with('document_category')->where('document_code',$search_text)->first();
             if($documentDetail){
@@ -72,7 +72,7 @@ class DocumentController extends Controller
                 return view('tracked');
           }
 
-
+        //   dd($documentTraces);
            return view('tracked',compact('documentTraces','documentTracking','documentDetail'));
         }
 
@@ -113,7 +113,7 @@ class DocumentController extends Controller
 
         $terminals = Terminal::whereHas('user', function($query) {
             return $query->where('is_active', 1);
-        })->get();
+        })->orderBy('terminal_name')->get();
 
         $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
         if($terminal != null){
@@ -122,7 +122,7 @@ class DocumentController extends Controller
             ->with('user','documentDetail', 'remark');
 
             $documentTrackings = $this->filter($request, $documentTrackings);
-            $documentTrackings = $documentTrackings->get();
+            $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
         }
 
         return view('document.received',compact('documentTrackings', 'terminals', 'filters'));
@@ -132,7 +132,6 @@ class DocumentController extends Controller
     {
        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
-
         $documentTrackings = [];
         $terminal = Terminal::where('user_id', auth()->user()->id)->first();
 
@@ -144,6 +143,8 @@ class DocumentController extends Controller
 
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->get();
+
+        
 
         return view('document.incoming',compact('documentTrackings', 'filters'));
     }
@@ -167,9 +168,9 @@ class DocumentController extends Controller
     {
        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
-        $documentTrackings = Outgoing::with('user.terminal','documentDetail', 'terminal', 'remark');
+        $documentTrackings = Outgoing::with('user.terminal','documentDetail', 'terminal', 'remark')->where('user_id', auth()->user()->id);
         $documentTrackings = $this->filter($request, $documentTrackings);
-        $documentTrackings = $documentTrackings->get();
+        $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
 
         $documentTrackings->filter(function ($o){
             return $o->user->office_id == auth()->user()->office_id;
@@ -188,7 +189,7 @@ class DocumentController extends Controller
             ->with('remark', 'documentDetail', 'user');
 
             $documentTrackings = $this->filter($request, $documentTrackings);
-            $documentTrackings = $documentTrackings->get();
+            $documentTrackings = $documentTrackings->orderBy('updated_at', 'desc')->get();
         }
 
        // ** use to get the data for filters dropdown
@@ -227,11 +228,11 @@ class DocumentController extends Controller
             });
         }
 
-        $documents = $documents->get()->sortBy('created_by');
+        $documents = $documents->orderBy('created_at', 'desc')->get();
 
         $terminals = Terminal::whereHas('user', function($query) {
             return $query->where('is_active', 1);
-        })->get();
+        })->orderBy('terminal_name')->get();
 
         $categories = DocumentCategory::get()->sortBy('category_name');
 
@@ -333,6 +334,10 @@ class DocumentController extends Controller
                     // $documentDetail->is_check_by_dm = $request->is_check_by_dm == 'on';
                     $documentDetail->save();
 
+                    $documentTrace = DocumentTrace::where('document_detail_id', '=', $id)->latest()->first();
+                    $documentTrace->remark_id = $remark->id;
+                    $documentTrace->save();
+
                     Outgoing::create([
                         'document_detail_id' => $documentTracking->id,
                         'user_id'            => auth()->user()->id,
@@ -351,6 +356,7 @@ class DocumentController extends Controller
                     DocumentTrace::create([
                         'user_id'            => auth()->user()->id,
                         'document_detail_id' => $documentTracking->id,
+                        // 'remark_id'          => $remark->id
                     ]);
 
                     ReceivedHistory::create([
