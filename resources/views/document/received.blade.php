@@ -142,7 +142,7 @@
                                                 </option>
                                                 @foreach ($terminals as $terminal)
                                                 <option value="{{ $terminal->id }}">
-                                                    {{ $terminal->terminal_name }}</option>
+                                                    {!! strtoupper($terminal->terminal_name) !!} - {!! ucfirst(strtolower($terminal->user->first_name)) !!} {!! ucfirst(strtolower($terminal->user->last_name)) !!}</option>
                                                 @endforeach
                                             </select>
                                         </div>

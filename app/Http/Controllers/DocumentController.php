@@ -111,7 +111,7 @@ class DocumentController extends Controller
        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
 
-        $terminals = Terminal::whereHas('user', function($query) {
+        $terminals = Terminal::with('user')->whereHas('user', function($query) {
             return $query->where('is_active', 1);
         })->orderBy('terminal_name')->get();
 
