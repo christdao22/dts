@@ -126,9 +126,10 @@
                                                         <option value="" disabled selected>Select recipient
                                                         </option>
                                                         @foreach ($terminals as $terminal)
-                                                        <option value="{{ $terminal->id }}"
+                                                        <option class="text-uppercase" value="{{ $terminal->id }}"
                                                             {{ old('terminal') == $terminal->id? 'selected':'' }}>
-                                                            {{ $terminal->terminal_name }}</option>
+                                                            {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }} {{ $terminal->user->last_name }}
+                                                        </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -245,7 +246,6 @@
             </div>
         </div>
     </div>
-
     {{-- Edit Modal --}}
     <div class="modal" id="editModal">
         <div class="modal-dialog">
@@ -302,9 +302,9 @@
                                 <select name="terminal_id" id="editTerminal_id" class="form-select" required>
                                     <option value="" disabled selected>Select recipient </option>
                                     @foreach ($terminals as $terminal)
-                                    <option value="{{ $terminal->id }}"
-                                        {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
-                                        {{ $terminal->terminal_name }}</option>
+                                    <option value="{{ $terminal->id }}" {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
+                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }} {{ $terminal->user->last_name }}
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>
