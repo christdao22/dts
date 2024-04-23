@@ -23,7 +23,7 @@ class DocumentController extends Controller
      */
     function find(Request $request){
       try {
-            $search_text = $request->input('query'); 
+            $search_text = $request->input('query');
 
             $documentDetail = DocumentDetail::with('document_category')->where('document_code',$search_text)->first();
             if($documentDetail){
@@ -144,7 +144,7 @@ class DocumentController extends Controller
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->get();
 
-        
+
 
         return view('document.incoming',compact('documentTrackings', 'filters'));
     }
@@ -230,7 +230,7 @@ class DocumentController extends Controller
 
         $documents = $documents->orderBy('created_at', 'desc')->get();
 
-        $terminals = Terminal::whereHas('user', function($query) {
+        $terminals = Terminal::with('user')->whereHas('user', function($query) {
             return $query->where('is_active', 1);
         })->orderBy('terminal_name')->get();
 
@@ -480,7 +480,7 @@ class DocumentController extends Controller
             'document_code' => $document_code,
         ]);
 
-        Alert::success($document_code, 'Code Generated Successfully');
+        Alert::success($document_code, 'Code Generated Successfully')->persistent('Dismiss');
         return redirect()->back();
     }
 }

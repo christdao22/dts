@@ -51,7 +51,7 @@
                             Documents</button>
                         <form action="{{ route('document.generateCode') }}" method="get">
                             @csrf
-                            <button class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light" data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i> Generate Code</button>
+                            <button title="This button generates a code if you need to get the code first and then add it later if youre ready to create document" class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light" data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i> Generate Code</button>
                         </form>
                     </div>
                     <div class="modal" id="myModal">
@@ -126,9 +126,10 @@
                                                         <option value="" disabled selected>Select recipient
                                                         </option>
                                                         @foreach ($terminals as $terminal)
-                                                        <option value="{{ $terminal->id }}"
+                                                        <option class="text-uppercase" value="{{ $terminal->id }}"
                                                             {{ old('terminal') == $terminal->id? 'selected':'' }}>
-                                                            {{ $terminal->terminal_name }}</option>
+                                                            {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }} {{ $terminal->user->last_name }}
+                                                        </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -245,7 +246,6 @@
             </div>
         </div>
     </div>
-
     {{-- Edit Modal --}}
     <div class="modal" id="editModal">
         <div class="modal-dialog">
@@ -302,9 +302,9 @@
                                 <select name="terminal_id" id="editTerminal_id" class="form-select" required>
                                     <option value="" disabled selected>Select recipient </option>
                                     @foreach ($terminals as $terminal)
-                                    <option value="{{ $terminal->id }}"
-                                        {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
-                                        {{ $terminal->terminal_name }}</option>
+                                    <option value="{{ $terminal->id }}" {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
+                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }} {{ $terminal->user->last_name }}
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>
