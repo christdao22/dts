@@ -126,9 +126,9 @@
                                                         <option value="" disabled selected>Select recipient
                                                         </option>
                                                         @foreach ($terminals as $terminal)
-                                                        <option class="text-uppercase" value="{{ $terminal->id }}"
+                                                        <option value="{{ $terminal->id }}"
                                                             {{ old('terminal') == $terminal->id? 'selected':'' }}>
-                                                            {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }} {{ $terminal->user->last_name }}
+                                                            {!! strtoupper($terminal->terminal_name) !!} - {!! ucfirst(strtolower($terminal->user->first_name)) !!} {!! ucfirst(strtolower($terminal->user->last_name)) !!}
                                                         </option>
                                                         @endforeach
                                                     </select>
