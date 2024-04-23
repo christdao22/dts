@@ -51,7 +51,7 @@
                             Documents</button>
                         <form action="{{ route('document.generateCode') }}" method="get">
                             @csrf
-                            <button class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light" data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i> Generate Code</button>
+                            <button title="This button generates a code for you to obtain first and then add it when you're ready to create a document." class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light" data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i> Generate Code</button>
                         </form>
                     </div>
                     <div class="modal" id="myModal">

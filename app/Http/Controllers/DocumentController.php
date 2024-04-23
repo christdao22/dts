@@ -480,7 +480,7 @@ class DocumentController extends Controller
             'document_code' => $document_code,
         ]);
 
-        Alert::success($document_code, 'Code Generated Successfully');
+        Alert::success($document_code, 'Code Generated Successfully')->persistent('Dismiss');
         return redirect()->back();
     }
 }
