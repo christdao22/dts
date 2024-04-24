@@ -170,7 +170,9 @@ class DocumentController extends Controller
     public function outgoing(Request $request)
     {
         // ** use to get the data for filters dropdown
-        $terminals = Terminal::get();
+        $terminals = Terminal::with('user')->whereHas('user', function ($query) {
+            return $query->where('is_active', 1);
+        })->orderBy('terminal_name')->get();
         $filters = $this->getFilters();
         $documentTrackings = Outgoing::with('user.terminal', 'documentDetail.documentTracking', 'terminal', 'remark')->where('user_id', auth()->user()->id);
         $documentTrackings = $this->filter($request, $documentTrackings);
@@ -186,7 +188,9 @@ class DocumentController extends Controller
     public function completed(Request $request)
     {
         $documentTrackings = [];
-        $terminals = Terminal::get();
+        $terminals = Terminal::with('user')->whereHas('user', function ($query) {
+            return $query->where('is_active', 1);
+        })->orderBy('terminal_name')->get();
         $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
         if ($terminal != null) {
             $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
