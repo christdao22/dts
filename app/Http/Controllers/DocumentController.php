@@ -483,6 +483,34 @@ class DocumentController extends Controller
         Alert::success($document_code, 'Code Generated Successfully')->persistent('Dismiss');
         return redirect()->back();
     }
+
+    public function undoActionComplete(Request $request, string $id) {
+        $documentDetail = DocumentDetail::FindOrFail($id);
+
+        $documentTrace = DocumentTrace::where('document_detail_id', $documentDetail->id)->latest()->first();
+        $documentTrace->status = 'received';
+        $documentTrace->save();
+
+        $documentTracking = DocumentTracking::FindOrFail($documentDetail->id);
+        $documentTracking->status = 'incoming';
+        $documentTracking->user_id = $documentTrace->user_id;
+        $documentTracking->terminal_id = $request->terminal_id;
+        $documentTracking->save();
+
+        $remark = Remark::FindOrFail($documentTracking->remark_id);
+        $remark->remarks = $request->remarks;
+        $remark->save();
+
+        Outgoing::create([
+            'document_detail_id' => $documentTracking->id,
+            'user_id'            => $documentTrace->user_id,
+            'terminal_id'        => $request->terminal_id,
+            'remark_id'          => $remark->id
+        ]);
+
+        Alert::success('Forwarded Successfully', '');
+        return redirect()->back();
+    }
 }
 
 
