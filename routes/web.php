@@ -54,6 +54,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dm', [DocumentController::class, 'decision_maker'])->name('document.decision_maker');
         Route::get('/generateCode', [DocumentController::class, 'generateCode'])->name('document.generateCode');
         Route::patch('/undoActionComplete/{id}', [DocumentController::class, 'undoActionComplete'])->name('document.undoActionComplete');
+        Route::patch('/changeForward/{id}', [DocumentController::class, 'changeForward'])->name('document.changeForward');
 
         Route::resources([ 'document_category' => DocumentCategoryController::class ]);
     });

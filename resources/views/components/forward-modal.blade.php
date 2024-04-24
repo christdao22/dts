@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="forwardModalLabel">Document Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('document.undoActionComplete', $documentTracking->documentDetail->id) }}" method="POST"
+            <form action="{{ route($routeName, $documentTracking->documentDetail->id) }}" method="POST"
                 enctype="multipart/form-data">
                 @method('PATCH')
                 @csrf

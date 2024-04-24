@@ -8,12 +8,13 @@ use Illuminate\View\Component;
 
 class ForwardModal extends Component
 {
-    public $documentTracking, $terminals;
+    public $documentTracking, $terminals, $routeName;
 
-    public function __construct($documentTracking, $terminals)
+    public function __construct($documentTracking, $terminals, $routeName)
     {
         $this->documentTracking = $documentTracking;
         $this->terminals = $terminals;
+        $this->routeName = $routeName;
     }
 
     /**

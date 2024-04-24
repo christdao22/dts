@@ -81,12 +81,12 @@
                                     {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}</td>
                                 <td>{{ formatDateTime($documentTracking->documentDetail->updated_at) }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
-                                <td class="d-flex gap-2">
+                                <td class="d-flex gap-1">
                                     @if (auth()->user()->is_admin)
-                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                        <button type="button" class="btn btn-warning text-white" data-bs-toggle="modal"
                                         data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
-                                            class="ri ri-edit-line" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Show"></i></button>
+                                            class="ri-arrow-left-right-fill" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Change"></i></button>
                                     @endif
                                     <a class="btn btn-info"
                                         href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
@@ -94,7 +94,7 @@
                                             title="Track"></i></a>
                                 </td>
                             </tr>
-                            <x-forward-modal :$documentTracking :$terminals/>
+                            <x-forward-modal :$documentTracking :$terminals routeName='document.undoActionComplete'/>
                             @endforeach
                         </tbody>
                     </table>

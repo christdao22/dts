@@ -63,7 +63,7 @@
                             @foreach ($documentTrackings as $documentTracking)
                             <tr>
                                 <td><strong class="text-uppercase">{{ $documentTracking->documentDetail->document_code }}</strong></td>
-                                
+
                                 <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
                                 <td>
                                     {{ $documentTracking->user->is_admin? 'Admin' : strtoupper($documentTracking->user->terminal->terminal_name) }}<br>-
@@ -72,9 +72,8 @@
                                     {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}
                                 </td>
                                 <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</td>
-                                <td><strong>{{ $documentTracking->documentDetail->document_category_id != null?
-                                    $documentTracking->documentDetail->document_category->category_name : "<b>Others:
-                                    </b>" . $documentTracking->documentDetail->type }}</strong> <br> -{{ $documentTracking->documentDetail->description }}</td>
+                                <td><strong>{!! $documentTracking->documentDetail->document_category_id != null?
+                                    $documentTracking->documentDetail->document_category->category_name : "Others:" . $documentTracking->documentDetail->type !!}</strong> <br> - {{ $documentTracking->documentDetail->description }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
                                 <td class="d-flex gap-1">
                                     <button class="ri ri-eye-fill btn btn-warning" data-bs-toggle="modal"

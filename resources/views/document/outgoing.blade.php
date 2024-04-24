@@ -93,13 +93,20 @@
                                 <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</i></td>
                                 <td>{{ formatDateTime($documentTracking->created_at) }}</i></td>
                                 <td>{{ $documentTracking->remark->remarks }}</i></td>
-                                <td>
+                                <td class="d-flex gap-2">
+                                    @if ($documentTracking->documentDetail->documentTracking->status == 'incoming' && $documentTrackings->first()->id == $documentTracking->id)
+                                        <button type="button" class="btn btn-warning text-white" data-bs-toggle="modal"
+                                        data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
+                                            class="ri-arrow-left-right-fill" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Change"></i></button>
+                                    @endif
                                     <a class="btn btn-info"
                                         href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
                                             class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="Track"></i></a>
                                 </td>
                             </tr>
+                            <x-forward-modal :$documentTracking :$terminals routeName='document.changeForward'/>
                             @endforeach
                         </tbody>
                     </table>
