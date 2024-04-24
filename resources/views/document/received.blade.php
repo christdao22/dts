@@ -39,7 +39,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header w-100">
-                    <x-filter :$filters route='document.received'/>
+                    <x-filter :$filters route='document.received' />
                 </div>
                 <div class="card-body">
                     <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
@@ -65,7 +65,9 @@
                                     $documentTracking->documentDetail->document_category->category_name : "<b>Others:
                                     </b>" . $documentTracking->documentDetail->type
                                     !!}</td>
-                                <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
+                                <td>{{ $documentTracking->documentDetail->name_of_client }} <br>
+                                    {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}
+                                </td>
                                 <td>{{ $documentTracking->documentDetail->description }}</td>
                                 <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
@@ -123,99 +125,95 @@
                                                         <p class="form-label"> <b>Remarks:</b>
                                                             {{ $documentTracking->remark->remarks }} </p>
                                                     </div>
-                                                    {{-- <div class="form-check form-switch ps-0 mb-2">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <label class="form-check-label"
-                                                                for="is_check_by_dm_{{ $documentTracking->id }}">Forward
-                                                    to the Decision Maker?</label>
-                                                    <input class="form-check-input" type="checkbox"
-                                                        name="is_check_by_dm"
-                                                        id="is_check_by_dm_{{ $documentTracking->id }}"
-                                                        style="width: 4em; height: 2em;">
+                                                    <div class="mb-4" id="secondary-select-container">
+                                                        <label class="form-label"><b>Forward: </b></label>
+                                                        <select name="terminal_id" class="form-control" required
+                                                            id="terminal_{{ $documentTracking->id }}">
+                                                            <option value="" selected="true" disabled>Select...
+                                                            </option>
+                                                            @foreach ($terminals as $terminal)
+                                                            <option value="{{ $terminal->id }}">
+                                                                {!! strtoupper($terminal->terminal_name) !!} - {!!
+                                                                ucfirst(strtolower($terminal->user->first_name)) !!} {!!
+                                                                ucfirst(strtolower($terminal->user->last_name)) !!}
+                                                            </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-4">
+                                                        <label class="form-label" for="remarks">Remarks</label>
+                                                        <textarea name="remarks" id="remarks" cols="30" rows="5"
+                                                            class="form-control">{{ old('remarks') }}</textarea>
+                                                    </div>
+                                                    <input type="text" value="incoming" name="status"
+                                                        class="form-control" hidden>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-success">Forward</button>
+                                                    </div>
                                                 </div>
-                                        </div> --}}
-                                        <div class="mb-4" id="secondary-select-container">
-                                            <label class="form-label"><b>Forward: </b></label>
-                                            <select name="terminal_id" class="form-control" required
-                                                id="terminal_{{ $documentTracking->id }}">
-                                                <option value="" selected="true" disabled>Select...
-                                                </option>
-                                                @foreach ($terminals as $terminal)
-                                                <option value="{{ $terminal->id }}">
-                                                    {!! strtoupper($terminal->terminal_name) !!} - {!! ucfirst(strtolower($terminal->user->first_name)) !!} {!! ucfirst(strtolower($terminal->user->last_name)) !!}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label" for="remarks">Remarks</label>
-                                            <textarea name="remarks" id="remarks" cols="30" rows="5"
-                                                class="form-control">{{ old('remarks') }}</textarea>
-                                        </div>
-                                        <input type="text" value="incoming" name="status" class="form-control" hidden>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-success">Forward</button>
+                                            </form>
                                         </div>
                                     </div>
-                                    </form>
                                 </div>
-                </div>
-            </div>
 
-            {{-- Confirm Complete Modal --}}
-            <div class="modal fade" id="completeModal-{{ $documentTracking->id }}" tabindex="-1"
-                aria-labelledby="completeModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="completeModalLabel">Complete this process?
-                            </h4>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form action="{{ route('document.update' ,$documentTracking->id) }}" method="POST"
-                            enctype="multipart/form-data">
-                            @method('PATCH')
-                            @csrf
-                            <div class="modal-body">
-                                <div class="mb-2">
-                                    <p class="form-label"><b>Type:</b>
-                                        {{ $documentTracking->documentDetail->type }}</p>
-                                    <p class="form-label"> <b>Document Code:</b>
-                                        {{ $documentTracking->documentDetail->document_code }}
-                                    </p>
-                                    <p class="form-label"> <b>Name of Client:</b>
-                                        {{ $documentTracking->documentDetail->name_of_client }}
-                                    </p>
-                                    <p class="form-label"> <b>Description:</b>
-                                        {{ $documentTracking->documentDetail->description }}</p>
-                                    <p class="form-label"> <b>Remarks:</b>
-                                        {{ $documentTracking->remark->remarks }} </p>
+                                {{-- Confirm Complete Modal --}}
+                                <div class="modal fade" id="completeModal-{{ $documentTracking->id }}" tabindex="-1"
+                                    aria-labelledby="completeModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="completeModalLabel">Complete this process?
+                                                </h4>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <form action="{{ route('document.update' ,$documentTracking->id) }}"
+                                                method="POST" enctype="multipart/form-data">
+                                                @method('PATCH')
+                                                @csrf
+                                                <div class="modal-body">
+                                                    <div class="mb-2">
+                                                        <p class="form-label"><b>Type:</b>
+                                                            {{ $documentTracking->documentDetail->type }}</p>
+                                                        <p class="form-label"> <b>Document Code:</b>
+                                                            {{ $documentTracking->documentDetail->document_code }}
+                                                        </p>
+                                                        <p class="form-label"> <b>Name of Client:</b>
+                                                            {{ $documentTracking->documentDetail->name_of_client }}
+                                                        </p>
+                                                        <p class="form-label"> <b>Description:</b>
+                                                            {{ $documentTracking->documentDetail->description }}</p>
+                                                        <p class="form-label"> <b>Remarks:</b>
+                                                            {{ $documentTracking->remark->remarks }} </p>
+                                                    </div>
+                                                    <div class="mb-4">
+                                                        <label class="form-label" for="remarks">Remarks</label>
+                                                        <textarea name="remarks" id="remarks" cols="30" rows="5"
+                                                            class="form-control">{{ old('remarks') }}</textarea>
+                                                    </div>
+                                                    <input type="text" value="completed" name="status"
+                                                        class="form-control" hidden>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit"
+                                                            class="btn btn-success">Complete/Release</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="mb-4">
-                                    <label class="form-label" for="remarks">Remarks</label>
-                                    <textarea name="remarks" id="remarks" cols="30" rows="5"
-                                        class="form-control">{{ old('remarks') }}</textarea>
-                                </div>
-                                <input type="text" value="completed" name="status" class="form-control" hidden>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-success">Complete/Release</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            </tr>
-            @endforeach
-            </tbody>
-            </table>
         </div>
-    </div>
-</div>
-</div> <!-- end col -->
+    </div> <!-- end col -->
 </div> <!-- end row -->
 <script>
     $(document).ready(function () {

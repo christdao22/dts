@@ -43,7 +43,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header w-100">
-                    <x-filter :$filters route='document.completed'/>
+                    <x-filter :$filters route='document.completed' />
                 </div>
                 <div class="card-body">
                     <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
@@ -57,7 +57,7 @@
                                 <th>FORWARDED BY</th>
                                 <th>DATE/TIME COMPLETED</th>
                                 <th>REMARKS</th>
-                                <th><i class=" ri-settings-2-line"  data-bs-toggle="tooltip" data-bs-placement="top"
+                                <th><i class=" ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top"
                                         title="Action"></i></th>
                             </tr>
                         </thead>
@@ -67,9 +67,12 @@
                             <tr>
                                 <td><strong>{{ $documentTracking->documentDetail->document_code }}</strong></td>
                                 <td>{!! $documentTracking->documentDetail->document_category_id != null?
-                                    $documentTracking->documentDetail->document_category->category_name : "<b>Others: </b>" . $documentTracking->documentDetail->type
+                                    $documentTracking->documentDetail->document_category->category_name : "<b>Others:
+                                    </b>" . $documentTracking->documentDetail->type
                                     !!}</td>
-                                <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
+                                <td>{{ $documentTracking->documentDetail->name_of_client }} <br>
+                                    {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}
+                                </td>
                                 <td>{{ $documentTracking->documentDetail->description }}</td>
                                 <td>
                                     {{ $documentTracking->user->is_admin? 'Admin' : strtoupper($documentTracking->user->terminal->terminal_name) }}<br>-
@@ -78,11 +81,20 @@
                                     {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}</td>
                                 <td>{{ formatDateTime($documentTracking->documentDetail->updated_at) }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
-                                <td>
-                                    <a class="btn btn-info" href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
+                                <td class="d-flex gap-2">
+                                    @if (auth()->user()->is_admin)
+                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
+                                            class="ri ri-edit-line" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Show"></i></button>
+                                    @endif
+                                    <a class="btn btn-info"
+                                        href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
+                                            class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="Track"></i></a>
                                 </td>
                             </tr>
+                            <x-forward-modal :$documentTracking :$terminals/>
                             @endforeach
                         </tbody>
                     </table>
@@ -93,5 +105,5 @@
     </div> <!-- end col -->
 </div> <!-- end row -->
 
-</div>
+
 @endsection
