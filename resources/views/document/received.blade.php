@@ -39,7 +39,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header w-100">
-                    <x-filter :$filters route='document.received' />
+                    <x-filter :$filters route='document.received'/>
                 </div>
                 <div class="card-body">
                     <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
