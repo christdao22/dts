@@ -76,9 +76,9 @@
                                     $documentTracking->documentDetail->document_category->category_name : "Others:" . $documentTracking->documentDetail->type !!}</strong> <br> - {{ $documentTracking->documentDetail->description }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
                                 <td class="d-flex gap-1">
-                                    <button class="ri ri-eye-fill btn btn-warning" data-bs-toggle="modal"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Show"
-                                        data-bs-target="#myModal-{{ $documentTracking->id }}"></button>
+                                    <button class="btn btn-warning text-white" data-bs-toggle="modal"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Forward"
+                                        data-bs-target="#myModal-{{ $documentTracking->id }}"><i class="ri-share-forward-2-fill"></i></button>
                                     <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
                                         title="Track"
                                         href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
