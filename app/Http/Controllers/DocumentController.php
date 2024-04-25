@@ -135,17 +135,24 @@ class DocumentController extends Controller
     {
         // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
+
         $documentTrackings = [];
-        $terminal = Terminal::where('user_id', auth()->user()->id)->first();
+       if(!auth()->user()->is_admin) {
+            $terminal = Terminal::where('user_id', auth()->user()->id)->first();
 
-        if ($terminal == null) {
-            return view('document.incoming', compact('documentTrackings'));
+            if ($terminal == null) {
+                return view('document.incoming', compact('documentTrackings'));
+            }
+
+            $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
+                ->where('status', 'incoming')
+                ->with('user', 'documentDetail.document_category', 'remark');
+
+        } else {
+            $documentTrackings = DocumentTracking::where('status', 'incoming')
+                ->with('user', 'documentDetail.document_category', 'remark');
         }
-
-        $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
-            ->where('status', 'incoming')
-            ->with('user', 'documentDetail.document_category', 'remark');
-
+        
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->get();
 
@@ -191,15 +198,23 @@ class DocumentController extends Controller
         $terminals = Terminal::with('user')->whereHas('user', function ($query) {
             return $query->where('is_active', 1);
         })->orderBy('terminal_name')->get();
-        $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
-        if ($terminal != null) {
-            $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
-                ->where('status', 'completed')
-                ->with('remark', 'documentDetail', 'user');
 
-            $documentTrackings = $this->filter($request, $documentTrackings);
-            $documentTrackings = $documentTrackings->orderBy('updated_at', 'desc')->get();
+        if(!auth()->user()->is_admin){
+            $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
+
+            if ($terminal != null) {
+                $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
+                    ->where('status', 'completed')
+                    ->with('remark', 'documentDetail', 'user');
+            }
+
+        } else {
+            $documentTrackings = DocumentTracking::where('status', 'completed')
+            ->with('remark', 'documentDetail', 'user');
         }
+
+        $documentTrackings = $this->filter($request, $documentTrackings);
+        $documentTrackings = $documentTrackings->orderBy('updated_at', 'desc')->get();
 
         // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
