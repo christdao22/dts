@@ -44,7 +44,7 @@ function incomingTotal()
 function outgoingTotal()
 {
     $total = Outgoing::with('user')->get()->filter(function($o){
-                    return $o->user->office_id == auth()->user()->office_id;
+                    return $o->user->id == auth()->user()->id;
                 })->count();
     return $total;
 }
