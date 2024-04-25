@@ -41,7 +41,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header w-100">
-                    <x-filter :$filters route='document.incoming'/>
+                    <x-filter :$filters route='document.incoming' />
                 </div>
                 <div class="card-body">
                     <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
@@ -62,9 +62,13 @@
                         <tbody>
                             @foreach ($documentTrackings as $documentTracking)
                             <tr>
-                                <td><strong class="text-uppercase">{{ $documentTracking->documentDetail->document_code }}</strong></td>
+                                <td><strong
+                                        class="text-uppercase">{{ $documentTracking->documentDetail->document_code }}</strong>
+                                </td>
 
-                                <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
+                                <td>{{ $documentTracking->documentDetail->name_of_client }} <br>
+                                    {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}
+                                </td>
                                 <td>
                                     {{ $documentTracking->user->is_admin? 'Admin' : strtoupper($documentTracking->user->terminal->terminal_name) }}<br>-
                                     {{ Str::ucfirst(strtolower($documentTracking->user->first_name)) }}
@@ -73,12 +77,16 @@
                                 </td>
                                 <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</td>
                                 <td><strong>{!! $documentTracking->documentDetail->document_category_id != null?
-                                    $documentTracking->documentDetail->document_category->category_name : "Others:" . $documentTracking->documentDetail->type !!}</strong> <br> - {{ $documentTracking->documentDetail->description }}</td>
+                                        $documentTracking->documentDetail->document_category->category_name : "Others:"
+                                        . $documentTracking->documentDetail->type !!}</strong> <br> -
+                                    {{ $documentTracking->documentDetail->description }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
                                 <td class="d-flex gap-1">
-                                    <button class="btn btn-warning text-white" data-bs-toggle="modal"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Forward"
-                                        data-bs-target="#myModal-{{ $documentTracking->id }}"><i class="ri-share-forward-2-fill"></i></button>
+                                    <button class="btn btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#myModal-{{ $documentTracking->id }}">
+                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Show"><i
+                                                class="ri ri-eye-fill"></i></span>
+                                    </button>
                                     <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
                                         title="Track"
                                         href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i

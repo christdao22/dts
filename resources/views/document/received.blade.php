@@ -76,11 +76,10 @@
                                 </td> --}}
                                 <td class="d-flex gap-1">
 
-
                                     <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
-                                            class="ri ri-eye-fill" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Show"></i></button>
+                                            class="ri-share-forward-2-fill" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Forward"></i></button>
                                     <a class="btn btn-info"
                                         href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
                                             class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
