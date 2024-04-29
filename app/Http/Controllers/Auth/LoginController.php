@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-
+use RealRashid\SweetAlert\Facades\Alert;
 
 class LoginController extends Controller
 {
@@ -48,15 +48,6 @@ class LoginController extends Controller
                 'email'=>'required|email',
                 'password'=>'required'
             ]);
-
-            // if(auth()->attempt(array('email'=>$input['email'], 'password'=>$input['password']))){
-            //     return redirect()->route('document.incoming');
-            //     // if(auth()->user()->is_admin == 1){
-            //     //     return redirect()->route('admin.home');
-            //     // }else{
-            //     //     return redirect()->route('home');
-            //     // }
-            // }
 
             $user = User::where('email', $input['email'])->first();
 
