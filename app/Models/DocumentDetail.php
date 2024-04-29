@@ -51,7 +51,7 @@ class DocumentDetail extends Model
     }
 
     public function document_category() {
-        return $this->belongsTo(DocumentCategory::class);
+        return $this->belongsTo(DocumentCategory::class)->withTrashed();
     }
 
 }
