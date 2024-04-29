@@ -5,35 +5,35 @@
 
 <style>
     td:nth-child(1) {
-        width: 50px;
+        width: 10%;
     }
 
     td:nth-child(2) {
-        width: 150px;
+        width: 10%;
     }
 
     td:nth-child(3) {
-        width: 200px;
+        width: 15%;
     }
 
     td:nth-child(4) {
-        width: 300px;
+        width: 15%;
     }
 
     td:nth-child(5) {
-        width: 100px;
+        width: 10%;
     }
 
     td:nth-child(6) {
-        width: 50px;
+        width: 15%;
     }
 
     td:nth-child(7) {
-        width: 50px;
+        width: 10%;
     }
 
     td:nth-child(8) {
-        width: 200px;
+        width: 15%;
     }
 
 </style>
@@ -46,9 +46,13 @@
                 </div>
                 <div class="card-body">
                     @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1)
-                    <div class="d-flex flex-row-reverse">
+                    <div class="d-flex flex-row-reverse gap-2">
                         <button class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#myModal">Create
                             Documents</button>
+                        <form action="{{ route('document.generateCode') }}" method="get">
+                            @csrf
+                            <button title="This button generates a code for you to obtain first and then add it when you're ready to create a document." class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light" data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i> Generate Code</button>
+                        </form>
                     </div>
                     <div class="modal" id="myModal">
                         <div class="modal-dialog">
@@ -71,6 +75,16 @@
                                                             style="width: 4em; height: 2em;">
                                                     </div>
                                                 </div> --}}
+
+
+                                                <x-form.input :$errors data="{
+                                                    'input_name'  : 'document_code',
+                                                    'label'       : 'Document Code',
+                                                    'type'        : 'text',
+                                                    'is_required' : false,
+                                                    'placeholder' : '******',
+                                                    'small'        : 'Leave empty if you dont have document code'}" />
+
                                                 <div class="form-group">
                                                     <label class="form-label" for="category_id"><b>Document Type
                                                         </b></label>
@@ -114,7 +128,8 @@
                                                         @foreach ($terminals as $terminal)
                                                         <option value="{{ $terminal->id }}"
                                                             {{ old('terminal') == $terminal->id? 'selected':'' }}>
-                                                            {{ $terminal->terminal_name }}</option>
+                                                            {!! strtoupper($terminal->terminal_name) !!} - {!! ucfirst(strtolower($terminal->user->first_name)) !!} {!! ucfirst(strtolower($terminal->user->last_name)) !!}
+                                                        </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -157,7 +172,6 @@
                                         title="Action"></i></th>
                             </tr>
                         </thead>
-
                         <tbody>
                             @foreach ($documents as $document)
                             <tr>
@@ -168,7 +182,7 @@
                                 <td>{{ $document->name_of_client }} <br> {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
                                 <td>{{ $document->description}}</td>
                                 <td>{{ $document->terminal->terminal_name}}</td>
-                                <td>{{ $document->created_at }}</td>
+                                <td>{{ formatDateTime($document->created_at) }}</td>
                                 <td>
                                     @if ($document->documentTracking->status == 'completed')
                                     <span class="badge rounded-pill bg-success">Completed/Release</span>
@@ -232,7 +246,6 @@
             </div>
         </div>
     </div>
-
     {{-- Edit Modal --}}
     <div class="modal" id="editModal">
         <div class="modal-dialog">
@@ -289,9 +302,9 @@
                                 <select name="terminal_id" id="editTerminal_id" class="form-select" required>
                                     <option value="" disabled selected>Select recipient </option>
                                     @foreach ($terminals as $terminal)
-                                    <option value="{{ $terminal->id }}"
-                                        {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
-                                        {{ $terminal->terminal_name }}</option>
+                                    <option value="{{ $terminal->id }}" {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
+                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }} {{ $terminal->user->last_name }}
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -309,6 +322,7 @@
         </div>
     </div>
 </div>
+
 <script>
     $(document).ready(function () {
         var id = $("#getID").val();

@@ -44,7 +44,7 @@
 
 </head>
 
-<body data-topbar="dark" data-sidebar="dark">
+<body data-topbar="dark" data-sidebar="dark"  data-bs-theme="dark" data-theme-mode="dark">
     <!-- Begin page -->
     <div id="layout-wrapper">
         <header id="page-topbar">
@@ -85,8 +85,9 @@
                                 <img class="rounded-circle header-profile-user"
                                     src="{{ asset('assets/images/users/user-profile-icon-free-vector.jpg') }}"
                                     alt="Header Avatar">
-                            <span
-                                class="d-none d-xl-inline-block ms-1 me-2">{{ Str::ucfirst(Auth::user()->first_name) }} {!! auth()->user()->is_active? '<span class="text-success">(Active)</span>':'<span class="text-danger">(Inactive)</span>' !!}</span>
+                            {{-- <span
+                                class="d-none d-xl-inline-block ms-1 me-2">{{ Str::ucfirst(Auth::user()->first_name) }} {!! auth()->user()->is_active? '<span class="text-success">(Active)</span>':'<span class="text-danger">(Inactive)</span>' !!}</span> --}}
+                                <span class="d-none d-xl-inline-block ms-1 me-2">{{ Str::ucfirst(Auth::user()->first_name) }} </span>
                             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">
@@ -131,7 +132,14 @@
                         @else
                         <span>(Office Terminal)</span>
                         @endif
+                        <p class="mt-1 d-flex align-items-center justify-content-center gap-2">
+                            @if (auth()->user()->is_active)
+                                <i class="ri-record-circle-line mt-0 text-success"></i> Online
+                            @else
+                                <i class="ri-record-circle-line mt-0 text-secondary"></i> Offline
+                            @endif
 
+                        </p>
                     </div>
                 </div>
 
@@ -205,6 +213,12 @@
                                 <span>TRACK DOCUMENTS</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="\assets\forms\DEPEDCDO-001-F01.pdf" target='_blank' class=" waves-effect">
+                                <i class="ri-file-download-line"></i>
+                                <span>DOWNLOAD FORM</span>
+                            </a>
+                        </li>
                         <li class="menu-title">Settings</li>
                         <li>
                             <a href="{{ route('user.profile') }}" class=" waves-effect">
@@ -237,6 +251,13 @@
                                 <span>DOCUMENT CATEGORY</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('document.systemUpdates') }}" class=" waves-effect">
+                                <i class="ri-refresh-line"></i>
+                                <span>SYSTEM UPDATES</span>
+                            </a>
+                        </li>
+
                         @endif
 
                     </ul>
@@ -327,6 +348,7 @@
     <script>
         $(document).ready(function () {
             $('#datatable-buttons').DataTable();
+
         });
 
     </script>

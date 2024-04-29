@@ -8,19 +8,24 @@ use Illuminate\View\Component;
 
 class Input extends Component
 {
-    public $input_name, $label, $type, $placeholder, $is_required, $errors, $is_hidden;
+    public $input_name, $label, $type, $placeholder, $is_required, $errors, $is_hidden, $small, $arr;
 
     public function __construct($errors, $data)
     {
-        $arr = \jsonToPHPArray($data);
+        $this->arr = \jsonToPHPArray($data);
         $err = \jsonToPHPArray($errors);
-        $this->input_name   = $arr['input_name'];
-        $this->label        = $arr['label'];
-        $this->type         = $arr['type'];
-        $this->placeholder  = isset($arr['placeholder']) && $arr['placeholder']!==null ? $arr['placeholder'] : 'Enter ' . strtolower($arr['label']) . '...';
-        $this->is_required  = $arr['is_required'];
+        $this->input_name   = $this->checkIfExist('input_name');
+        $this->label        = $this->checkIfExist('label');
+        $this->type         = $this->checkIfExist('type');
+        $this->placeholder  = $this->checkIfExist('placeholder') && $this->arr['placeholder'] != ''? $this->arr['placeholder'] : 'Enter ' . strtolower($this->label) . '...';
+        $this->is_required  = $this->checkIfExist('is_required');
         $this->errors       = $err;
-        $this->is_hidden    = isset($arr['is_hidden']) && $arr['is_hidden']==true? 'd-none' : '';
+        $this->is_hidden    = $this->checkIfExist('is_hidden') == true? 'd-none' : '';
+        $this->small        = $this->checkIfExist('small');
+    }
+
+    public function checkIfExist($data) {
+        return isset($this->arr[$data])? $this->arr[$data] : '';
     }
 
     /**

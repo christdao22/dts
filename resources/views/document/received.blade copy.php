@@ -39,7 +39,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header w-100">
-                    <x-filter :$filters route='document.received'/>
+                    <x-filter :$filters route='document.received' />
                 </div>
                 <div class="card-body">
                     <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
@@ -56,7 +56,6 @@
                                         title="Action"></i></th>
                             </tr>
                         </thead>
-
                         <tbody>
                             @foreach ($documentTrackings as $documentTracking)
                             <tr>
@@ -71,15 +70,13 @@
                                 <td>{{ $documentTracking->documentDetail->description }}</td>
                                 <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
-                                {{-- <td class="text-center">
-                                    @php echo getTransactionStatus($documentTracking->documentDetail); @endphp
-                                </td> --}}
                                 <td class="d-flex gap-1">
+
 
                                     <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                                         data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
-                                            class="ri-share-forward-2-fill" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Forward"></i></button>
+                                            class="ri ri-eye-fill" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Show"></i></button>
                                     <a class="btn btn-info"
                                         href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
                                             class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -124,6 +121,7 @@
                                                         <p class="form-label"> <b>Remarks:</b>
                                                             {{ $documentTracking->remark->remarks }} </p>
                                                     </div>
+
                                                     <div class="mb-4" id="secondary-select-container">
                                                         <label class="form-label"><b>Forward: </b></label>
                                                         <select name="terminal_id" class="form-control" required
@@ -132,10 +130,7 @@
                                                             </option>
                                                             @foreach ($terminals as $terminal)
                                                             <option value="{{ $terminal->id }}">
-                                                                {!! strtoupper($terminal->terminal_name) !!} - {!!
-                                                                ucfirst(strtolower($terminal->user->first_name)) !!} {!!
-                                                                ucfirst(strtolower($terminal->user->last_name)) !!}
-                                                            </option>
+                                                                {{ $terminal->terminal_name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
