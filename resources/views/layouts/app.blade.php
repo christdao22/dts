@@ -31,17 +31,21 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}"
         rel="stylesheet" type="text/css" />
 
-    <!-- Bootstrap Css -->
-    <link href="{{ asset('assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
     <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
 
-
+    @if ($theme == 'dark')
+        <link href="{{ asset('assets/css/bootstrap-dark.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/css/app-dark.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
+    @else
+        <!-- Bootstrap Css -->
+        <link href="{{ asset('assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+        <!-- App Css-->
+        <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
+    @endif
 </head>
 
-<body data-topbar="dark" data-sidebar="dark"  data-bs-theme="dark" data-theme-mode="dark">
+<body data-topbar="dark" data-sidebar="dark" data-bs-theme="dark">
     <!-- Begin page -->
     <div id="layout-wrapper">
         <header id="page-topbar">
@@ -75,7 +79,10 @@
                     </button>
                 </div>
 
-                <div class="d-flex">
+                <div class="d-flex align-items-center">
+                    <button href="" id="dark_mode_btn" class="btn btn-primary-outline text-size-50">
+                        <i class="{{ $theme == 'dark'? 'ri-sun-line':'ri-moon-line' }} h2 text-white"></i>
+                    </button>
                     <div class="dropdown d-inline-block user-dropdown">
                         <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -123,7 +130,7 @@
                         <span class="text-muted">{{ strtoupper(Auth::user()->terminal->terminal_name) }}</span>
                         <br>
                         @if (Auth::user()->is_admin)
-                        <span>(Admin)</span>
+                        {{-- <span>(Admin)</span> --}}
                         @elseif (Auth::user()->is_dm)
                         <span>(Decision Maker)</span>
                         @else
@@ -248,13 +255,6 @@
                                 <span>DOCUMENT CATEGORY</span>
                             </a>
                         </li>
-                        <!-- <li>
-                            <a href="{{ route('document.systemUpdates') }}" class=" waves-effect">
-                                <i class="ri-refresh-line"></i>
-                                <span>SYSTEM UPDATES</span>
-                            </a>
-                        </li> -->
-
                         @endif
 
                     </ul>
@@ -346,6 +346,21 @@
         $(document).ready(function () {
             $('#datatable-buttons').DataTable();
 
+            $('#dark_mode_btn').on('click', function() {
+                $('i', this).toggleClass('ri-sun-line ri-moon-line');
+
+                var theme = $('i', this).hasClass('ri-sun-line') ? 'dark' : 'light';
+
+                setCookie('theme', theme);
+                location.reload(true)
+            });
+
+            function setCookie(name, value) {
+                var d = new Date();
+                d.setTime(d.getTime() + (365*24*60*60*1000));
+                var expires = "expires=" + d.toUTCString();
+                document.cookie = `${name}=${value};${expires};path=/;`;
+            }
         });
 
     </script>
