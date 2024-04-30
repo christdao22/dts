@@ -56,6 +56,8 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/undoActionComplete/{id}', [DocumentController::class, 'undoActionComplete'])->name('document.undoActionComplete');
         Route::patch('/changeForward/{id}', [DocumentController::class, 'changeForward'])->name('document.changeForward');
 
+        Route::get('system-updates', [HomeController::class, 'systemUpdates'])->name('document.systemUpdates');
+        
         Route::resources([ 'document_category' => DocumentCategoryController::class ]);
     });
 

@@ -248,12 +248,12 @@
                                 <span>DOCUMENT CATEGORY</span>
                             </a>
                         </li>
-                        <li>
+                        <!-- <li>
                             <a href="{{ route('document.systemUpdates') }}" class=" waves-effect">
                                 <i class="ri-refresh-line"></i>
                                 <span>SYSTEM UPDATES</span>
                             </a>
-                        </li>
+                        </li> -->
 
                         @endif
 
