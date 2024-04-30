@@ -270,7 +270,7 @@ class DocumentController extends Controller
     public function store(Request $request)
     {
         try {
-            $document_code = $request->document_code != '' && $request->document_code != null ? $request->document_code : $this->generateDocumentNumber();
+            $document_code = $request->document_code != '' ? $request->document_code : $this->generateDocumentNumber();
             DB::transaction(function () use ($request, $document_code) {
                 $documentDetail = DocumentDetail::create([
                     'user_id' => auth()->user()->id,
@@ -458,7 +458,7 @@ class DocumentController extends Controller
 
     public function getFilters()
     {
-        $types = DocumentCategory::get();
+        $types = DocumentCategory::get()->sortBy('category_name');
         $users = User::with('office')->get();
 
         return compact('types', 'users');
