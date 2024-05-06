@@ -154,7 +154,7 @@ class DocumentController extends Controller
         }
 
         $documentTrackings = $this->filter($request, $documentTrackings);
-        $documentTrackings = $documentTrackings->get();
+        $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
 
         return view('document.incoming', compact('documentTrackings', 'filters'));
     }
