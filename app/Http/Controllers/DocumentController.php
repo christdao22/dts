@@ -152,7 +152,7 @@ class DocumentController extends Controller
             $documentTrackings = DocumentTracking::where('status', 'incoming')
                 ->with('user', 'documentDetail.document_category', 'remark');
         }
-        
+
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->get();
 
@@ -271,7 +271,10 @@ class DocumentController extends Controller
     {
         try {
             $document_code = $request->document_code != '' ? $request->document_code : $this->generateDocumentNumber();
+
             DB::transaction(function () use ($request, $document_code) {
+                $generated_code_query = GeneratedCode::where('document_code', $document_code);
+                $generated_data = $generated_code_query->get();
                 $documentDetail = DocumentDetail::create([
                     'user_id' => auth()->user()->id,
                     'document_code' => $document_code,
@@ -281,12 +284,14 @@ class DocumentController extends Controller
                     'terminal_id' => $request->terminal,
                     'document_category_id' => $request->category_id == 'others' ? null : $request->category_id,
                     'contact' => $request->contact,
+                    'created_at' => count($generated_data)!=0? date($generated_data[0]->created_at) : date('Y-m-d H:i:s')
+
                     // 'is_check_by_dm'    => $request->is_check_by_dm == 'on'
                     // 'transaction_type'  =>  1, // to identify if simple, complex, highly technical
                     // 'is_verified'       => false // used to check if na verified na ba ni DM
                 ]);
 
-                GeneratedCode::where('document_code', $document_code)->delete();
+                $generated_code_query->delete();
 
                 $remark = Remark::create([
                     'remarks' => $request->remarks,
