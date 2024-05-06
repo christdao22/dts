@@ -21,7 +21,8 @@ class DocumentDetail extends Model
         'terminal_id',
         'is_check_by_dm',
         'document_category_id',
-        'contact'
+        'contact',
+        'created_at'
         // 'is_verified',
         // 'transaction_type'
     ];
