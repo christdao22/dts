@@ -18,6 +18,13 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class DocumentController extends Controller
 {
+
+    public function maintenance() {
+        if(true) {
+            Alert::warning('System maintenance', 'The system will be down for maintenance on Thursday, May 9th from 11:00am to 11:10am')->persistent('Dismiss');
+
+        }
+    }
     /**
      * Display a listing of the resource.
      */
@@ -95,6 +102,8 @@ class DocumentController extends Controller
 
     public function allDocuments(Request $request)
     {
+        $this->maintenance();
+
         // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
 
@@ -110,6 +119,8 @@ class DocumentController extends Controller
 
     public function received(Request $request)
     {
+        $this->maintenance();
+
         $documentTrackings = [];
         // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
@@ -133,6 +144,8 @@ class DocumentController extends Controller
 
     public function incoming(Request $request)
     {
+        $this->maintenance();
+
         // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
 
@@ -161,6 +174,8 @@ class DocumentController extends Controller
 
     public function receivedHistory(Request $request)
     {
+        $this->maintenance();
+
         // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
         $receivedHistories = ReceivedHistory::with('user.terminal', 'documentDetail.document_category', 'remark');
@@ -176,6 +191,8 @@ class DocumentController extends Controller
 
     public function outgoing(Request $request)
     {
+        $this->maintenance();
+
         // ** use to get the data for filters dropdown
         $terminals = Terminal::with('user')->whereHas('user', function ($query) {
             return $query->where('is_active', 1);
@@ -194,6 +211,8 @@ class DocumentController extends Controller
 
     public function completed(Request $request)
     {
+        $this->maintenance();
+
         $documentTrackings = [];
         $terminals = Terminal::with('user')->whereHas('user', function ($query) {
             return $query->where('is_active', 1);
@@ -233,6 +252,8 @@ class DocumentController extends Controller
 
     public function create(Request $request)
     {
+        $this->maintenance();
+
         // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
 
