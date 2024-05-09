@@ -11,10 +11,6 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/dts_logo.png') }}">
 
-    <!-- jquery.vectormap css -->
-    {{-- <link href="{{ asset('assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}"
-        rel="stylesheet" type="text/css" /> --}}
-
     <!-- DataTables -->
     <link href="{{ asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
@@ -53,15 +49,6 @@
                 <div class="d-flex">
                     <!-- LOGO -->
                     <div class="navbar-brand-box">
-                        {{-- <a href="index.html" class="logo logo-dark">
-                                <span class="logo-sm">
-                                    <img src="{{ asset('assets/images/logo-sm.png') }}" alt="logo-sm" height="22">
-                        </span>
-                        <span class="logo-lg">
-                            <img src="{{ asset('assets/images/logo-dark.png') }}" alt="logo-dark" height="20">
-                        </span>
-                        </a> --}}
-
                         <a href="#" class="logo logo-light">
                             <span class="logo-sm">
                                 <img src="{{ asset('assets/images/cdo_dts_sm.png') }}" alt="logo-sm-light" height="30">
@@ -195,14 +182,6 @@
                             </a>
                         </li>
 
-                        {{-- <li>
-                                <a href="{{ route('document.rejected') }}" class=" waves-effect"><span
-                            class="badge bg-danger float-end">{{ rejectedTotal() }}</span>
-                        <i class=" ri-mail-close-line"></i>
-                        <span>REJECTED</span>
-                        </a>
-                        </li> --}}
-
                         <li>
                             <a href="{{ route('document.receivedHistory') }}" class=" waves-effect"><span
                                     class="badge bg-success float-end"></span>
@@ -307,64 +286,55 @@
     <script src="{{ asset('assets/libs/simplebar/simplebar.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/node-waves/waves.min.js') }}" defer></script>
 
-
-    <!-- apexcharts -->
-    {{-- <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script> --}}
-
-    <!-- jquery.vectormap map -->
-    {{-- <script src="{{ asset('assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/admin-resources/jquery.vectormap/maps/jquery-jvectormap-us-merc-en.js') }}">
-    </script> --}}
-
     <!-- Required datatable js -->
     <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}" defer></script>
     <!-- Buttons examples -->
     <script src="{{ asset('assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/jszip/jszip.min.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/pdfmake/build/pdfmake.min.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/pdfmake/build/vfs_fonts.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }}" defer></script>
-
-    <script src="{{ asset('assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/datatables.net-select/js/dataTables.select.min.js') }}" defer></script>
 
     <!-- Responsive examples -->
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}" defer></script>
 
-    {{-- <script src="{{ asset('assets/js/pages/dashboard.init.js') }}"></script> --}}
     <!-- Datatable init js -->
-    <script src="{{ asset('assets/js/pages/datatables.init.min.js') }}" ></script>
+    <script src="{{ asset('assets/js/pages/datatables.init.min.js') }}" defer></script>
 
     <!-- App js -->
     <script src="{{ asset('assets/js/app.js') }}" defer></script>
     <script defer>
-        $(document).ready(function () {
-            $('#datatable-buttons').DataTable();
+        window.onload = function() {
+            if (window.jQuery) {
+                $(document).ready(function () {
+                    $('#datatable-buttons').DataTable();
 
-            $('#dark_mode_btn').on('click', function() {
-                $('i', this).toggleClass('ri-sun-line ri-moon-line');
+                    $('#dark_mode_btn').on('click', function() {
+                        $('i', this).toggleClass('ri-sun-line ri-moon-line');
 
-                var theme = $('i', this).hasClass('ri-sun-line') ? 'dark' : 'light';
+                        var theme = $('i', this).hasClass('ri-sun-line') ? 'dark' : 'light';
 
-                setCookie('theme', theme);
-                location.reload(true)
-            });
+                        setCookie('theme', theme);
+                        location.reload(true)
+                    });
 
-            function setCookie(name, value) {
-                var d = new Date();
-                d.setTime(d.getTime() + (365*24*60*60*1000));
-                var expires = "expires=" + d.toUTCString();
-                document.cookie = `${name}=${value};${expires};path=/;`;
+                    function setCookie(name, value) {
+                        var d = new Date();
+                        d.setTime(d.getTime() + (365*24*60*60*1000));
+                        var expires = "expires=" + d.toUTCString();
+                        document.cookie = `${name}=${value};${expires};path=/;`;
+                    }
+                });
             }
-        });
 
+
+        }
     </script>
 
+    <script src="{{ asset('assets/libs/pdfmake/build/pdfmake.min.js') }}" defer></script>
+    <script src="{{ asset('assets/libs/pdfmake/build/vfs_fonts.js') }}" defer></script>
+    <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}" defer></script>
+    <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}" defer></script>
+    <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }}" defer></script>
 </body>
 
 </html>
