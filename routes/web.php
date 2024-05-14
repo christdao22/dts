@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DocumentCategoryController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UsersController;
@@ -57,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/changeForward/{id}', [DocumentController::class, 'changeForward'])->name('document.changeForward');
 
         Route::get('system-updates', [HomeController::class, 'systemUpdates'])->name('document.systemUpdates');
-        
+
         Route::resources([ 'document_category' => DocumentCategoryController::class ]);
     });
 
