@@ -324,8 +324,8 @@
         }
     </script>
 
-    {{-- <script src="{{ asset('assets/libs/pdfmake/build/pdfmake.min.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/pdfmake/build/vfs_fonts.js') }}" defer></script> --}}
+    <script src="{{ asset('assets/libs/pdfmake/build/pdfmake.min.js') }}" defer></script>
+    <script src="{{ asset('assets/libs/pdfmake/build/vfs_fonts.js') }}" defer></script>
     <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }}" defer></script>
