@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('document_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('user_id')->nullable();
             $table->string('document_code');
             $table->string('name_of_client');
             $table->string('type')->nullable();

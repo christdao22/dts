@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UsersController;
+use App\Models\DocumentCategory;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,8 +21,13 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+
 // Home
-Route::get('/', function () { return view('welcome'); });
+Route::get('/', function () {
+    $categories = DocumentCategory::get()->sortBy('category_name');
+
+    return view('welcome', compact('categories'));
+});
 // Route::get('/register', function () { return view('welcome'); });
 
 // Auth Route
@@ -78,3 +84,11 @@ Route::middleware(['auth'])->group(function () {
 
 // For registration only
 Route::post('/guestStore', [UsersController::class, 'guestStore'])->name('guestStore');
+Route::post('/guestCreate', [DocumentController::class, 'guestCreate'])->name('guest.guestCreate');
+
+Route::get('/printPDF/{id}',[DocumentController::class, 'printPDF']);
+
+
+
+
+

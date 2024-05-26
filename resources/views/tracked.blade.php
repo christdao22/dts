@@ -6,8 +6,6 @@
     <meta charset="utf-8" />
     <title>DepEd - CDO | Document Tracking System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesdesign" name="author" />
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/dts_logo.png') }}">
 
@@ -123,7 +121,7 @@
                                             <p class="mb-0 text-muted font-14">by
                                                 {{ Str::ucfirst($documentTrace->user->first_name) }}
                                                 {{ strtoupper(substr($documentTrace->user->middle_name,0,1)) }}.
-                                                {{ ucfirst($documentTrace->user->last_name) }} 
+                                                {{ ucfirst($documentTrace->user->last_name) }}
                                             </p>
                                             <p class="mt-3">{!! isset($documentTrace->remark->remarks) ? '<b>Remarks: </b>' .
                                                 $documentTrace->remark->remarks : '' !!}

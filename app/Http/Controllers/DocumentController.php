@@ -260,7 +260,7 @@ class DocumentController extends Controller
         // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
 
-        $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category');
+        $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category')->where('user_id', '!=', null);
 
         if (!auth()->user()->can_view_all) {
             $documents->where('user_id', auth()->user()->id);
@@ -281,7 +281,6 @@ class DocumentController extends Controller
         }
 
         $documents = $documents->orderBy('created_at', 'desc')->get();
-
         $terminals = Terminal::with('user')->whereHas('user', function ($query) {
             return $query->where('is_active', 1);
         })->orderBy('terminal_name')->get();
@@ -596,5 +595,37 @@ class DocumentController extends Controller
 
         Alert::success('Successfully Changed', '');
         return redirect()->back();
+    }
+
+    public function guestCreate(Request $request) {
+        try {
+            $document_code = $this->generateDocumentNumber();
+            DB::transaction(function () use ($request, $document_code) {
+                DocumentDetail::create([
+                    'document_code' => $document_code,
+                    'name_of_client' => $request->name_of_client,
+                    'description' => $request->description,
+                    'contact' => $request->contact,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            });
+
+            Alert::success($document_code, 'Successfully Created')->persistent('Dismiss');
+            return redirect()->back()->with([
+                'success'=> 'true',
+                'code' => $document_code
+            ]);
+
+        } catch (\Exception $e) {
+            Alert::error('oppss', 'Please try again...');
+            return redirect()->back();
+        }
+    }
+
+    public function printPDF(string $id) {
+
+        $detail = DocumentDetail::where('document_code', $id)->get()->first();
+
+        return view('document.pdf_slip', compact('detail'));
     }
 }
