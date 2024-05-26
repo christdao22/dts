@@ -51,8 +51,12 @@
                             Documents</button>
                         <form action="{{ route('document.generateCode') }}" method="get">
                             @csrf
-                            <button title="This button generates a code for you to obtain first and then add it when you're ready to create a document." class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light" data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i> Generate Code</button>
-                        </form>
+                            <button
+                                title="This button generates a code for you to obtain first and then add it when you're ready to create a document."
+                                class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light"
+                                data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i>
+                                Generate Code</button>
+                        </form><button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#documentCodeModal">Search Code</button>
                     </div>
                     <div class="modal" id="myModal">
                         <div class="modal-dialog">
@@ -128,7 +132,9 @@
                                                         @foreach ($terminals as $terminal)
                                                         <option value="{{ $terminal->id }}"
                                                             {{ old('terminal') == $terminal->id? 'selected':'' }}>
-                                                            {!! strtoupper($terminal->terminal_name) !!} - {!! ucfirst(strtolower($terminal->user->first_name)) !!} {!! ucfirst(strtolower($terminal->user->last_name)) !!}
+                                                            {!! strtoupper($terminal->terminal_name) !!} - {!!
+                                                            ucfirst(strtolower($terminal->user->first_name)) !!} {!!
+                                                            ucfirst(strtolower($terminal->user->last_name)) !!}
                                                         </option>
                                                         @endforeach
                                                     </select>
@@ -157,7 +163,8 @@
                         </div>
                     </div>
                     @endif
-                    <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
+                    <div class="">
+                        <table id="datatable-buttons" class="col-md-10 table table-striped table-bordered dt-responsive"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr>
@@ -177,9 +184,11 @@
                             <tr>
                                 <td><strong>{{ $document->document_code }}</strong></td>
                                 <td>{!! $document->document_category_id != null?
-                                    $document->document_category->category_name : "<b>Others: </b>" . $document->type
+                                        $document->document_category->category_name : "<b>Others: </b>" .
+                                        $document->type
                                     !!}</td>
-                                <td>{{ $document->name_of_client }} <br> {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
+                                    <td>{{ $document->name_of_client }} <br>
+                                        {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
                                 <td>{{ $document->description}}</td>
                                 <td>{{ $document->terminal->terminal_name}}</td>
                                 <td>{{ formatDateTime($document->created_at) }}</td>
@@ -196,7 +205,8 @@
                                     <div class="d-flex justify-content-end gap-1">
                                         {{-- <a class="ri ri-printer-fill btn btn-warning" data-bs-toggle="tooltip"
                                             data-bs-placement="top" title="Print"
-                                            href="{{ route('document.pdf_view',$document->id ) }}" target="_blank"> --}}
+                                            href="{{ route('document.pdf_view',$document->id ) }}" target="_blank">
+                                            --}}
                                             <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="Track"
                                                 href="{{ route('web.find', 'query='.$document->document_code) }}"><i
@@ -220,14 +230,12 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
 
         </div> <!-- end col -->
     </div> <!-- end row -->
-    @if ($message = Session::get('success'))
-    <input type="text" name="getID" id="getID" value="{{ $message }}" hidden>
-    @endif
 
     {{-- Confirm Delete --}}
     <div class="modal" id="confirmModal">
@@ -302,8 +310,10 @@
                                 <select name="terminal_id" id="editTerminal_id" class="form-select" required>
                                     <option value="" disabled selected>Select recipient </option>
                                     @foreach ($terminals as $terminal)
-                                    <option value="{{ $terminal->id }}" {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
-                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }} {{ $terminal->user->last_name }}
+                                    <option value="{{ $terminal->id }}"
+                                        {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
+                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }}
+                                        {{ $terminal->user->last_name }}
                                     </option>
                                     @endforeach
                                 </select>
@@ -325,15 +335,6 @@
 
 <script>
     $(document).ready(function () {
-        var id = $("#getID").val();
-        if (id) {
-            var url = "http://127.0.0.1:8000/document/pdf/" + id; // Replace with your desired URL
-            var windowName = '_blank';
-            var windowFeatures = 'width=1000,height=800';
-
-            // Open a new window when the document is ready
-            window.open(url, windowName, windowFeatures);
-        }
 
         $('.deleteBtn').on('click', function (e) {
             var id = $(this).data('bs-id');
@@ -417,6 +418,8 @@
                 $('#editType').parent().toggleClass('d-none', $(this).val() !== 'others');
             });
         });
+
+                $('#datatable-codes').DataTable();
     });
 
 </script>
