@@ -93,16 +93,6 @@ class DocumentController extends Controller
         return view('tracked');
     }
 
-    public function createPDF(string $id)
-    {
-        $data = DocumentDetail::where('id', $id)->first();
-
-        return view('document.pdf_view', compact('data'));
-        // $pdf = Pdf::loadView('document.pdf_view', compact('data'))->setPaper('a4', 'landscape')->setWarnings(false);
-
-        // return $pdf->stream();
-    }
-
     public function allDocuments(Request $request)
     {
         $this->maintenance();
@@ -287,7 +277,9 @@ class DocumentController extends Controller
 
         $categories = DocumentCategory::get()->sortBy('category_name');
 
-        return view('document.create', compact('documents', 'terminals', 'categories', 'filters'));
+        $document_codes = DocumentDetail::where('user_id', null)->get();
+
+        return view('document.create', compact('documents', 'terminals', 'categories', 'filters', 'document_codes'));
     }
 
     public function store(Request $request)
@@ -627,5 +619,53 @@ class DocumentController extends Controller
         $detail = DocumentDetail::where('document_code', $id)->get()->first();
 
         return view('document.pdf_slip', compact('detail'));
+    }
+
+
+
+    public function storeGuestCreate(string $id, Request $request)
+    {
+        try {
+            DB::transaction(function () use ($request, $id) {
+                $documentDetail = DocumentDetail::find($id);
+                $documentDetail->user_id = auth()->user()->id;
+                $documentDetail->document_category_id = $request->category_id == 'others' ? null : $request->category_id;
+                $documentDetail->terminal_id = $request->terminal_id;
+                $documentDetail->save();
+
+
+                $remark = Remark::create([
+                    'remarks' => $request->remarks,
+                ]);
+
+                DocumentTracking::create([
+                    'user_id' => auth()->user()->id,
+                    'document_detail_id' => $documentDetail->id,
+                    'terminal_id' => $request->terminal,
+                    'remark_id' => $remark->id,
+                    'status' => 'incoming',
+                ]);
+
+                DocumentTrace::create([
+                    'user_id' => auth()->user()->id,
+                    'document_detail_id' => $documentDetail->id,
+                    'remark_id' => $remark->id,
+                ]);
+
+                ReceivedHistory::create([
+                    'user_id' => auth()->user()->id,
+                    'document_detail_id' => $documentDetail->id,
+                    'remark_id' => $remark->id,
+                ]);
+            });
+            $latestId = DocumentDetail::orderBy('created_at', 'desc')->pluck('id')->first();
+
+            toast('Successfully created...', 'success');
+            return redirect()->back()->with('success', $latestId);
+
+        } catch (\Exception $e) {
+            Alert::error('oppss', 'Please try again...');
+            return redirect()->back();
+        }
     }
 }
