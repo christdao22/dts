@@ -20,11 +20,11 @@ class DocumentController extends Controller
 {
 
     public function maintenance() {
-        if(false) {
-            Alert::warning('System maintenance', 'The system will be down for maintenance on Thursday, May 9th from 10:40am to 10:50am')->persistent('Dismiss');
+        if(true) {
+            Alert::warning('System maintenance', 'The system will be down for maintenance today. Please save your work')->persistent('Dismiss');
         }
 
-        if(true) {
+        if(false) {
             Alert::success('System maintenance completed', 'Thank you for waiting!');
         }
     }
