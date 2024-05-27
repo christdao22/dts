@@ -140,7 +140,7 @@
     <!-- Template Main JS File -->
     <script>
         if('{{ session("success") }}' == 'true') {
-            window.open(window.location.href + 'printPDF/{{ session("code") }}', '_blank', 'width=1000,height=800');
+            window.open(window.location.href + 'printPDF/{{ session("code") }}', '_blank');
         }
     </script>
     <script src="assets2/js/main.js" defer></script>
