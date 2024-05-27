@@ -21,7 +21,7 @@
         rel="stylesheet" type="text/css" />
 
     <!-- Icons Css -->
-    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" rel=preload />
+    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css"/>
 
     @if ($theme == 'dark')
         <link href="{{ asset('assets/css/bootstrap-dark.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
@@ -273,7 +273,7 @@
     <div class="rightbar-overlay"></div>
 
     <!-- JAVASCRIPT -->
-    <script src="{{ asset('assets/libs/jquery/jquery.min.js') }}" defer></script>
+    <script src="{{ asset('assets/libs/jquery/jquery.min.js') }}" ></script>
     <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/metismenu/metisMenu.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/simplebar/simplebar.min.js') }}" defer></script>

@@ -75,31 +75,16 @@
                             <div class="form-group mb-3 row">
                                 <div class="col-12">
                                     <div class="custom-control custom-checkbox">
-                                        {{-- <input type="checkbox" class="custom-control-input" id="customCheck1">
-                                        <label class="form-label ms-1" for="customCheck1">Remember me</label> --}}
-                                        {{-- <input class="custom-control-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                                        <label class="form-label ms-1" for="remember">
-                                            {{ __('Remember Me') }}
-                                        </label> --}}
+
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- <div class="row mb-3">
-                                <div class="col-md-6 offset-md-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remember" id="remember"
-                                            {{ old('remember') ? 'checked' : '' }}>
 
-                                        <label class="form-check-label" for="remember">
-                                            {{ __('Remember Me') }}
-                                        </label>
-                                    </div>
-                                </div>
-                            </div> --}}
                             <div class="form-group mb-3 text-center row mt-3 pt-1">
                                 <div class="col-12">
-                                    <button class="btn btn-info w-100 waves-effect waves-light" type="submit">Log In</button>
+                                    <button class="btn btn-info w-100 waves-effect waves-light" type="submit">Log
+                                        In</button>
                                 </div>
                             </div>
                             <div class="form-group mt-2 mb-0 row">
@@ -113,15 +98,16 @@
                     <!-- end -->
                 </div>
                 <!-- end cardbody -->
-
-                <!-- JAVASCRIPT -->
-                <script src="assets/libs/jquery/jquery.min.js"></script>
-                <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-                <script src="assets/libs/metismenu/metisMenu.min.js"></script>
-                <script src="assets/libs/simplebar/simplebar.min.js"></script>
-                <script src="assets/libs/node-waves/waves.min.js"></script>
-                <script src="assets/js/app.js"></script>
-
+            </div>
+        </div>
+    </div>
+    <!-- JAVASCRIPT -->
+    <script src="assets/libs/jquery/jquery.min.js"></script>
+    <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/libs/metismenu/metisMenu.min.js"></script>
+    <script src="assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="assets/libs/node-waves/waves.min.js"></script>
+    <script src="assets/js/app.js"></script>
 </body>
 
 </html>

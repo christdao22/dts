@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\DocumentCategoryController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UsersController;
+use App\Models\DocumentCategory;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,8 +21,13 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+
 // Home
-Route::get('/', function () { return view('welcome'); });
+Route::get('/', function () {
+    $categories = DocumentCategory::get()->sortBy('category_name');
+
+    return view('welcome', compact('categories'));
+});
 // Route::get('/register', function () { return view('welcome'); });
 
 // Auth Route
@@ -45,7 +52,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/outgoing', [DocumentController::class, 'outgoing'])->name('document.outgoing');
         Route::get('/received/history', [DocumentController::class, 'receivedHistory'])->name('document.receivedHistory');
         Route::get('/tracked', [DocumentController::class, 'tracked'])->name('document.tracked');
-        Route::get('/pdf/{id}', [DocumentController::class, 'createPDF'])->name('document.pdf_view');
         Route::get('/search',[DocumentController::class, 'find'])->name('web.find');
         Route::patch('/update/{id}', [DocumentController::class, 'update'])->name('document.update');
         Route::patch('/update-edit/{id}', [DocumentController::class, 'updateEdit'])->name('document.updateEdit');
@@ -57,8 +63,9 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/changeForward/{id}', [DocumentController::class, 'changeForward'])->name('document.changeForward');
 
         Route::get('system-updates', [HomeController::class, 'systemUpdates'])->name('document.systemUpdates');
-        
+
         Route::resources([ 'document_category' => DocumentCategoryController::class ]);
+        Route::patch('storeGuestCreate/{id}', [DocumentController::class, 'storeGuestCreate'])->name('document.storeGuestCreate');
     });
 
     // Admin
@@ -72,8 +79,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/getTerminals/{q}', [TerminalController::class, 'getTerminals'])->name('terminals.getTerminals');
     });
 
+
+
     Route::post('document', [DocumentController::class, 'store'])->name('document.store');
 });
 
 // For registration only
 Route::post('/guestStore', [UsersController::class, 'guestStore'])->name('guestStore');
+Route::post('/guestCreate', [DocumentController::class, 'guestCreate'])->name('guest.guestCreate');
+
+Route::get('/printPDF/{id}',[DocumentController::class, 'printPDF'])->name('printPDF');
+
+
+
+
+

@@ -42,7 +42,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header w-100">
-                    <x-filter :$filters route='document.create'/>
+                    <x-filter :$filters route='document.create' />
                 </div>
                 <div class="card-body">
                     @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1)
@@ -51,8 +51,13 @@
                             Documents</button>
                         <form action="{{ route('document.generateCode') }}" method="get">
                             @csrf
-                            <button title="This button generates a code for you to obtain first and then add it when you're ready to create a document." class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light" data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i> Generate Code</button>
-                        </form>
+                            <button
+                                title="This button generates a code for you to obtain first and then add it when you're ready to create a document."
+                                class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light"
+                                data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i>
+                                Generate Code</button>
+                        </form><button class="btn btn-success mb-3" data-bs-toggle="modal"
+                            data-bs-target="#documentCodeModal">Search Code</button>
                     </div>
                     <div class="modal" id="myModal">
                         <div class="modal-dialog">
@@ -128,7 +133,9 @@
                                                         @foreach ($terminals as $terminal)
                                                         <option value="{{ $terminal->id }}"
                                                             {{ old('terminal') == $terminal->id? 'selected':'' }}>
-                                                            {!! strtoupper($terminal->terminal_name) !!} - {!! ucfirst(strtolower($terminal->user->first_name)) !!} {!! ucfirst(strtolower($terminal->user->last_name)) !!}
+                                                            {!! strtoupper($terminal->terminal_name) !!} - {!!
+                                                            ucfirst(strtolower($terminal->user->first_name)) !!} {!!
+                                                            ucfirst(strtolower($terminal->user->last_name)) !!}
                                                         </option>
                                                         @endforeach
                                                     </select>
@@ -156,52 +163,101 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="modal " id="documentCodeModal">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title secondary">Search Document Code</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <table id="datatable-codes"
+                                        class="col-md-10 table table-striped table-bordered dt-responsive"
+                                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>CODE</th>
+                                                <th><i class=" ri-settings-2-line" data-bs-toggle="tooltip"
+                                                        data-bs-placement="top" title="Action"></i></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($document_codes as $code)
+                                            <tr>
+                                                <td><strong>{{ $code->document_code }}</strong></td>
+                                                <td>
+                                                    <div class="d-flex justify-content-end gap-1">
+                                                        <a class="btn btn-primary editCode"
+                                                            data-bs-id='{{ $code->id }}' data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
+                                                                class="ri-edit-line"></i></a>
+
+                                                        <a class="ri ri-printer-fill btn btn-warning"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            title="Print"
+                                                            href="{{ route('printPDF', $code->document_code ) }}"
+                                                            target="_blank"></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @endif
-                    <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>CODE</th>
-                                <th>TYPE</th>
-                                <th>FROM</th>
-                                <th>DESCRIPTION</th>
-                                <th>TO</th>
-                                <th>DATE</th>
-                                <th>STATUS</th>
-                                <th><i class=" ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top"
-                                        title="Action"></i></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($documents as $document)
-                            <tr>
-                                <td><strong>{{ $document->document_code }}</strong></td>
-                                <td>{!! $document->document_category_id != null?
-                                    $document->document_category->category_name : "<b>Others: </b>" . $document->type
-                                    !!}</td>
-                                <td>{{ $document->name_of_client }} <br> {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
-                                <td>{{ $document->description}}</td>
-                                <td>{{ $document->terminal->terminal_name}}</td>
-                                <td>{{ formatDateTime($document->created_at) }}</td>
-                                <td>
-                                    @if ($document->documentTracking->status == 'completed')
-                                    <span class="badge rounded-pill bg-success">Completed/Release</span>
-                                    @elseif (!$document->documentTracking->is_received)
-                                    <span class="badge rounded-pill bg-secondary">Pending receive</span>
-                                    @else
-                                    <span class="badge rounded-pill bg-warning">In progress</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-end gap-1">
-                                        {{-- <a class="ri ri-printer-fill btn btn-warning" data-bs-toggle="tooltip"
+                    <div class="">
+                        <table id="datatable-buttons" class="col-md-10 table table-striped table-bordered dt-responsive"
+                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>CODE</th>
+                                    <th>TYPE</th>
+                                    <th>FROM</th>
+                                    <th>DESCRIPTION</th>
+                                    <th>TO</th>
+                                    <th>DATE</th>
+                                    <th>STATUS</th>
+                                    <th><i class=" ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Action"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($documents as $document)
+                                <tr>
+                                    <td><strong>{{ $document->document_code }}</strong></td>
+                                    <td>{!! $document->document_category_id != null?
+                                        $document->document_category->category_name : "<b>Others: </b>" .
+                                        $document->type
+                                        !!}</td>
+                                    <td>{{ $document->name_of_client }} <br>
+                                        {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
+                                    <td>{{ $document->description}}</td>
+                                    <td>{{ $document->terminal->terminal_name}}</td>
+                                    <td>{{ formatDateTime($document->created_at) }}</td>
+                                    <td>
+                                        @if ($document->documentTracking->status == 'completed')
+                                        <span class="badge rounded-pill bg-success">Completed/Release</span>
+                                        @elseif (!$document->documentTracking->is_received)
+                                        <span class="badge rounded-pill bg-secondary">Pending receive</span>
+                                        @else
+                                        <span class="badge rounded-pill bg-warning">In progress</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="d-flex justify-content-end gap-1">
+                                            {{-- <a class="ri ri-printer-fill btn btn-warning" data-bs-toggle="tooltip"
                                             data-bs-placement="top" title="Print"
-                                            href="{{ route('document.pdf_view',$document->id ) }}" target="_blank"> --}}
+                                            href="{{ route('document.pdf_view',$document->id ) }}" target="_blank">
+                                            --}}
                                             <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="Track"
                                                 href="{{ route('web.find', 'query='.$document->document_code) }}"><i
                                                     class="ri-route-line"></i></a>
-                                            @if (!$document->documentTracking->is_received && $document->user_id == Auth::user()->id)
+                                            @if (!$document->documentTracking->is_received && $document->user_id ==
+                                            Auth::user()->id)
                                             <button class="btn btn-danger deleteBtn" data-bs-id={{ $document->id }}><i
                                                     class="ri-delete-bin-line"></i>
                                                 <form id="delete_form_{{ $document->id }}"
@@ -214,20 +270,18 @@
                                             <a class="btn btn-primary editButton"
                                                 data-bs-id='{{ $document->id }}'>EDIT</a>
                                             @endif
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
         </div> <!-- end col -->
     </div> <!-- end row -->
-    @if ($message = Session::get('success'))
-    <input type="text" name="getID" id="getID" value="{{ $message }}" hidden>
-    @endif
 
     {{-- Confirm Delete --}}
     <div class="modal" id="confirmModal">
@@ -302,8 +356,10 @@
                                 <select name="terminal_id" id="editTerminal_id" class="form-select" required>
                                     <option value="" disabled selected>Select recipient </option>
                                     @foreach ($terminals as $terminal)
-                                    <option value="{{ $terminal->id }}" {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
-                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }} {{ $terminal->user->last_name }}
+                                    <option value="{{ $terminal->id }}"
+                                        {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
+                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }}
+                                        {{ $terminal->user->last_name }}
                                     </option>
                                     @endforeach
                                 </select>
@@ -321,19 +377,77 @@
             </div>
         </div>
     </div>
+    {{-- Edit Searched Doc Modal --}}
+    <div class="modal" id="editCodeModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title secondary">Document Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="codeEditForm" action="" method="POST" enctype="multipart/form-data">
+                    @method('PATCH')
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+
+                            <p>Document Code: <strong id="c_document_code">test</strong></p>
+                            <p>Name Of Client: <strong id="c_name_of_client"></strong></p>
+                            <p>Contact No.: <strong id="c_contact"></strong></p>
+                            <p>Description: <strong id="c_description"></strong></p>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label" for="codeCategory_id"><b>Document Type </b></label>
+                                <select name="category_id" id="codeCategory_id" class="form-select" required>
+                                    <option value="" disabled selected>Select document type</option>
+                                    @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}"
+                                        {{ old('category_id') == $category->id? 'selected':'' }}>
+                                        {{ $category->category_name }}</option>
+                                    @endforeach
+                                    <option value="others">Others</option>
+                                </select>
+                            </div>
+
+                            {{-- <div class="mb-3">
+                                <label class="form-label" for="codeType"><b>Other Document Type</b></label>
+                                <input type="text" name="type" id="codeType" value="{{ old('type') }}"
+                                    class="form-control hidden">
+                            </div> --}}
+
+                            <div class="mb-3">
+                                <label class="form-label" for="codeTerminal_id"><b>Recipient </b></label>
+                                <select name="terminal_id" id="codeTerminal_id" class="form-select" required>
+                                    <option value="" disabled selected>Select recipient </option>
+                                    @foreach ($terminals as $terminal)
+                                    <option value="{{ $terminal->id }}"
+                                        {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
+                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }}
+                                        {{ $terminal->user->last_name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label" for="codeRemarks">Remarks</label>
+                                <textarea name="remarks" id="codeRemarks" cols="30" rows="5"
+                                    class="form-control">{{ old('remarks') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success" id="codeUpdateBtn">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     $(document).ready(function () {
-        var id = $("#getID").val();
-        if (id) {
-            var url = "http://127.0.0.1:8000/document/pdf/" + id; // Replace with your desired URL
-            var windowName = '_blank';
-            var windowFeatures = 'width=1000,height=800';
-
-            // Open a new window when the document is ready
-            window.open(url, windowName, windowFeatures);
-        }
 
         $('.deleteBtn').on('click', function (e) {
             var id = $(this).data('bs-id');
@@ -417,6 +531,33 @@
                 $('#editType').parent().toggleClass('d-none', $(this).val() !== 'others');
             });
         });
+
+        $('.editCode').on('click', function () {
+            let id = $(this).data('bs-id');
+            $.ajax({
+                url: '/document/getDocument/' + id,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#c_document_code').text(data.documents.document_code);
+                    $('#c_name_of_client').text(data.documents.name_of_client);
+                    $('#c_contact').text(data.documents.contact);
+                    $('#c_description').text(data.documents.description);
+
+                    $('#documentCodeModal').modal('hide');
+                    $('#editCodeModal').modal('show');
+
+                    $('#codeUpdateBtn').on('click', function () {
+                        $("#codeEditForm").attr("action", `/document/storeGuestCreate/${id}`).submit();
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        });
+
+        $('#datatable-codes').DataTable();
     });
 
 </script>

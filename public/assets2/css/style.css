@@ -389,10 +389,6 @@ h6 {
   background: #37517e;
 }
 
-#hero .container {
-  padding-top: 72px;
-}
-
 #hero h1 {
   margin: 0 0 10px 0;
   font-size: 48px;
@@ -1637,6 +1633,8 @@ section {
 #footer {
   font-size: 14px;
   background: #37517e;
+  position: absolute; bottom: 0;
+  width: 100%;
 }
 
 #footer .footer-newsletter {
