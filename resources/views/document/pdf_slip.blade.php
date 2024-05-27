@@ -8,13 +8,6 @@
     <title>DepEd - CDO | Print Slip</title>
     <style>
         @page { size: 8.5in 13in; margin: 0; }
-        @media print {
-            .odd {
-                background-color: #0b459b;
-                color: white;
-                print-color-adjust: exact;
-            }
-        }
 
         * { box-sizing: border-box; padding: 0; margin: 0; }
         table { width: 100%; border-collapse: collapse; }
@@ -27,8 +20,8 @@
         .text-center { text-align: center; }
         .border { border: 1px solid black; padding: 10px }
 
-        .container { font-size: 8px; display: flex; justify-content: space-between; height: 100vh; }
-        .section { height: 50vh; width: 100%; padding: 15px; }
+        .container { font-size: 8px; display: flex;  height: 100vh; justify-content: center; }
+        .section { height: 50vh; width: 100%; padding: 15px; max-width: min-content; }
         .section:first-child { border: 1px solid black;  }
         .header { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .trans-code { font-size: 18px; font-weight: 700; }
@@ -64,13 +57,13 @@
                 </div>
                 <div class="iso" style="width: 33.33%">
                     <table>
-                        <tr class="odd" style="background-color: #0b459b; color: white;">
+                        <tr class="odd">
                             <td colspan="3">Document Code No.</td>
                         </tr>
                         <tr>
                             <td colspan="3"><strong>SDOCDO-OSDS-REC-DTS-001</strong></td>
                         </tr>
-                        <tr class="odd" style="background-color: #0b459b; color: white;">
+                        <tr class="odd">
                             <td>Rev. No.</td>
                             <td>Effective Date</td>
                             <td>Page No.</td>
