@@ -78,24 +78,24 @@
             </div>
 
             <p class="text-center"><strong>SCHOOLS DIVISION OF CAGAYAN DE ORO CITY</strong></p>
-            <hr style="width: 60%; margin: 15px auto;">
+            <hr style="width: 80%; margin: 10px auto;">
 
             <div class="content">
-                <p class="text-center" style="margin: 15px auto;"><strong>DOCUMENT ROUTING SLIP</strong></p>
-                <div class="d-flex" style="line-height: 12px;">
+                <p class="text-center" style="margin: 10px auto;"><strong>DOCUMENT ROUTING SLIP</strong></p>
+                <div class="d-flex" style="line-height: 12px; font-size: 9px;">
                     <div style="width: 60%;">
-                        <p>FROM: &nbsp;{{ $detail->name_of_client != ''? $detail->name_of_client : '_______________________________________________' }}</p>
-                        <p>SUBJECT: &nbsp;{{ $detail->description != ''? $detail->description : '____________________________________________' }}</p>
+                        <p><strong>FROM:</strong> &nbsp;{{ $detail->name_of_client != ''? $detail->name_of_client : '_______________________________________________' }}</p>
+                        <p><strong>SUBJECT:</strong> &nbsp;{{ $detail->description != ''? $detail->description : '____________________________________________' }}</p>
                     </div>
                     <div style="width: 40%;">
-                        <p>DATE CREATED: &nbsp;{{ $detail->created_at->format('m/d/Y') != ''? $detail->created_at->format('m/d/Y') : '__________________' }}</p>
-                        <p>CONTACT NO.: &nbsp;{{ $detail->contact != ''? $detail->contact : '____________________' }}</p>
+                        <p><strong>DATE CREATED:</strong> &nbsp;{{ $detail->created_at->format('m/d/Y') != ''? $detail->created_at->format('m/d/Y') : '__________________' }}</p>
+                        <p><strong>CONTACT NO.:</strong> &nbsp;{{ $detail->contact != ''? $detail->contact : '____________________' }}</p>
                     </div>
                 </div>
                 <div class="border" style="margin: 10px auto">
                     <p><strong>Office/Unit</strong> (<i>To be filled out by Schools Division Superintendent Office</i>) </p>
-                    <div class="d-flex" style="margin-top: 10px; font-size: 7px;">
-                        <div class="" style="width: 33.33%">
+                    <div class="d-flex" style="margin-top: 10px; font-size: 9px;">
+                        <div class="" style="width: 50%">
                             <div class="">[&nbsp; &nbsp;] Asst. Schools Division Supt.</div>
                             <div class="">[&nbsp; &nbsp;] CID, Chief</div>
                             <div class="">[&nbsp; &nbsp;] SGOD, Chief</div>
@@ -105,11 +105,12 @@
                             <div class="">[&nbsp; &nbsp;] Learning Resource Mngt. Sec</div>
                             <div class="">[&nbsp; &nbsp;] Legal Office</div>
                             <div class="">[&nbsp; &nbsp;] Accounting Office</div>
-                        </div>
-
-                        <div class="" style="width: 33.33%">
                             <div class="">[&nbsp; &nbsp;] Budget Office</div>
                             <div class="">[&nbsp; &nbsp;] Supply Office</div>
+                        </div>
+
+                        <div class="" style="width: 50%">
+
                             <div class="">[&nbsp; &nbsp;] SGOD, Engineer / Educ. Facilities</div>
                             <div class="">[&nbsp; &nbsp;] SGOD, Youth Formation Div.</div>
                             <div class="">[&nbsp; &nbsp;] SGOD, Planning and Research</div>
@@ -117,24 +118,24 @@
                             <div class="">[&nbsp; &nbsp;] SGOD, Medical / Dental</div>
                             <div class="">[&nbsp; &nbsp;] SGOD, Monitoring & Evaluation</div>
                             <div class="">[&nbsp; &nbsp;] SGOD, Social Mobilization / Net</div>
-                        </div>
-                        <div class="" style="width: 33.33%">
                             <div class="">[&nbsp; &nbsp;] Info & Communication Tech</div>
                             <div class="">[&nbsp; &nbsp;] COA Office</div>
                             <div class="">[&nbsp; &nbsp;] Human Resource Office</div>
                             <div class="">[&nbsp; &nbsp;] Others: __________</div>
                         </div>
+                        {{-- <div class="" style="width: 33.33%">
+
+                        </div> --}}
                     </div>
-                    <p style="margin-top: 10px; line-height: 12px">
+                    <p style="margin-top: 10px; line-height: 12px; font-size: 9px;">
                         <strong>Please:</strong>_________________________________________________________________________________ <br>
-                        _______________________________________________________________________________________
                         _______________________________________________________________________________________
                         _______________________________________________________________________________________
                         _______________________________________________________________________________________
                         _______________________________________________________________________________________
                     </p>
 
-                    <p class="text-center" style="margin-top: 25px">
+                    <p class="text-center" style="margin-top: 25px; font-size: 9px;">
                         <strong>ROY ANGELO E. GAZO</strong> <br>
                         <small>Schools Division Superintendent</small>
                     </p>
@@ -159,8 +160,8 @@
                 <hr style="border-style: dashed">
                 <div class="" style="margin-top: 10px;">
                     <p class="text-center"><strong>CUSTOMER'S COPY (PLEASE KEEP THIS ALWAYS)</strong></p>
-                    <div class="d-flex justify-content-between" style="margin-top: 10px">
-                        <div class="" style="line-height: 12px">
+                    <div class="d-flex justify-content-between" style="margin-top: 5px">
+                        <div class="" style="line-height: 12px; font-size: 8px;">
                         <p><strong>FROM: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>{{ $detail->name_of_client != ''? $detail->name_of_client : '________________________________________' }}</p>
                         <p><strong>SUBJECT: &nbsp;&nbsp;</strong>{{ $detail->description != ''? $detail->description : '________________________________________' }}</p>
                         <p><strong>DATE: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>{{ $detail->created_at->format('m/d/Y') != ''? $detail->created_at->format('m/d/Y') : '________________________________________' }}</p>
@@ -177,7 +178,7 @@
                 </div>
             </div>
         </div>
-        <div class="section">
+        <div class="section" style="display: none;">
         </div>
     </div>
 
