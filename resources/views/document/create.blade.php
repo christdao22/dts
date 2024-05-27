@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
 <style>
     td:nth-child(1) {
@@ -188,9 +188,9 @@
                                                 <td><strong>{{ $code->document_code }}</strong></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end gap-1">
-                                                        <a class="btn btn-primary editCode"
-                                                            data-bs-id='{{ $code->id }}' data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
-                                                                class="ri-edit-line"></i></a>
+                                                        <a class="btn btn-primary editCode" data-bs-id='{{ $code->id }}'
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            title="Edit"><i class="ri-edit-line"></i></a>
 
                                                         <a class="ri ri-printer-fill btn btn-warning"
                                                             data-bs-toggle="tooltip" data-bs-placement="top"
@@ -412,153 +412,161 @@
                             {{-- <div class="mb-3">
                                 <label class="form-label" for="codeType"><b>Other Document Type</b></label>
                                 <input type="text" name="type" id="codeType" value="{{ old('type') }}"
-                                    class="form-control hidden">
-                            </div> --}}
+                            class="form-control hidden">
+                        </div> --}}
 
-                            <div class="mb-3">
-                                <label class="form-label" for="codeTerminal_id"><b>Recipient </b></label>
-                                <select name="terminal_id" id="codeTerminal_id" class="form-select" required>
-                                    <option value="" disabled selected>Select recipient </option>
-                                    @foreach ($terminals as $terminal)
-                                    <option value="{{ $terminal->id }}"
-                                        {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
-                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }}
-                                        {{ $terminal->user->last_name }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="codeTerminal_id"><b>Recipient </b></label>
+                            <select name="terminal_id" id="codeTerminal_id" class="form-select" required>
+                                <option value="" disabled selected>Select recipient </option>
+                                @foreach ($terminals as $terminal)
+                                <option value="{{ $terminal->id }}"
+                                    {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
+                                    {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }}
+                                    {{ $terminal->user->last_name }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                            <div class="mb-4">
-                                <label class="form-label" for="codeRemarks">Remarks</label>
-                                <textarea name="remarks" id="codeRemarks" cols="30" rows="5"
-                                    class="form-control">{{ old('remarks') }}</textarea>
-                            </div>
+                        <div class="mb-4">
+                            <label class="form-label" for="codeRemarks">Remarks</label>
+                            <textarea name="remarks" id="codeRemarks" cols="30" rows="5"
+                                class="form-control">{{ old('remarks') }}</textarea>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success" id="codeUpdateBtn">Update</button>
-                    </div>
-                </form>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success" id="codeUpdateBtn">Update</button>
+            </div>
+            </form>
         </div>
     </div>
 </div>
+</div>
 
-<script>
-    $(document).ready(function () {
-
-        $('.deleteBtn').on('click', function (e) {
-            var id = $(this).data('bs-id');
-            $('#confirmModal').modal('show');
-            $('#confirmDelete').on('click', function () {
-                $('#delete_form_' + id).submit()
-            });
-        });
-
-        $('.editButton').on('click', function () {
-            let id = $(this).data('bs-id');
-            $.ajax({
-                url: '/document/getDocument/' + id,
-                method: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    $('#editCategory_id').val(data.documents.document_category_id !== null ?
-                        data.documents.document_category_id : 'others');
-                    $('#editType').val(data.documents.type);
-                    $('#editCode').val(data.documents.document_code);
-                    $('#editName_of_client').val(data.documents.name_of_client);
-                    $('#editDescription').val(data.documents.description);
-                    $('#editTerminal_id').val(data.documents.terminal_id);
-                    $('#editContact').val(data.documents.contact);
-                    $('#editType').parent().toggleClass('d-none', data.documents
-                        .document_category_id !== null);
-                    $('#editModal').modal('show');
-
-                    $('#updateBtn').on('click', function () {
-                        $("#editForm").attr("action", `/document/update-edit/${id}`)
-                            .submit();
+<script defer>
+    window.addEventListener('load',
+        function () {
+            if (window.jQuery) {
+                $('.deleteBtn').on('click', function (e) {
+                    var id = $(this).data('bs-id');
+                    $('#confirmModal').modal('show');
+                    $('#confirmDelete').on('click', function () {
+                        $('#delete_form_' + id).submit()
                     });
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error fetching data:', error);
-                }
-            });
-        });
-
-        $('#myModal').on('shown.bs.modal', function () {
-            $('#is_check_by_dm').on('change', function () {
-                let checked = $(this).prop("checked");
-                $.ajax({
-                    url: '/admin/getTerminals/' + checked,
-                    method: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        $('#terminal').empty().append(
-                            '<option value="" disabled selected>Select recipient</option>'
-                        )
-                        $.each(data.terminal, function (index, item) {
-
-                            $('#terminal').append(
-                                `<option value="${item.id}">${item.terminal_name}</option>`
-                            );
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error fetching data:', error);
-                    }
                 });
-            });
 
-            $('#category_id').on('change', function () {
-                $('#type').parent().toggleClass('d-none', $(this).val() !== 'others');
-            });
-        })
+                $('.editButton').on('click', function () {
+                    let id = $(this).data('bs-id');
+                    $.ajax({
+                        url: '/document/getDocument/' + id,
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            $('#editCategory_id').val(data.documents
+                                .document_category_id !== null ?
+                                data.documents.document_category_id : 'others');
+                            $('#editType').val(data.documents.type);
+                            $('#editCode').val(data.documents.document_code);
+                            $('#editName_of_client').val(data.documents.name_of_client);
+                            $('#editDescription').val(data.documents.description);
+                            $('#editTerminal_id').val(data.documents.terminal_id);
+                            $('#editContact').val(data.documents.contact);
+                            $('#editType').parent().toggleClass('d-none', data.documents
+                                .document_category_id !== null);
+                            $('#editModal').modal('show');
 
-        $('#editModal').on('hidden.bs.modal', function () {
-            $('#editCategory_id').val();
-            $('#editType').val();
-            $('#editCode').val();
-            $('#editName_of_client').val();
-            $('#editDescription').val();
-            $('#editContact').val();
-            $('#terminal_id').val();
-        });
-
-        $('#editModal').on('shown.bs.modal', function () {
-            $('#editCategory_id').on('change', function () {
-                $('#editType').parent().toggleClass('d-none', $(this).val() !== 'others');
-            });
-        });
-
-        $('.editCode').on('click', function () {
-            let id = $(this).data('bs-id');
-            $.ajax({
-                url: '/document/getDocument/' + id,
-                method: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    $('#c_document_code').text(data.documents.document_code);
-                    $('#c_name_of_client').text(data.documents.name_of_client);
-                    $('#c_contact').text(data.documents.contact);
-                    $('#c_description').text(data.documents.description);
-
-                    $('#documentCodeModal').modal('hide');
-                    $('#editCodeModal').modal('show');
-
-                    $('#codeUpdateBtn').on('click', function () {
-                        $("#codeEditForm").attr("action", `/document/storeGuestCreate/${id}`).submit();
+                            $('#updateBtn').on('click', function () {
+                                $("#editForm").attr("action",
+                                        `/document/update-edit/${id}`)
+                                    .submit();
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error fetching data:', error);
+                        }
                     });
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error fetching data:', error);
-                }
-            });
-        });
+                });
 
-        $('#datatable-codes').DataTable();
-    });
+                $('#myModal').on('shown.bs.modal', function () {
+                    $('#is_check_by_dm').on('change', function () {
+                        let checked = $(this).prop("checked");
+                        $.ajax({
+                            url: '/admin/getTerminals/' + checked,
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                $('#terminal').empty().append(
+                                    '<option value="" disabled selected>Select recipient</option>'
+                                )
+                                $.each(data.terminal, function (index, item) {
+
+                                    $('#terminal').append(
+                                        `<option value="${item.id}">${item.terminal_name}</option>`
+                                    );
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching data:', error);
+                            }
+                        });
+                    });
+
+                    $('#category_id').on('change', function () {
+                        $('#type').parent().toggleClass('d-none', $(this).val() !==
+                            'others');
+                    });
+                })
+
+                $('#editModal').on('hidden.bs.modal', function () {
+                    $('#editCategory_id').val();
+                    $('#editType').val();
+                    $('#editCode').val();
+                    $('#editName_of_client').val();
+                    $('#editDescription').val();
+                    $('#editContact').val();
+                    $('#terminal_id').val();
+                });
+
+                $('#editModal').on('shown.bs.modal', function () {
+                    $('#editCategory_id').on('change', function () {
+                        $('#editType').parent().toggleClass('d-none', $(this).val() !==
+                            'others');
+                    });
+                });
+
+                $('.editCode').on('click', function () {
+                    let id = $(this).data('bs-id');
+                    $.ajax({
+                        url: '/document/getDocument/' + id,
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            $('#c_document_code').text(data.documents.document_code);
+                            $('#c_name_of_client').text(data.documents.name_of_client);
+                            $('#c_contact').text(data.documents.contact);
+                            $('#c_description').text(data.documents.description);
+
+                            $('#documentCodeModal').modal('hide');
+                            $('#editCodeModal').modal('show');
+
+                            $('#codeUpdateBtn').on('click', function () {
+                                $("#codeEditForm").attr("action",
+                                        `/document/storeGuestCreate/${id}`)
+                                    .submit();
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error fetching data:', error);
+                        }
+                    });
+                });
+
+                $('#datatable-codes').DataTable();
+            }
+        }, false);
 
 </script>
 @endsection

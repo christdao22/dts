@@ -10,6 +10,7 @@ class DocumentTracking extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'user_id',
         'document_detail_id',
         'terminal_id',

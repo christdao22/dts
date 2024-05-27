@@ -19,12 +19,13 @@ use RealRashid\SweetAlert\Facades\Alert;
 class DocumentController extends Controller
 {
 
-    public function maintenance() {
-        if(false) {
+    public function maintenance()
+    {
+        if (false) {
             Alert::warning('System maintenance', 'The system will be down for maintenance today. Please save your work')->persistent('Dismiss');
         }
 
-        if(false) {
+        if (false) {
             Alert::success('System maintenance completed', 'Thank you for waiting!');
         }
     }
@@ -143,21 +144,15 @@ class DocumentController extends Controller
         $filters = $this->getFilters();
 
         $documentTrackings = [];
-       if(!auth()->user()->is_admin) {
-            $terminal = Terminal::where('user_id', auth()->user()->id)->first();
+        $terminal = Terminal::where('user_id', auth()->user()->id)->first();
 
-            if ($terminal == null) {
-                return view('document.incoming', compact('documentTrackings'));
-            }
-
-            $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
-                ->where('status', 'incoming')
-                ->with('user', 'documentDetail.document_category', 'remark');
-
-        } else {
-            $documentTrackings = DocumentTracking::where('status', 'incoming')
-                ->with('user', 'documentDetail.document_category', 'remark');
+        if ($terminal == null) {
+            return view('document.incoming', compact('documentTrackings'));
         }
+
+        $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
+            ->where('status', 'incoming')
+            ->with('user', 'documentDetail.document_category', 'remark');
 
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
@@ -211,7 +206,7 @@ class DocumentController extends Controller
             return $query->where('is_active', 1);
         })->orderBy('terminal_name')->get();
 
-        if(!auth()->user()->is_admin){
+        if (!auth()->user()->is_admin) {
             $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
 
             if ($terminal != null) {
@@ -222,7 +217,7 @@ class DocumentController extends Controller
 
         } else {
             $documentTrackings = DocumentTracking::where('status', 'completed')
-            ->with('remark', 'documentDetail', 'user');
+                ->with('remark', 'documentDetail', 'user');
         }
 
         $documentTrackings = $this->filter($request, $documentTrackings);
@@ -299,7 +294,7 @@ class DocumentController extends Controller
                     'terminal_id' => $request->terminal,
                     'document_category_id' => $request->category_id == 'others' ? null : $request->category_id,
                     'contact' => $request->contact,
-                    'created_at' => count($generated_data)!=0? date($generated_data[0]->created_at) : date('Y-m-d H:i:s')
+                    'created_at' => count($generated_data) != 0 ? date($generated_data[0]->created_at) : date('Y-m-d H:i:s'),
 
                     // 'is_check_by_dm'    => $request->is_check_by_dm == 'on'
                     // 'transaction_type'  =>  1, // to identify if simple, complex, highly technical
@@ -313,6 +308,7 @@ class DocumentController extends Controller
                 ]);
 
                 DocumentTracking::create([
+                    'id' => $documentDetail->id,
                     'user_id' => auth()->user()->id,
                     'document_detail_id' => $documentDetail->id,
                     'terminal_id' => $request->terminal,
@@ -443,6 +439,10 @@ class DocumentController extends Controller
                 $documentDetail->contact = $request->contact;
                 $documentDetail->document_category_id = $request->category_id == 'others' ? null : $request->category_id;
                 $documentDetail->save();
+
+                $tracking = DocumentTracking::find($id);
+                $tracking->terminal_id = $request->terminal_id;
+                $tracking->save();
             });
         } catch (\Exception $e) {
             Alert::error('Ooppss', 'Please try again...');
@@ -589,7 +589,8 @@ class DocumentController extends Controller
         return redirect()->back();
     }
 
-    public function guestCreate(Request $request) {
+    public function guestCreate(Request $request)
+    {
         try {
             $document_code = $this->generateDocumentNumber();
             DB::transaction(function () use ($request, $document_code) {
@@ -604,8 +605,8 @@ class DocumentController extends Controller
 
             Alert::success($document_code, 'Successfully Created')->persistent('Dismiss');
             return redirect()->back()->with([
-                'success'=> 'true',
-                'code' => $document_code
+                'success' => 'true',
+                'code' => $document_code,
             ]);
 
         } catch (\Exception $e) {
@@ -614,14 +615,13 @@ class DocumentController extends Controller
         }
     }
 
-    public function printPDF(string $id) {
+    public function printPDF(string $id)
+    {
 
         $detail = DocumentDetail::where('document_code', $id)->get()->first();
 
         return view('document.pdf_slip', compact('detail'));
     }
-
-
 
     public function storeGuestCreate(string $id, Request $request)
     {
@@ -633,15 +633,14 @@ class DocumentController extends Controller
                 $documentDetail->terminal_id = $request->terminal_id;
                 $documentDetail->save();
 
-
                 $remark = Remark::create([
                     'remarks' => $request->remarks,
                 ]);
-
                 DocumentTracking::create([
+                    'id' => $documentDetail->id,
                     'user_id' => auth()->user()->id,
                     'document_detail_id' => $documentDetail->id,
-                    'terminal_id' => $request->terminal,
+                    'terminal_id' => $request->terminal_id,
                     'remark_id' => $remark->id,
                     'status' => 'incoming',
                 ]);
