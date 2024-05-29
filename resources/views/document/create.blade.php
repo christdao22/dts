@@ -176,7 +176,7 @@
                                             @foreach ($document_codes as $code)
                                             <tr>
                                                 <td><strong>{{ $code->document_code }}</strong></td>
-                                                <td><strong>{{ $code->name_of_client }}</strong></td>
+                                                <td><strong class="text-uppercase">{{ $code->name_of_client }}</strong></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end gap-1">
                                                         <a class="btn btn-primary editCode" data-bs-id='{{ $code->id }}'
