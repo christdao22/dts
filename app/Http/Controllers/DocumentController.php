@@ -26,7 +26,7 @@ class DocumentController extends Controller
         }
 
         if (false) {
-            Alert::success('System maintenance completed', 'Thank you for waiting!');
+            Alert::success('System maintenance completed', 'Sorry for the inconvenience. Anhi lang sa ICT Team if naa mo concern. Thank you for your understanding!.');
         }
     }
     /**
