@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
-
 <style>
     td:nth-child(1) {
         width: 10%;
@@ -47,7 +45,7 @@
                 <div class="card-body">
                     @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1)
                     <div class="d-flex flex-row-reverse gap-2">
-                        <button class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#myModal">Create
+                        <button class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Create
                             Documents</button>
                         <form action="{{ route('document.generateCode') }}" method="get">
                             @csrf
@@ -57,9 +55,9 @@
                                 data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i>
                                 Generate Code</button>
                         </form><button class="btn btn-success mb-3" data-bs-toggle="modal"
-                            data-bs-target="#documentCodeModal">Search Code</button>
+                            data-bs-target="#guestDocumentModal">Add Document</button>
                     </div>
-                    <div class="modal" id="myModal">
+                    <div class="modal" id="createModal">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -73,15 +71,6 @@
                                     <div class="modal-body">
                                         <div class="mb-3">
                                             <div class="mb-4 d-flex flex-column gap-3">
-                                                {{-- <div class="form-check form-switch ps-0">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <label class="form-check-label" for="is_check_by_dm">Forward to the Decision Maker?</label>
-                                                        <input class="form-check-input" type="checkbox" name="is_check_by_dm" id="is_check_by_dm"
-                                                            style="width: 4em; height: 2em;">
-                                                    </div>
-                                                </div> --}}
-
-
                                                 <x-form.input :$errors data="{
                                                     'input_name'  : 'document_code',
                                                     'label'       : 'Document Code',
@@ -164,7 +153,7 @@
                         </div>
                     </div>
 
-                    <div class="modal " id="documentCodeModal">
+                    <div class="modal " id="guestDocumentModal">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -193,12 +182,23 @@
                                                         <a class="btn btn-primary editCode" data-bs-id='{{ $code->id }}'
                                                             data-bs-toggle="tooltip" data-bs-placement="top"
                                                             title="Edit"><i class="ri-edit-line"></i></a>
-
+                                                        {{-- <button class="btn btn-danger codeDeleteBtn"
+                                                            data-bs-id={{ $code->id }}><i
+                                                            class="ri-delete-bin-line"></i>
+                                                        <form id="code_delete_form_{{ $code->id }}"
+                                                            action="{{ route('document.destroy', $code->id) }}"
+                                                            method="POST" enctype="multipart/form-data">
+                                                            @method('DELETE')
+                                                            @csrf
+                                                        </form>
+                                                        </button> --}}
                                                         <a class="ri ri-printer-fill btn btn-warning"
                                                             data-bs-toggle="tooltip" data-bs-placement="top"
                                                             title="Print"
                                                             href="{{ route('printPDF', $code->document_code ) }}"
                                                             target="_blank"></a>
+
+
                                                     </div>
                                                 </td>
                                             </tr>
@@ -380,7 +380,7 @@
         </div>
     </div>
     {{-- Edit Searched Doc Modal --}}
-    <div class="modal" id="editCodeModal">
+    <div class="modal" id="addDocumentModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -393,121 +393,116 @@
                     <div class="modal-body">
                         <div class="mb-3">
 
-                            <p>Document Code: <strong id="c_document_code">test</strong></p>
-                            <p>Name Of Client: <strong id="c_name_of_client"></strong></p>
-                            <p>Contact No.: <strong id="c_contact"></strong></p>
-                            <p>Description: <strong id="c_description"></strong></p>
+                            <p>Document Code: <strong id="add_document_code"></strong></p>
+                            <div class="mb-3">
+                                <label class="form-label" for="add_name_of_client">Name Of Client</label>
+                                <input id="add_name_of_client" name="add_name_of_client" type="text"
+                                    class="form-control" required name="add_name_of_client" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="add_contact">Contact No.</label>
+                                <input id="add_contact" type="text" class="form-control" required name="add_contact" />
+                            </div>
 
                             <div class="form-group mb-3">
-                                <label class="form-label" for="codeCategory_id"><b>Document Type </b></label>
-                                <select name="category_id" id="codeCategory_id" class="form-select" required>
+                                <label class="form-label" for="add_category_id"><b>Document Type </b></label>
+                                <select name="add_category_id" id="add_category_id" class="form-select" required>
                                     <option value="" disabled selected>Select document type</option>
                                     @foreach ($categories as $category)
                                     <option value="{{ $category->id }}"
-                                        {{ old('category_id') == $category->id? 'selected':'' }}>
+                                        {{ old('add_category_id') == $category->id? 'selected':'' }}>
                                         {{ $category->category_name }}</option>
                                     @endforeach
                                     <option value="others">Others</option>
                                 </select>
                             </div>
 
-                            {{-- <div class="mb-3">
-                                <label class="form-label" for="codeType"><b>Other Document Type</b></label>
-                                <input type="text" name="type" id="codeType" value="{{ old('type') }}"
-                            class="form-control hidden">
-                        </div> --}}
+                            <div class="mb-3 d-none">
+                                <label class="form-label" for="add_type"><b>Other Document Type</b></label>
+                                <input type="text" name="add_type" id="add_type" value="{{ old('add_type') }}"
+                                    class="form-control hidden">
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label" for="codeTerminal_id"><b>Recipient </b></label>
-                            <select name="terminal_id" id="codeTerminal_id" class="form-select" required>
-                                <option value="" disabled selected>Select recipient </option>
-                                @foreach ($terminals as $terminal)
-                                <option value="{{ $terminal->id }}"
-                                    {{ old('terminal_id') == $terminal->id? 'selected':'' }}>
-                                    {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }}
-                                    {{ $terminal->user->last_name }}
-                                </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label" for="codeRemarks">Remarks</label>
-                            <textarea name="remarks" id="codeRemarks" cols="30" rows="5"
-                                class="form-control">{{ old('remarks') }}</textarea>
+                            <div class="mb-3">
+                                <label class="form-label" for="add_terminal_id"><b>Recipient </b></label>
+                                <select name="add_terminal_id" id="add_terminal_id" class="form-select" required>
+                                    <option value="" disabled selected>Select recipient </option>
+                                    @foreach ($terminals as $terminal)
+                                    <option value="{{ $terminal->id }}"
+                                        {{ old('add_terminal_id') == $terminal->id? 'selected':'' }}>
+                                        {{ $terminal->terminal_name }} - {{ $terminal->user->first_name }}
+                                        {{ $terminal->user->last_name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label" for="add_description">Description</label>
+                                <textarea name="add_description" id="add_description" cols="30" rows="5"
+                                    class="form-control">{{ old('add_description') }}</textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label" for="add_remarks">Remarks</label>
+                                <textarea name="add_remarks" id="add_remarks" cols="30" rows="5"
+                                    class="form-control">{{ old('add_remarks') }}</textarea>
+                            </div>
                         </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success" id="codeUpdateBtn">Update</button>
+                    </div>
+                </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-success" id="codeUpdateBtn">Update</button>
-            </div>
-            </form>
         </div>
     </div>
-</div>
 </div>
 
 <script defer>
     window.addEventListener('load',
         function () {
             if (window.jQuery) {
-                $('.deleteBtn').on('click', function (e) {
-                    var id = $(this).data('bs-id');
-                    $('#confirmModal').modal('show');
-                    $('#confirmDelete').on('click', function () {
-                        $('#delete_form_' + id).submit()
+                $(document).ready(function () {
+                    initializeDataTable('#datatable-codes');
+                    handleModalCategoryChange('#createModal', '#category_id', '#type');
+                    handleModalCategoryChange('#editModal', '#editCategory_id', '#editType');
+                    handleModalCategoryChange('#addDocumentModal', '#add_category_id', '#add_type');
+                    handleEditButton('.editButton', '#editModal', '#updateBtn', '/document/update-edit/');
+
+                    $('.deleteBtn').on('click', function (e) {
+                        var id = $(this).data('bs-id');
+                        $('#confirmModal').modal('show');
+                        $('#confirmDelete').on('click', function () {
+                            $('#delete_form_' + id).submit()
+                        });
                     });
-                });
 
-                $('.editButton').on('click', function () {
-                    let id = $(this).data('bs-id');
-                    $.ajax({
-                        url: '/document/getDocument/' + id,
-                        method: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            $('#editCategory_id').val(data.documents
-                                .document_category_id !== null ?
-                                data.documents.document_category_id : 'others');
-                            $('#editType').val(data.documents.type);
-                            $('#editCode').val(data.documents.document_code);
-                            $('#editName_of_client').val(data.documents.name_of_client);
-                            $('#editDescription').val(data.documents.description);
-                            $('#editTerminal_id').val(data.documents.terminal_id);
-                            $('#editContact').val(data.documents.contact);
-                            $('#editType').parent().toggleClass('d-none', data.documents
-                                .document_category_id !== null);
-                            $('#editModal').modal('show');
-
-                            $('#updateBtn').on('click', function () {
-                                $("#editForm").attr("action",
-                                        `/document/update-edit/${id}`)
-                                    .submit();
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error fetching data:', error);
-                        }
-                    });
-                });
-
-                $('#myModal').on('shown.bs.modal', function () {
-                    $('#is_check_by_dm').on('change', function () {
-                        let checked = $(this).prop("checked");
+                    $('.editButton').on('click', function () {
+                        let id = $(this).data('bs-id');
                         $.ajax({
-                            url: '/admin/getTerminals/' + checked,
+                            url: '/document/getDocument/' + id,
                             method: 'GET',
                             dataType: 'json',
                             success: function (data) {
-                                $('#terminal').empty().append(
-                                    '<option value="" disabled selected>Select recipient</option>'
-                                )
-                                $.each(data.terminal, function (index, item) {
+                                $('#editCategory_id').val(data.documents
+                                    .document_category_id !== null ?
+                                    data.documents.document_category_id : 'others');
+                                $('#editType').val(data.documents.type);
+                                $('#editCode').val(data.documents.document_code);
+                                $('#editName_of_client').val(data.documents
+                                    .name_of_client);
+                                $('#editDescription').val(data.documents.description);
+                                $('#editTerminal_id').val(data.documents.terminal_id);
+                                $('#editContact').val(data.documents.contact);
+                                $('#editType').parent().toggleClass('d-none', data
+                                    .documents
+                                    .document_category_id !== null);
+                                $('#editModal').modal('show');
 
-                                    $('#terminal').append(
-                                        `<option value="${item.id}">${item.terminal_name}</option>`
-                                    );
+                                $('#updateBtn').on('click', function () {
+                                    $("#editForm").attr("action",
+                                            `/document/update-edit/${id}`)
+                                        .submit();
                                 });
                             },
                             error: function (xhr, status, error) {
@@ -516,59 +511,86 @@
                         });
                     });
 
-                    $('#category_id').on('change', function () {
-                        $('#type').parent().toggleClass('d-none', $(this).val() !==
-                            'others');
+                    $('.editCode').on('click', function () {
+                        let id = $(this).data('bs-id');
+                        $.ajax({
+                            url: '/document/getDocument/' + id,
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                $('#add_document_code').text(data.documents
+                                    .document_code);
+                                $('#add_name_of_client').val(data.documents
+                                    .name_of_client);
+                                $('#add_contact').val(data.documents.contact);
+                                $('#add_description').val(data.documents.description);
+                                $('#guestDocumentModal').modal('hide');
+                                $('#addDocumentModal').modal('show');
+
+                                $('#codeUpdateBtn').on('click', function () {
+                                    $("#codeEditForm").attr("action",
+                                            `/document/storeGuestCreate/${id}`)
+                                        .submit();
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching data:', error);
+                            }
+                        });
                     });
                 })
+            }
 
-                $('#editModal').on('hidden.bs.modal', function () {
-                    $('#editCategory_id').val();
-                    $('#editType').val();
-                    $('#editCode').val();
-                    $('#editName_of_client').val();
-                    $('#editDescription').val();
-                    $('#editContact').val();
-                    $('#terminal_id').val();
-                });
+            function initializeDataTable(selector) {
+                $(selector).DataTable();
+            }
 
-                $('#editModal').on('shown.bs.modal', function () {
-                    $('#editCategory_id').on('change', function () {
-                        $('#editType').parent().toggleClass('d-none', $(this).val() !==
-                            'others');
+            function handleModalCategoryChange(modalSelector, categorySelector, typeSelector) {
+                $(modalSelector).on('shown.bs.modal', function () {
+                    $(categorySelector).on('change', function () {
+                        $(typeSelector).parent().toggleClass('d-none', $(this).val() !== 'others');
                     });
                 });
+            }
 
-                $('.editCode').on('click', function () {
-                    let id = $(this).data('bs-id');
-                    $.ajax({
-                        url: '/document/getDocument/' + id,
-                        method: 'GET',
-                        dataType: 'json',
-                        success: function (data) {
-                            $('#c_document_code').text(data.documents.document_code);
-                            $('#c_name_of_client').text(data.documents.name_of_client);
-                            $('#c_contact').text(data.documents.contact);
-                            $('#c_description').text(data.documents.description);
-
-                            $('#documentCodeModal').modal('hide');
-                            $('#editCodeModal').modal('show');
-
-                            $('#codeUpdateBtn').on('click', function () {
-                                $("#codeEditForm").attr("action",
-                                        `/document/storeGuestCreate/${id}`)
-                                    .submit();
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error fetching data:', error);
-                        }
+            function handleEditButton(editButtonSelector, editModalSelector, updateButtonSelector, updateUrl) {
+                $(editButtonSelector).on('click', function () {
+                    const id = $(this).data('bs-id');
+                    fetchDocumentData(id, function (data) {
+                        populateEditModal(data.documents);
+                        $(editModalSelector).modal('show');
+                        $(updateButtonSelector).off('click').on('click', function () {
+                            $("#editForm").attr("action", updateUrl + id).submit();
+                        });
                     });
                 });
+            }
 
-                $('#datatable-codes').DataTable();
+            function handleEditCodeButton(editCodeButtonSelector, addDocumentModalSelector,
+                guestDocumentModalSelector, codeUpdateButtonSelector, updateUrl) {
+                $(editCodeButtonSelector).on('click', function () {
+                    const id = $(this).data('bs-id');
+                    fetchDocumentData(id, function (data) {
+                        populateAddDocumentModal(data.documents);
+                        $(guestDocumentModalSelector).modal('hide');
+                        $(addDocumentModalSelector).modal('show');
+                        $(codeUpdateButtonSelector).off('click').on('click', function () {
+                            $("#codeEditForm").attr("action", updateUrl + id).submit();
+                        });
+                    });
+                });
             }
         }, false);
 
 </script>
 @endsection
+
+
+
+
+* Printed application form (8.5in x 13in) generated in the OCSEAS;
+Original & photocopy of identification card (same as the e-copy ID submitted);
+* 4 pieces of the original passport-sized ID picture (same as the picture submitted during the online application);
+Original & photocopy of Certificate of Live Birth (if applicable);
+Original & photocopy of Certificate of Employment (if applicable); and
+*Payment of 500.00 to CSC RO X (Offsite) - SM Downtown Ext, CM Recto Ave and Osmeña St Cagayan de Oro City.

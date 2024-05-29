@@ -629,13 +629,17 @@ class DocumentController extends Controller
             DB::transaction(function () use ($request, $id) {
                 $documentDetail = DocumentDetail::find($id);
                 $documentDetail->user_id = auth()->user()->id;
-                $documentDetail->document_category_id = $request->category_id == 'others' ? null : $request->category_id;
-                $documentDetail->terminal_id = $request->terminal_id;
+                $documentDetail->name_of_client = $request->add_name_of_client;
+                $documentDetail->contact = $request->add_contact;
+                $documentDetail->description = $request->add_description;
+                $documentDetail->document_category_id = $request->add_category_id == 'others' ? $request->add_type : $request->add_category_id;
+                $documentDetail->terminal_id = $request->add_terminal_id;
                 $documentDetail->save();
 
                 $remark = Remark::create([
-                    'remarks' => $request->remarks,
+                    'remarks' => $request->add_remarks,
                 ]);
+
                 DocumentTracking::create([
                     'id' => $documentDetail->id,
                     'user_id' => auth()->user()->id,
