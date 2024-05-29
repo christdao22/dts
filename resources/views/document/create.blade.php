@@ -587,10 +587,3 @@
 
 
 
-
-* Printed application form (8.5in x 13in) generated in the OCSEAS;
-Original & photocopy of identification card (same as the e-copy ID submitted);
-* 4 pieces of the original passport-sized ID picture (same as the picture submitted during the online application);
-Original & photocopy of Certificate of Live Birth (if applicable);
-Original & photocopy of Certificate of Employment (if applicable); and
-*Payment of 500.00 to CSC RO X (Offsite) - SM Downtown Ext, CM Recto Ave and Osmeña St Cagayan de Oro City.
