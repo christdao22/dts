@@ -179,7 +179,7 @@
                                                 <td><strong class="text-uppercase">{{ $code->name_of_client }}</strong></td>
                                                 <td>
                                                     <div class="d-flex justify-content-end gap-1">
-                                                        <a class="btn btn-primary editCode" data-bs-id='{{ $code->id }}'
+                                                        <a class="btn btn-primary editCodeModal" data-bs-id='{{ $code->id }}'
                                                             data-bs-toggle="tooltip" data-bs-placement="top"
                                                             title="Edit"><i class="ri-edit-line"></i></a>
                                                         {{-- <button class="btn btn-danger codeDeleteBtn"
@@ -477,7 +477,7 @@
                         });
                     });
 
-                    $('.editButton').on('click', function () {
+                    $(document).on('click', '.editButton', function() {
                         let id = $(this).data('bs-id');
                         $.ajax({
                             url: '/document/getDocument/' + id,
@@ -511,7 +511,7 @@
                         });
                     });
 
-                    $('.editCode').on('click', function () {
+                    $(document).on('click', '.editCodeModal', function() {
                         let id = $(this).data('bs-id');
                         $.ajax({
                             url: '/document/getDocument/' + id,
