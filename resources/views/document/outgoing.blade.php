@@ -52,6 +52,7 @@
 </style>
 <div class="container-fluid">
     <div class="row">
+
         <div class="col-12">
             <div class="card">
                 <div class="card-header w-100">
@@ -77,7 +78,16 @@
                         </thead>
 
                         <tbody>
+                            @php
+                                $latestCodes = [];
+                            @endphp
                             @foreach ($documentTrackings as $documentTracking)
+                            @php
+                                $isLatest = !isset($latestCodes[$documentTracking->documentDetail->document_code]);
+                                if ($isLatest) {
+                                    $latestCodes[$documentTracking->documentDetail->document_code] = $documentTracking;
+                                }
+                            @endphp
                             <tr>
                                 <td><strong>{{ $documentTracking->documentDetail->document_code }}</strong></td>
                                 <td>{!! $documentTracking->documentDetail->document_category_id != null?
@@ -94,7 +104,8 @@
                                 <td>{{ formatDateTime($documentTracking->created_at) }}</i></td>
                                 <td>{{ $documentTracking->remark->remarks }}</i></td>
                                 <td class="d-flex gap-2">
-                                    @if ($documentTracking->documentDetail->documentTracking->status == 'incoming' && $documentTrackings->first()->id == $documentTracking->id)
+                                     {{-- && $documentTrackings->first()->id == $documentTracking->id --}}
+                                    @if ($documentTracking->documentDetail->documentTracking->status == 'incoming' && $isLatest)
                                         <button type="button" class="btn btn-warning text-white" data-bs-toggle="modal"
                                         data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
                                             class="ri-arrow-left-right-fill" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -118,3 +129,7 @@
 </div> <!-- end row -->
 
 @endsection
+
+
+
+
