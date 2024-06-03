@@ -60,12 +60,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dm', [DocumentController::class, 'decision_maker'])->name('document.decision_maker');
         Route::get('/generateCode', [DocumentController::class, 'generateCode'])->name('document.generateCode');
         Route::patch('/undoActionComplete/{id}', [DocumentController::class, 'undoActionComplete'])->name('document.undoActionComplete');
-        Route::patch('/changeForward/{id}', [DocumentController::class, 'changeForward'])->name('document.changeForward');
+        Route::delete('/changeForward/{id}', [DocumentController::class, 'changeForward'])->name('document.changeForward');
 
         Route::get('system-updates', [HomeController::class, 'systemUpdates'])->name('document.systemUpdates');
 
         Route::resources([ 'document_category' => DocumentCategoryController::class ]);
         Route::patch('storeGuestCreate/{id}', [DocumentController::class, 'storeGuestCreate'])->name('document.storeGuestCreate');
+        Route::delete('deleteGuestCode/{id}', [DocumentController::class, 'deleteGuestCode'])->name('document.deleteGuestCode');
     });
 
     // Admin

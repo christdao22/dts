@@ -184,16 +184,16 @@
                                                             data-bs-id='{{ $code->id }}' data-bs-toggle="tooltip"
                                                             data-bs-placement="top" title="Edit"><i
                                                                 class="ri-edit-line"></i></a>
-                                                        {{-- <button class="btn btn-danger codeDeleteBtn"
+                                                        <button class="btn btn-danger codeDeleteBtn"
                                                             data-bs-id={{ $code->id }}><i
                                                             class="ri-delete-bin-line"></i>
-                                                        <form id="code_delete_form_{{ $code->id }}"
-                                                            action="{{ route('document.destroy', $code->id) }}"
-                                                            method="POST" enctype="multipart/form-data">
-                                                            @method('DELETE')
-                                                            @csrf
-                                                        </form>
-                                                        </button> --}}
+                                                            <form id="code_delete_form_{{ $code->id }}"
+                                                                action="{{ route('document.deleteGuestCode', $code->id) }}"
+                                                                method="POST" enctype="multipart/form-data">
+                                                                @method('DELETE')
+                                                                @csrf
+                                                            </form>
+                                                        </button>
                                                         <a class="ri ri-printer-fill btn btn-warning"
                                                             data-bs-toggle="tooltip" data-bs-placement="top"
                                                             title="Print"
@@ -479,6 +479,14 @@
                         });
                     });
 
+                    $(document).on('click', '.codeDeleteBtn', function() {
+                        var id = $(this).data('bs-id');
+                        $('#confirmModal').modal('show');
+                        $('#confirmDelete').on('click', function () {
+                            $('#code_delete_form_' + id).submit()
+                        });
+                    });
+
                     $(document).on('click', '.editButton', function () {
                         let id = $(this).data('bs-id');
                         $.ajax({
@@ -508,7 +516,7 @@
                                                 '#add_category_id',
                                                 '#add_terminal_id'
                                             ])) {
-                                                
+
                                             $("#editForm").submit();
                                         }
                                     });
@@ -552,6 +560,10 @@
                         });
                     });
                 })
+            }
+
+            if("{{ session('addDocumentModal') }}" == 'true') {
+                $('#guestDocumentModal').modal('show')
             }
 
             function initializeDataTable(selector) {

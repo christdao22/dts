@@ -457,7 +457,7 @@ class DocumentController extends Controller
     {
         $detail = DocumentDetail::find($id);
         if ($detail->is_verified) {
-            toast('Document cannot be deleted when verified.', 'danger');
+            toast('Document cannot be deleted if verified.', 'danger');
             return redirect()->back()->with('danger');
         }
 
@@ -670,5 +670,13 @@ class DocumentController extends Controller
             Alert::error('oppss', 'Please try again...');
             return redirect()->back();
         }
+    }
+
+    public function deleteGuestCode(string $id) {
+        $document = DocumentDetail::find($id);
+        $document->delete();
+        toast('Successfully deleted...', 'success');
+
+        return redirect()->back()->with('addDocumentModal', 'true');
     }
 }
