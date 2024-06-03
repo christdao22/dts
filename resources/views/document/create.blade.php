@@ -176,12 +176,14 @@
                                             @foreach ($document_codes as $code)
                                             <tr>
                                                 <td><strong>{{ $code->document_code }}</strong></td>
-                                                <td><strong class="text-uppercase">{{ $code->name_of_client }}</strong></td>
+                                                <td><strong class="text-uppercase">{{ $code->name_of_client }}</strong>
+                                                </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end gap-1">
-                                                        <a class="btn btn-primary editCodeModal" data-bs-id='{{ $code->id }}'
-                                                            data-bs-toggle="tooltip" data-bs-placement="top"
-                                                            title="Edit"><i class="ri-edit-line"></i></a>
+                                                        <a class="btn btn-primary editCodeModal"
+                                                            data-bs-id='{{ $code->id }}' data-bs-toggle="tooltip"
+                                                            data-bs-placement="top" title="Edit"><i
+                                                                class="ri-edit-line"></i></a>
                                                         {{-- <button class="btn btn-danger codeDeleteBtn"
                                                             data-bs-id={{ $code->id }}><i
                                                             class="ri-delete-bin-line"></i>
@@ -237,7 +239,8 @@
                                     <td>{{ $document->name_of_client }} <br>
                                         {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
                                     <td>{{ $document->description}}</td>
-                                    <td>{{ $document->terminal->terminal_name}}</td>
+                                    <td>{{ isset($document->terminal->terminal_name)? $document->terminal->terminal_name : 'wala' }}
+                                    </td>
                                     <td>{{ formatDateTime($document->created_at) }}</td>
                                     <td>
                                         @if ($document->documentTracking->status == 'completed')
@@ -310,9 +313,9 @@
                     <h5 class="modal-title secondary">Document Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="editForm" action="" method="POST" enctype="multipart/form-data">
-                    @method('PATCH')
+                <form id="editForm" action="#" method="POST" enctype="multipart/form-data">
                     @csrf
+                    @method('PATCH')
                     <div class="modal-body">
                         <div class="mb-3">
                             <div class="form-group mb-3">
@@ -387,7 +390,7 @@
                     <h5 class="modal-title secondary">Document Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="codeEditForm" action="" method="POST" enctype="multipart/form-data">
+                <form id="codeEditForm" action="#" method="POST" enctype="multipart/form-data">
                     @method('PATCH')
                     @csrf
                     <div class="modal-body">
@@ -401,7 +404,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label" for="add_contact">Contact No.</label>
-                                <input id="add_contact" type="text" class="form-control" required name="add_contact" />
+                                <input id="add_contact" type="text" class="form-control" name="add_contact" />
                             </div>
 
                             <div class="form-group mb-3">
@@ -467,9 +470,8 @@
                     handleModalCategoryChange('#createModal', '#category_id', '#type');
                     handleModalCategoryChange('#editModal', '#editCategory_id', '#editType');
                     handleModalCategoryChange('#addDocumentModal', '#add_category_id', '#add_type');
-                    handleEditButton('.editButton', '#editModal', '#updateBtn', '/document/update-edit/');
 
-                    $('.deleteBtn').on('click', function (e) {
+                    $(document).on('click', '.deleteBtn', function() {
                         var id = $(this).data('bs-id');
                         $('#confirmModal').modal('show');
                         $('#confirmDelete').on('click', function () {
@@ -477,7 +479,7 @@
                         });
                     });
 
-                    $(document).on('click', '.editButton', function() {
+                    $(document).on('click', '.editButton', function () {
                         let id = $(this).data('bs-id');
                         $.ajax({
                             url: '/document/getDocument/' + id,
@@ -498,12 +500,18 @@
                                     .documents
                                     .document_category_id !== null);
                                 $('#editModal').modal('show');
+                                $("#editForm").attr("action", `/document/update-edit/${id}`);
 
-                                $('#updateBtn').on('click', function () {
-                                    $("#editForm").attr("action",
-                                            `/document/update-edit/${id}`)
-                                        .submit();
-                                });
+                                $('#updateBtn').off('click').on('click',
+                                    function () {
+                                        if (validateForm(['#add_name_of_client',
+                                                '#add_category_id',
+                                                '#add_terminal_id'
+                                            ])) {
+                                                
+                                            $("#editForm").submit();
+                                        }
+                                    });
                             },
                             error: function (xhr, status, error) {
                                 console.error('Error fetching data:', error);
@@ -511,7 +519,8 @@
                         });
                     });
 
-                    $(document).on('click', '.editCodeModal', function() {
+                    $(document).on('click', '.editCodeModal', function (e) {
+
                         let id = $(this).data('bs-id');
                         $.ajax({
                             url: '/document/getDocument/' + id,
@@ -526,12 +535,16 @@
                                 $('#add_description').val(data.documents.description);
                                 $('#guestDocumentModal').modal('hide');
                                 $('#addDocumentModal').modal('show');
-
-                                $('#codeUpdateBtn').on('click', function () {
-                                    $("#codeEditForm").attr("action",
-                                            `/document/storeGuestCreate/${id}`)
-                                        .submit();
-                                });
+                                $("#codeEditForm").attr("action", `/document/storeGuestCreate/${id}`);
+                                $('#codeUpdateBtn').off('click').on('click',
+                                    function () {
+                                        if (validateForm(['#add_name_of_client',
+                                                '#add_category_id',
+                                                '#add_terminal_id'
+                                            ])) {
+                                            $("#codeEditForm").submit();
+                                        }
+                                    });
                             },
                             error: function (xhr, status, error) {
                                 console.error('Error fetching data:', error);
@@ -553,37 +566,25 @@
                 });
             }
 
-            function handleEditButton(editButtonSelector, editModalSelector, updateButtonSelector, updateUrl) {
-                $(editButtonSelector).on('click', function () {
-                    const id = $(this).data('bs-id');
-                    fetchDocumentData(id, function (data) {
-                        populateEditModal(data.documents);
-                        $(editModalSelector).modal('show');
-                        $(updateButtonSelector).off('click').on('click', function () {
-                            $("#editForm").attr("action", updateUrl + id).submit();
-                        });
-                    });
+            function validateForm(requiredFields) {
+                let isValid = true;
+
+                // Check each required field
+                requiredFields.forEach(function (selector) {
+                    if ($(selector).val() === '' || $(selector).val() === null) {
+                        isValid = false;
+                        $(selector).addClass(
+                            'is-invalid'); // Add Bootstrap's invalid class to highlight empty fields
+                    } else {
+                        $(selector).removeClass(
+                            'is-invalid'); // Remove the invalid class if the field is not empty
+                    }
                 });
+
+                return isValid;
             }
 
-            function handleEditCodeButton(editCodeButtonSelector, addDocumentModalSelector,
-                guestDocumentModalSelector, codeUpdateButtonSelector, updateUrl) {
-                $(editCodeButtonSelector).on('click', function () {
-                    const id = $(this).data('bs-id');
-                    fetchDocumentData(id, function (data) {
-                        populateAddDocumentModal(data.documents);
-                        $(guestDocumentModalSelector).modal('hide');
-                        $(addDocumentModalSelector).modal('show');
-                        $(codeUpdateButtonSelector).off('click').on('click', function () {
-                            $("#codeEditForm").attr("action", updateUrl + id).submit();
-                        });
-                    });
-                });
-            }
         }, false);
 
 </script>
 @endsection
-
-
-

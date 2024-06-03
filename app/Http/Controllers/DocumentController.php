@@ -644,7 +644,7 @@ class DocumentController extends Controller
                     'id' => $documentDetail->id,
                     'user_id' => auth()->user()->id,
                     'document_detail_id' => $documentDetail->id,
-                    'terminal_id' => $request->terminal_id,
+                    'terminal_id' => $request->add_terminal_id,
                     'remark_id' => $remark->id,
                     'status' => 'incoming',
                 ]);
