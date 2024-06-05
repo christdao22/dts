@@ -23,6 +23,9 @@
     <!-- Vendor CSS Files -->
     <link href="assets2/vendor/aos/aos.css" rel="stylesheet">
 
+    <!-- Icons Css -->
+    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css"/>
+
     <!-- Template Main CSS File -->
     <link href="assets2/css/style.css" rel="stylesheet">
 </head>
@@ -32,11 +35,10 @@
     <header id="header" class="fixed-top">
         <div class="container d-flex align-items-center justify-content-between">
             <a href="{{ url('/') }}">
-                <img class="image-class" style="width: 25rem; float: left;"
+                <img class="home-logo"
                     src="{{ asset('assets/images/home_logo.png') }}" alt="DEPED CDO Logo">
             </a>
-
-            <nav id="navbar" class="navbar">
+             <nav id="navbar" class="navbar">
                 <ul>
                     @if (auth()->user())
                     <li><a class="nav-link scrollto" href="{{ route('document.incoming') }}">Dashboard</a></li>
@@ -45,7 +47,7 @@
                     <li><a class="nav-link scrollto" href="{{ route('register') }}">Register</a></li>
                     @endif
                 </ul>
-                <i class="bi bi-list mobile-nav-toggle"></i>
+                <i class="ri-menu-line mobile-nav-toggle"></i>
             </nav><!-- .navbar -->
         </div>
     </header><!-- End Header -->
@@ -53,7 +55,7 @@
     @include('sweetalert::alert')
     <!-- ======= Hero Section ======= -->
     <section id="hero" class="d-flex align-items-center h-100" style="background-image: url('assets/images/cdobg2.jpg'); background-size: cover;">
-        <div class="container">
+        <div class="container d-none">
             <div class="row d-flex justify-content-between">
                 <div class="col-lg-7 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-1 order-lg-1"
                     data-aos="fade-up" data-aos-delay="200">
@@ -147,3 +149,6 @@
 </body>
 
 </html>
+
+
+<i class="ri-close-line"></i>

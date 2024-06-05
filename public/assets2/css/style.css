@@ -309,7 +309,7 @@ h6 {
 
 .navbar-mobile .mobile-nav-toggle {
   position: absolute;
-  top: 15px;
+  top: 30px;
   right: 15px;
 }
 
@@ -1822,3 +1822,31 @@ section {
 }
 
 .hidden {display:none;}
+
+
+.home-logo {
+    width: 300px;
+}
+
+@media (max-width: 769px) {
+    .home-logo {
+        width: 275px;
+    }
+}
+
+@media (max-width: 577px) {
+    .home-logo {
+        width: 250px;
+    }
+}
+
+@media (max-width: 376px) {
+    .home-logo {
+        width: 200px;
+    }
+}
+
+.mobile-nav-toggle {
+    color: #fff;
+    font-size: 30px;
+}
