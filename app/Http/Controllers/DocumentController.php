@@ -632,7 +632,8 @@ class DocumentController extends Controller
                 $documentDetail->name_of_client = $request->add_name_of_client;
                 $documentDetail->contact = $request->add_contact;
                 $documentDetail->description = $request->add_description;
-                $documentDetail->document_category_id = $request->add_category_id == 'others' ? $request->add_type : $request->add_category_id;
+                $documentDetail->document_category_id = $request->add_category_id == 'others' ? null : $request->add_category_id;
+                $documentDetail->type = $request->add_type;
                 $documentDetail->terminal_id = $request->add_terminal_id;
                 $documentDetail->save();
 
@@ -667,6 +668,7 @@ class DocumentController extends Controller
             return redirect()->back()->with('success', $latestId);
 
         } catch (\Exception $e) {
+            dd($e);
             Alert::error('oppss', 'Please try again...');
             return redirect()->back();
         }
