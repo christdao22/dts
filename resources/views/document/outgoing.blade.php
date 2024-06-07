@@ -82,42 +82,43 @@
                                 $latestCodes = [];
                             @endphp
                             @foreach ($documentTrackings as $documentTracking)
-                            @php
-                                $isLatest = !isset($latestCodes[$documentTracking->documentDetail->document_code]);
-                                if ($isLatest) {
-                                    $latestCodes[$documentTracking->documentDetail->document_code] = $documentTracking;
-                                }
-                            @endphp
-                            <tr>
-                                <td><strong>{{ $documentTracking->documentDetail->document_code }}</strong></td>
-                                <td>{!! $documentTracking->documentDetail->document_category_id != null?
-                                    $documentTracking->documentDetail->document_category->category_name : "<b>Others: </b>" . $documentTracking->documentDetail->type
-                                    !!}</td>
-                                <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
-                                <td>{{ $documentTracking->documentDetail->description }}</td>
-                                <td>{{ strtoupper($documentTracking->user->terminal->terminal_name) }}<br>-
-                                    {{ Str::ucfirst(strtolower($documentTracking->user->first_name)) }}
-                                    {{ Str::ucfirst(strtolower(Str::substr($documentTracking->user->middle_name, 0, 1))) }}.
-                                    {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}</td>
-                                <td>{{ strtoupper($documentTracking->terminal->terminal_name) }}</td>
-                                <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</i></td>
-                                <td>{{ formatDateTime($documentTracking->created_at) }}</i></td>
-                                <td>{{ $documentTracking->remark->remarks }}</i></td>
-                                <td class="d-flex gap-2">
-                                     {{-- && $documentTrackings->first()->id == $documentTracking->id --}}
-                                    @if ($documentTracking->documentDetail->documentTracking->status == 'incoming' && $isLatest)
-                                        <button type="button" class="btn btn-warning text-white" data-bs-toggle="modal"
-                                        data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
-                                            class="ri-arrow-left-right-fill" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Change"></i></button>
-                                    @endif
-                                    <a class="btn btn-info"
-                                        href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
-                                            class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Track"></i></a>
-                                </td>
-                            </tr>
-                            <x-forward-modal :$documentTracking :$terminals routeName='document.changeForward'/>
+                                {{-- {{ dd($documentTracking) }} --}}
+                                @php
+                                    $code = $documentTracking->documentDetail->document_code;
+                                    $isLatest = !isset($latestCodes[$code]);
+                                    if ($isLatest) {
+                                        $latestCodes[$code] = $code;
+                                    }
+                                @endphp
+                                <tr>
+                                    <td><strong>{{ $documentTracking->documentDetail->document_code }}</strong></td>
+                                    <td>{!! $documentTracking->documentDetail->document_category_id != null?
+                                        $documentTracking->documentDetail->document_category->category_name : "<b>Others: </b>" . $documentTracking->documentDetail->type
+                                        !!}</td>
+                                    <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
+                                    <td>{{ $documentTracking->documentDetail->description }}</td>
+                                    <td>{{ strtoupper($documentTracking->user->terminal->terminal_name) }}<br>-
+                                        {{ Str::ucfirst(strtolower($documentTracking->user->first_name)) }}
+                                        {{ Str::ucfirst(strtolower(Str::substr($documentTracking->user->middle_name, 0, 1))) }}.
+                                        {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}</td>
+                                    <td>{{ strtoupper($documentTracking->terminal->terminal_name) }}</td>
+                                    <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</i></td>
+                                    <td>{{ formatDateTime($documentTracking->created_at) }}</i></td>
+                                    <td>{{ $documentTracking->remark->remarks }}</i></td>
+                                    <td class="d-flex gap-2">
+                                        @if ($documentTracking->documentDetail->documentTracking->status == 'incoming' && $isLatest)
+                                            <button type="button" class="btn btn-warning text-white" data-bs-toggle="modal"
+                                            data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
+                                                class="ri-arrow-left-right-fill" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="Change"></i></button>
+                                        @endif
+                                        <a class="btn btn-info"
+                                            href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
+                                                class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="Track"></i></a>
+                                    </td>
+                                </tr>
+                                <x-forward-modal :$documentTracking :$terminals routeName='document.changeForward'/>
                             @endforeach
                         </tbody>
                     </table>
