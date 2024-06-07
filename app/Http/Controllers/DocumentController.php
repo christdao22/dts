@@ -29,9 +29,7 @@ class DocumentController extends Controller
             Alert::success('System maintenance completed', 'Sorry for the inconvenience. Anhi lang sa ICT Team if naa mo concern. Thank you for your understanding!.');
         }
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function find(Request $request)
     {
         try {
@@ -242,11 +240,18 @@ class DocumentController extends Controller
     {
         $this->maintenance();
 
-        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
+        $terminals = cache()->rememberForever('terminals_cache_' . date('Y-m-d'), function () {
+            return Terminal::with('user')->whereHas('user', function ($query) {
+                return $query->where('is_active', 1);
+            })->orderBy('terminal_name')->get();
+        });
+
+        $categories = cache()->rememberForever('categories_cache_' . date('Y-m-d'), function () {
+            return DocumentCategory::get()->sortBy('category_name');
+        });
 
         $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category')->where('user_id', '!=', null);
-
         if (!auth()->user()->can_view_all) {
             $documents->where('user_id', auth()->user()->id);
         }
@@ -264,13 +269,7 @@ class DocumentController extends Controller
                 $q->where('user_id', '=', $request->user);
             });
         }
-
         $documents = $documents->orderBy('created_at', 'desc')->get();
-        $terminals = Terminal::with('user')->whereHas('user', function ($query) {
-            return $query->where('is_active', 1);
-        })->orderBy('terminal_name')->get();
-
-        $categories = DocumentCategory::get()->sortBy('category_name');
 
         $document_codes = DocumentDetail::where('user_id', null)->get();
 
@@ -478,8 +477,13 @@ class DocumentController extends Controller
 
     public function getFilters()
     {
-        $types = DocumentCategory::get()->sortBy('category_name');
-        $users = User::with('office')->get();
+        $types = cache()->rememberForever('types_cache_' . date('Y-m-d'), function () {
+            return DocumentCategory::get()->sortBy('category_name');
+        });
+
+        $users = cache()->rememberForever('users_cache_' . date('Y-m-d'), function () {
+            return User::with('office')->get();
+        });
 
         return compact('types', 'users');
     }
@@ -599,7 +603,7 @@ class DocumentController extends Controller
                     'name_of_client' => $request->name_of_client,
                     'description' => $request->description,
                     'contact' => $request->contact,
-                    'created_at' => date('Y-m-d H:i:s')
+                    'created_at' => date('Y-m-d H:i:s'),
                 ]);
             });
 
@@ -674,7 +678,8 @@ class DocumentController extends Controller
         }
     }
 
-    public function deleteGuestCode(string $id) {
+    public function deleteGuestCode(string $id)
+    {
         $document = DocumentDetail::find($id);
         $document->delete();
         toast('Successfully deleted...', 'success');

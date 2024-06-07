@@ -1,16 +1,14 @@
 <?php
 use App\Models\DocumentTracking;
 use App\Models\Outgoing;
-use App\Models\Terminal;
 use Carbon\Carbon;
 
 function receivedTotal()
 {
-    $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
+    $terminal_id = isset(auth()->user()->terminal->id)? auth()->user()->terminal->id : false;
+    if($terminal_id) return 0;
 
-    if($terminal == null) return 0;
-
-    $total = DocumentTracking::where('terminal_id', $terminal->id)
+    $total = DocumentTracking::where('terminal_id', $terminal_id)
     ->where('status', 'received')
     ->get()
     ->count();
@@ -18,22 +16,12 @@ function receivedTotal()
     return $total;
 }
 
-function rejectedTotal()
-{
-    $total = DocumentTracking::where('terminal_id', auth()->user()->terminal_id)
-    ->where('status', 'rejected')
-    ->get()
-    ->count();
-    return $total;
-}
-
 function incomingTotal()
 {
-    $terminal = Terminal::where('user_id', auth()->user()->id)->first();
+    $terminal_id = isset(auth()->user()->terminal->id) ? auth()->user()->terminal->id : false;
+    if ($terminal_id) return 0;
 
-    if($terminal==null) return 0;
-
-    $total = DocumentTracking::where('terminal_id', $terminal->id)
+    $total = DocumentTracking::where('terminal_id', $terminal_id)
     ->where('status', 'incoming')
     ->get()
     ->count();
