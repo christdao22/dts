@@ -16,6 +16,7 @@
         "realrashid/sweet-alert": "^7.0"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.13",
         "fakerphp/faker": "^1.9.1",
         "kevincobain2000/laravel-erd": "^1.6",
         "laravel/pint": "^1.0",
