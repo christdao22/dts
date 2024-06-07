@@ -55,7 +55,7 @@
     @include('sweetalert::alert')
     <!-- ======= Hero Section ======= -->
     <section id="hero" class="d-flex align-items-center h-100" style="background-image: url('assets/images/cdobg2.jpg'); background-size: cover;">
-        <div class="container d-none">
+        <div class="container">
             <div class="row d-flex justify-content-between">
                 <div class="col-lg-7 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-1 order-lg-1"
                     data-aos="fade-up" data-aos-delay="200">
@@ -149,6 +149,3 @@
 </body>
 
 </html>
-
-
-<i class="ri-close-line"></i>
