@@ -384,10 +384,13 @@ h6 {
 # Hero Section
 --------------------------------------------------------------*/
 #hero {
-  width: 100%;
+    /* margin-top: 100px; */
+  /* width: 100%;
   height: 80vh;
-  background: #37517e;
+  background: #37517e; */
 }
+
+
 
 #hero h1 {
   margin: 0 0 10px 0;
@@ -1633,7 +1636,8 @@ section {
 #footer {
   font-size: 14px;
   background: #37517e;
-  position: absolute; bottom: 0;
+  position: absolute;
+  bottom: 0;
   width: 100%;
 }
 
@@ -1832,6 +1836,14 @@ section {
     .home-logo {
         width: 275px;
     }
+
+    #hero .container {
+        margin-top: 150px;
+    }
+
+    section {
+        overflow: auto;
+    }
 }
 
 @media (max-width: 577px) {
@@ -1849,4 +1861,7 @@ section {
 .mobile-nav-toggle {
     color: #fff;
     font-size: 30px;
+}
+
+.welcome-content {
 }

@@ -24,115 +24,115 @@
     <link href="assets2/vendor/aos/aos.css" rel="stylesheet">
 
     <!-- Icons Css -->
-    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 
     <!-- Template Main CSS File -->
     <link href="assets2/css/style.css" rel="stylesheet">
 </head>
 
-<body class="position-relative vh-100">
-    <!-- ======= Header ======= -->
-    <header id="header" class="fixed-top">
-        <div class="container d-flex align-items-center justify-content-between">
-            <a href="{{ url('/') }}">
-                <img class="home-logo"
-                    src="{{ asset('assets/images/home_logo.png') }}" alt="DEPED CDO Logo">
-            </a>
-             <nav id="navbar" class="navbar">
-                <ul>
-                    @if (auth()->user())
-                    <li><a class="nav-link scrollto" href="{{ route('document.incoming') }}">Dashboard</a></li>
-                    @else
-                    <li><a class="nav-link scrollto" href="{{ route('login') }}">Login</a></li>
-                    <li><a class="nav-link scrollto" href="{{ route('register') }}">Register</a></li>
-                    @endif
-                </ul>
-                <i class="ri-menu-line mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
-        </div>
-    </header><!-- End Header -->
+<body>
+    <div class="position-relative vh-100 d-flex justify-content-between align-items-center " style="background-image: url('assets/images/cdobg2.jpg'); background-size: cover;">
+        <!-- ======= Header ======= -->
+        <header id="header" class="fixed-top">
+            <div class="container d-flex align-items-center justify-content-between">
+                <a href="{{ url('/') }}">
+                    <img class="home-logo" src="{{ asset('assets/images/home_logo.png') }}" alt="DEPED CDO Logo">
+                </a>
+                <nav id="navbar" class="navbar">
+                    <ul>
+                        @if (auth()->user())
+                        <li><a class="nav-link scrollto" href="{{ route('document.incoming') }}">Dashboard</a></li>
+                        @else
+                        <li><a class="nav-link scrollto" href="{{ route('login') }}">Login</a></li>
+                        <li><a class="nav-link scrollto" href="{{ route('register') }}">Register</a></li>
+                        @endif
+                    </ul>
+                    <i class="ri-menu-line mobile-nav-toggle"></i>
+                </nav><!-- .navbar -->
+            </div>
+        </header><!-- End Header -->
 
-    @include('sweetalert::alert')
-    <!-- ======= Hero Section ======= -->
-    <section id="hero" class="d-flex align-items-center h-100" style="background-image: url('assets/images/cdobg2.jpg'); background-size: cover;">
-        <div class="container d-none">
-            <div class="row d-flex justify-content-between">
-                <div class="col-lg-7 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-1 order-lg-1"
-                    data-aos="fade-up" data-aos-delay="200">
-                    <h1>Document Tracking System</h1>
-                    <h2>Track your document using tracking numbers!</h2>
-                    <div class="d-flex justify-content-center justify-content-lg-start">
-                        <a href="{{ route('dts') }}" class="scrollto btn btn-info px-5 py-3" id="track_here"
-                            target="_blank"><b>Track Here</b></a>
-                    </div>
-                </div>
-                <div class="col-lg-5 order-2 order-lg-2" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="text-center mt-4">
-                                <h3>Create Document</h3>
-                            </div>
-                            <div class="p-3">
-                                <form class="form-horizontal mt-3" method="POST" action="{{ route('guest.guestCreate') }}">
-                                    @csrf
-                                    <div class="form-group mb-3 row">
-                                        <div class="col-12">
-                                            <input id="name_of_client" class="form-control" type="text"
-                                                @error('name_of_client') is-invalid @enderror name="name_of_client"
-                                                value="{{ old('name_of_client') }}" required autocomplete="name_of_client"
-                                                autofocus placeholder="Agency/Clients/School Name">
-                                        </div>
-                                    </div>
-                                    <div class="form-group mb-3 row">
-                                        <div class="col-12">
-                                            <input id="contact" class="form-control" type="text" @error('contact')
-                                                is-invalid @enderror name="contact" value="{{ old('contact') }}"
-                                                required autocomplete="contact" autofocus placeholder="Contact Number">
-                                        </div>
-                                    </div>
-                                    <div class="form-group mb-3 row">
-                                        <div class="col-12">
-                                            <input id="description" class="form-control" type="text" @error('description')
-                                                is-invalid @enderror name="description" value="{{ old('description') }}"
-                                                required autocomplete="description" autofocus placeholder="Subject">
-                                        </div>
-                                    </div>
-                                    <div class="form-group mb-3 text-center row mt-5 pt-1">
-                                        <div class="col-12">
-                                            <button class="btn btn-info text-white w-100 waves-effect waves-light"
-                                                type="submit">Create</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <!-- end -->
+        @include('sweetalert::alert')
+        <!-- ======= Hero Section ======= -->
+        <section id="hero" class="d-flex align-items-center w-100"
+            >
+            <div class="container h-100">
+                <div class="welcome-content row d-flex justify-content-between flex-md-row flex-column">
+                    <div class="col-lg-7 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1"
+                        data-aos="fade-up" data-aos-delay="200">
+                        <h1>Document Tracking System</h1>
+                        <h2>Track your document using tracking numbers!</h2>
+                        <div class="d-flex justify-content-center justify-content-lg-start">
+                            <a href="{{ route('dts') }}" class="scrollto btn btn-info px-5 py-3" id="track_here"
+                                target="_blank"><b>Track Here</b></a>
                         </div>
-                        <!-- end cardbody -->
+                    </div>
+                    <div class="col-lg-5 order-1 order-lg-2" data-aos="zoom-in" data-aos-delay="200">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="text-center mt-4">
+                                    <h3>Create Document</h3>
+                                </div>
+                                <div class="">
+                                    <form class="form-horizontal mt-3" method="POST"
+                                        action="{{ route('guest.guestCreate') }}">
+                                        @csrf
+                                        <div class="form-group mb-3 row">
+                                            <div class="col-12">
+                                                <input id="name_of_client" class="form-control" type="text"
+                                                    @error('name_of_client') is-invalid @enderror name="name_of_client"
+                                                    value="{{ old('name_of_client') }}" required
+                                                    autocomplete="name_of_client" autofocus
+                                                    placeholder="Agency/Clients/School Name">
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-3 row">
+                                            <div class="col-12">
+                                                <input id="contact" class="form-control" type="text" @error('contact')
+                                                    is-invalid @enderror name="contact" value="{{ old('contact') }}"
+                                                    required autocomplete="contact" autofocus
+                                                    placeholder="Contact Number">
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-3 row">
+                                            <div class="col-12">
+                                                <input id="description" class="form-control" type="text"
+                                                    @error('description') is-invalid @enderror name="description"
+                                                    value="{{ old('description') }}" required autocomplete="description"
+                                                    autofocus placeholder="Subject">
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-3 text-center row mt-5 pt-1">
+                                            <div class="col-12">
+                                                <button class="btn btn-info text-white w-100 waves-effect waves-light"
+                                                    type="submit">Create</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </section><!-- End Hero -->
-
-
-    <main id="main"></main><!-- End #main -->
+        </section><!-- End Hero -->
 
 
-    <!-- ======= Footer ======= -->
-    <footer id="footer">
-        <div class="container footer-bottom clearfix">
+        <!-- ======= Footer ======= -->
+        <footer id="footer">
+            <div class="container footer-bottom clearfix">
 
-            <div class="credits">
-                ⓒ 2023 DepEd CDO | ICT Unit
+                <div class="credits">
+                    ⓒ 2023 DepEd CDO | ICT Unit
+                </div>
             </div>
-        </div>
-    </footer><!-- End Footer -->
+        </footer><!-- End Footer -->
 
-    <div id="preloader"></div>
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
-
+        <div id="preloader"></div>
+        <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+                class="bi bi-arrow-up-short"></i></a>
+    </div>
 
     <!-- Vendor JS Files -->
     <script src="assets2/vendor/aos/aos.js"></script>
@@ -140,15 +140,13 @@
 
     <!-- Template Main JS File -->
     <script>
-        if('{{ session("success") }}' == 'true') {
+        if ('{{ session("success") }}' == 'true') {
             window.open(window.location.href + 'printPDF/{{ session("code") }}', '_blank');
         }
+
     </script>
     <script src="assets2/js/main.js" defer></script>
 
 </body>
 
 </html>
-
-
-<i class="ri-close-line"></i>
