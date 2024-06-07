@@ -6,7 +6,7 @@ use Carbon\Carbon;
 function receivedTotal()
 {
     $terminal_id = isset(auth()->user()->terminal->id)? auth()->user()->terminal->id : false;
-    if($terminal_id) return 0;
+    if(!$terminal_id) return 0;
 
     $total = DocumentTracking::where('terminal_id', $terminal_id)
     ->where('status', 'received')
@@ -19,7 +19,7 @@ function receivedTotal()
 function incomingTotal()
 {
     $terminal_id = isset(auth()->user()->terminal->id) ? auth()->user()->terminal->id : false;
-    if ($terminal_id) return 0;
+    if (!$terminal_id) return 0;
 
     $total = DocumentTracking::where('terminal_id', $terminal_id)
     ->where('status', 'incoming')
