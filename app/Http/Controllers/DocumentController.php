@@ -147,7 +147,7 @@ class DocumentController extends Controller
 
         $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
             ->where('status', 'incoming')
-            ->with('user', 'documentDetail.document_category', 'remark');
+            ->with('user.terminal', 'documentDetail.document_category', 'remark');
 
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
