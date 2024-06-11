@@ -1,26 +1,26 @@
 <form action="{{ route($route) }}"  method="GET" enctype="multipart/form-data">
     <div class="row">
         <div class="form-group col-md-6 col-sm-12 mb-2">
-            <label for="type">Filter by type</label>
-            <select name="type" id="typetype" class="form-select">
-                <option value="" selected>
-                    All
-                </option>
-                @foreach ($types as $type)
-                <option value="{{ $type->id }}" {{ request()->get('type') ==  $type->id? 'selected':'' }}>
-                    {{ Str::ucfirst(strtolower($type->category_name)) }}
-                </option>
-                @endforeach
-            </select>
+                <label for="filterType">Filter by type</label>
+                <select name="filterType" id="filterType" class="form-select">
+                    <option value="" selected>
+                        All
+                    </option>
+                    @foreach ($types as $type)
+                    <option value="{{ $type->id }}" {{ request()->get('filterType') ==  $type->id? 'selected':'' }}>
+                        {{ Str::ucfirst(strtolower($type->category_name)) }}
+                    </option>
+                    @endforeach
+                </select>
         </div>
         <div class="form-group col-md-6 col-sm-12 mb-2">
-            <label for="user">Forwarded by</label>
-            <select name="user" id="user" class="form-select">
+            <label for="filterUser">Forwarded by</label>
+            <select name="filterUser" id="filterUser" class="form-select">
                 <option value="" selected>
                     All
                 </option>
                 @foreach ($users as $user)
-                <option value="{{ $user->id }}" {{ request()->get('user') ==  $user->id? 'selected':'' }}>
+                <option value="{{ $user->id }}" {{ request()->get('filterUser') ==  $user->id? 'selected':'' }}>
                     {{ $user->is_admin? 'Admin' : strtoupper($user->office->office_name) }}<br>-
                     {{ Str::ucfirst(strtolower($user->first_name)) }}
                     {{ Str::ucfirst(strtolower(Str::substr($user->middle_name, 0, 1))) }}.
@@ -33,12 +33,12 @@
     </div>
     <div class="row">
         <div class="form-group col-md-6 col-sm-12 mb-2">
-            <label for="date_from">Date created from</label>
-            <input type="date" name="date_from" id="date_from" value="{{ request()->get('date_from') != ''? request()->get('date_from'):'' }}" class="form-control">
+            <label for="filterDateFrom">Date created from</label>
+            <input type="date" name="filterDateFrom" id="filterDateFrom" value="{{ request()->get('filterDateFrom') != ''? request()->get('filterDateFrom'):'' }}" class="form-control">
         </div>
         <div class="form-group col-md-6 col-sm-12 mb-2">
-            <label for="date_to">Date created to</label>
-            <input type="date" name="date_to" class="form-control" value="{{ request()->get('date_to') != ''? request()->get('date_to'):'' }}">
+            <label for="filterDateTo">Date created to</label>
+            <input type="date" name="filterDateTo" id="filterDateTo" class="form-control" value="{{ request()->get('filterDateTo') != ''? request()->get('filterDateTo'):'' }}">
         </div>
     </div>
     <div class="d-flex justify-content-end w-100 gap-2">
