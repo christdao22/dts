@@ -481,21 +481,21 @@ class DocumentController extends Controller
     public function filter($request, $object)
     {
 
-        if (isset($request->type) && $request->type != '') {
+        if (isset($request->filterType) && $request->filterType != '') {
             $object->whereHas('documentDetail', function ($q) use ($request) {
-                $q->where('document_category_id', '=', $request->type);
+                $q->where('document_category_id', '=', $request->filterType);
             });
         }
 
-        if ((isset($request->date_from) && isset($request->date_to)) && ($request->date_from != '' && $request->date_to != '')) {
+        if ((isset($request->filterDateFrom) && isset($request->filterDateTo)) && ($request->filterDateFrom != '' && $request->filterDateTo != '')) {
             $object->whereHas('documentDetail', function ($q) use ($request) {
-                $q->whereDate('created_at', '>=', date($request->date_from))->whereDate('created_at', '<=', date($request->date_to));
+                $q->whereDate('created_at', '>=', date($request->filterDateFrom))->whereDate('created_at', '<=', date($request->filterDateTo));
             });
         }
 
-        if (isset($request->user) && $request->user != '') {
+        if (isset($request->filterUser) && $request->filterUser != '') {
             $object->whereHas('user', function ($q) use ($request) {
-                $q->where('id', '=', $request->user);
+                $q->where('id', '=', $request->filterUser);
             });
         }
 
