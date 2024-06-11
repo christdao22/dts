@@ -12,8 +12,8 @@ function receivedTotal()
 
     return DocumentTracking::where('terminal_id', $terminal_id)
         ->where('status', 'received')
-        ->get()
-        ->count();
+        ->count('id');
+
 }
 
 function incomingTotal()
@@ -25,15 +25,15 @@ function incomingTotal()
 
     return DocumentTracking::where('terminal_id', $terminal_id)
         ->where('status', 'incoming')
-        ->get()
-        ->count();
+        ->count('id');
 }
 
 function outgoingTotal()
 {
-    return Outgoing::with('user')->get()->filter(function ($o) {
-        return $o->user->id == auth()->user()->id;
-    })->count();
+    $userId = auth()->id();
+    return Outgoing::whereHas('user', function ($query) use ($userId) {
+        $query->where('id', $userId);
+    })->count('id');
 }
 
 // check if prop exist

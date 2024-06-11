@@ -213,7 +213,7 @@
                     </div>
                     @endif
                     <div class="">
-                        <table id="datatable-buttons" class="col-md-10 table table-striped table-bordered dt-responsive"
+                        <table id="document-datatable" class="col-md-10 table table-striped table-bordered dt-responsive"
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead>
                                 <tr>
@@ -224,12 +224,11 @@
                                     <th>TO</th>
                                     <th>DATE</th>
                                     <th>STATUS</th>
-                                    <th><i class=" ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Action"></i></th>
+                                    <th><i class="ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top" title="Action"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($documents as $document)
+                                {{-- @foreach ($documents as $document)
                                 <tr>
                                     <td><strong>{{ $document->document_code }}</strong></td>
                                     <td>{!! $document->document_category_id != null?
@@ -239,7 +238,7 @@
                                     <td>{{ $document->name_of_client }} <br>
                                         {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
                                     <td>{{ $document->description}}</td>
-                                    <td>{{ isset($document->terminal->terminal_name)? $document->terminal->terminal_name : 'wala' }}
+                                    <td>{{ isset($document->terminal->terminal_name)? $document->terminal->terminal_name : '' }}
                                     </td>
                                     <td>{{ formatDateTime($document->created_at) }}</td>
                                     <td>
@@ -253,10 +252,6 @@
                                     </td>
                                     <td>
                                         <div class="d-flex justify-content-end gap-1">
-                                            {{-- <a class="ri ri-printer-fill btn btn-warning" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Print"
-                                            href="{{ route('document.pdf_view',$document->id ) }}" target="_blank">
-                                            --}}
                                             <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="Track"
                                                 href="{{ route('web.find', 'query='.$document->document_code) }}"><i
@@ -278,7 +273,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                @endforeach
+                                @endforeach --}}
                             </tbody>
                         </table>
                     </div>
@@ -470,6 +465,17 @@
                     handleModalCategoryChange('#createModal', '#category_id', '#type');
                     handleModalCategoryChange('#editModal', '#editCategory_id', '#editType');
                     handleModalCategoryChange('#addDocumentModal', '#add_category_id', '#add_type');
+                    initDtServerSide("#document-datatable", "{{ route('document.getAllDocuments') }}", [
+                        {data: 'document_code',     name: 'CODE'},
+                        {data: 'category',          name: 'TYPE'},
+                        {data: 'from',              name: 'FROM'},
+                        {data: 'description',       name: 'DESCRIPTION'},
+                        {data: 'terminal',          name: 'TO'},
+                        {data: 'created_at',        name: 'DATE'},
+                        {data: 'status',            name: 'STATUS'},
+                        {data: 'action',            name: 'action',  orderable: false, searchable: false}
+                    ]);
+
 
                     $(document).on('click', '.deleteBtn', function() {
                         var id = $(this).data('bs-id');
@@ -594,6 +600,23 @@
                 });
 
                 return isValid;
+            }
+
+            function initDtServerSide(selector, route, columns) {
+                var table = $(selector).DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: route,
+                        data: function (d) {
+                            d.type = $('#filterType').val();
+                            d.date_from = $('#filterDateFrom').val();
+                            d.date_to = $('#filterDateTo').val();
+                            d.user = $('#filterUser').val();
+                        }
+                    },
+                    columns: columns
+                });
             }
 
         }, false);

@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
+use Yajra\DataTables\DataTables;
 
 class DocumentController extends Controller
 {
@@ -239,29 +240,30 @@ class DocumentController extends Controller
             return DocumentCategory::get()->sortBy('category_name');
         });
 
-        $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category')->where('user_id', '!=', null);
-        if (!auth()->user()->can_view_all) {
-            $documents->where('user_id', auth()->user()->id);
-        }
+        // $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category')->where('user_id', '!=', null);
 
-        if (isset($request->type) && $request->type != '') {
-            $documents->where('document_category_id', '=', $request->type);
-        }
+        // if (!auth()->user()->can_view_all) {
+        //     $documents->where('user_id', auth()->user()->id);
+        // }
 
-        if ((isset($request->date_from) && isset($request->date_to)) && ($request->date_from != '' && $request->date_to != '')) {
-            $documents->whereDate('created_at', '>=', date($request->date_from))->whereDate('created_at', '<=', date($request->date_to));
-        }
+        // if (isset($request->type) && $request->type != '') {
+        //     $documents->where('document_category_id', '=', $request->type);
+        // }
 
-        if (isset($request->user) && $request->user != '') {
-            $documents->whereHas('documentTracking', function ($q) use ($request) {
-                $q->where('user_id', '=', $request->user);
-            });
-        }
-        $documents = $documents->orderBy('created_at', 'desc')->get();
+        // if ((isset($request->date_from) && isset($request->date_to)) && ($request->date_from != '' && $request->date_to != '')) {
+        //     $documents->whereDate('created_at', '>=', date($request->date_from))->whereDate('created_at', '<=', date($request->date_to));
+        // }
+
+        // if (isset($request->user) && $request->user != '') {
+        //     $documents->whereHas('documentTracking', function ($q) use ($request) {
+        //         $q->where('user_id', '=', $request->user);
+        //     });
+        // }
+        // $documents = $documents->orderBy('created_at', 'desc')->get();
 
         $document_codes = DocumentDetail::where('user_id', null)->get();
 
-        return view('document.create', compact('documents', 'terminals', 'categories', 'filters', 'document_codes'));
+        return view('document.create', compact('terminals', 'categories', 'filters', 'document_codes'));
     }
 
     public function store(Request $request)
@@ -675,11 +677,115 @@ class DocumentController extends Controller
         return redirect()->back()->with('addDocumentModal', 'true');
     }
 
-    public function getTerminals() {
+    public function getTerminals()
+    {
         return cache()->rememberForever('terminals_cache_' . date('Y-m-d'), function () {
             return Terminal::with('user')->whereHas('user', function ($query) {
                 return $query->where('is_active', 1);
             })->orderBy('terminal_name')->get();
         });
     }
+
+    public function getAllDocuments(Request $request)
+    {
+        if ($request->ajax()) {
+            $user = auth()->user();
+
+            $documentsQuery = DB::table('document_details')
+                ->join('terminals', 'document_details.terminal_id', '=', 'terminals.id')
+                ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
+                ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->select(
+                    'document_details.id',
+                    'document_details.document_code',
+                    'document_details.name_of_client',
+                    'document_details.contact',
+                    'document_details.description',
+                    'document_details.type',
+                    'document_details.created_at',
+                    'document_details.document_category_id',
+                    'document_details.user_id',
+                    'document_trackings.status',
+                    'document_trackings.is_received',
+                    'terminals.terminal_name',
+                    'document_categories.category_name')
+                ->whereNotNull('document_details.user_id')
+                ->when(!$user->can_view_all, function ($query) use ($user) {
+                    $query->where('document_details.user_id', $user->id);
+                })
+                ->when($request->filled('type'), function ($query) use ($request) {
+                    $query->where('document_details.document_category_id', $request->type);
+                })
+                ->when($request->filled('date_from') && $request->filled('date_to'), function ($query) use ($request) {
+                    $query->whereBetween('document_details.created_at', [
+                        date($request->date_from),
+                        date($request->date_to),
+                    ]);
+                })
+                ->when($request->filled('user'), function ($query) use ($request) {
+                    $query->where('document_trackings.user_id', $request->user);
+                });
+
+            $documents = $documentsQuery->orderBy('document_details.created_at', 'desc')->get();
+
+            return DataTables::of($documents)
+                ->addIndexColumn()
+                ->editColumn('category', function($document) {
+                    return $document->document_category_id != null?
+                                $document->category_name : "<b>Others: </b>" .
+                                $document->type;
+                })
+                ->editColumn('from', function($document) {
+                    return $document->name_of_client . '<br>' . ($document->contact != ''? '(' . $document->contact . ')':'') ;
+                })
+                ->editColumn('terminal', function($document) {
+                    return isset($document->terminal_name)? $document->terminal_name : '';
+
+                })
+                ->editColumn('created_at', function($document) {
+                    return formatDateTime($document->created_at);
+
+                })
+
+                ->editColumn('status', function($document) {
+                    if($document->status == 'completed') {
+                        $status = '<span class="badge rounded-pill bg-success">Completed/Release</span>';
+                    } else if(!$document->is_received) {
+                        $status = '<span class="badge rounded-pill bg-secondary">Pending receive</span>';
+                    } else {
+                        $status = '<span class="badge rounded-pill bg-warning">In progress</span>';
+                    }
+
+                    return $status;
+                })
+                ->addColumn('action', function ($document) {
+                    $actionBtn = '
+                        <div class="d-flex justify-content-end gap-1">
+                            <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Track"
+                                href="' . route('web.find', ['query' => $document->document_code]) . '">
+                                <i class="ri-route-line"></i>
+                            </a>
+                            ' . (!$document->is_received && $document->user_id == auth()->user()->id ? '
+                            <button class="btn btn-danger deleteBtn" data-bs-id="' . $document->id . '">
+                                <i class="ri-delete-bin-line"></i>
+                                <form id="delete_form_' . $document->id . '"
+                                    action="' . route('document.destroy', $document->id) . '"
+                                    method="POST" enctype="multipart/form-data" style="display:none;">
+                                    ' . method_field('DELETE') . csrf_field() . '
+                                </form>
+                            </button>
+                            <a href="javascript:void(0)" class="btn btn-primary editButton"
+                                data-bs-id="' . $document->id . '">EDIT</a>
+                            ' : '') . '
+                        </div>
+                    ';
+
+                    return $actionBtn;
+                })
+                ->rawColumns(['created_at', 'terminal', 'status', 'from', 'category', 'action'])
+                ->toJson();
+        }
+    }
+
 }

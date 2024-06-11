@@ -67,6 +67,10 @@ Route::middleware(['auth'])->group(function () {
         Route::resources([ 'document_category' => DocumentCategoryController::class ]);
         Route::patch('storeGuestCreate/{id}', [DocumentController::class, 'storeGuestCreate'])->name('document.storeGuestCreate');
         Route::delete('deleteGuestCode/{id}', [DocumentController::class, 'deleteGuestCode'])->name('document.deleteGuestCode');
+
+        // Ajax
+        Route::get('/getAllDocuments', [DocumentController::class, 'getAllDocuments'])->name('document.getAllDocuments');
+
     });
 
     // Admin
