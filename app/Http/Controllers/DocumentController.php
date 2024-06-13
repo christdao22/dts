@@ -16,7 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 use Yajra\DataTables\DataTables;
-use Yajra\DataTables\Facades\DataTables as FacadesDataTables;
 
 class DocumentController extends Controller
 {
@@ -41,13 +40,8 @@ class DocumentController extends Controller
             if ($documentDetail) {
                 $documentTraces = DocumentTrace::where('document_detail_id', $documentDetail->id)->with('user.terminal', 'documentDetail', 'remark')->get();
                 $documentLatest = DocumentTrace::where('document_detail_id', $documentDetail->id)->with('user.terminal', 'documentDetail', 'remark')->latest()->first();
-                // $data = $documentLatest->user->terminal->id;
-                // throw new Exception('Something went wrong');
                 $documentTracking = DocumentTracking::where('document_detail_id', $documentDetail->id)->with('user', 'documentDetail', 'terminal', 'remark')->first();
-                // if($data == $documentTracking->terminal->id && $documentTracking->status == "incoming"){
-                //     $documentTracking =null;
-                // }
-                // dd($documentTraces);
+
             } else {
                 Alert::error('oppss', 'No record found...');
                 return view('document.tracked');
@@ -240,27 +234,6 @@ class DocumentController extends Controller
         $categories = cache()->rememberForever('categories_cache_' . date('Y-m-d'), function () {
             return DocumentCategory::get()->sortBy('category_name');
         });
-
-        // $documents = DocumentDetail::with('terminal', 'documentTracking', 'document_category')->where('user_id', '!=', null);
-
-        // if (!auth()->user()->can_view_all) {
-        //     $documents->where('user_id', auth()->user()->id);
-        // }
-
-        // if (isset($request->type) && $request->type != '') {
-        //     $documents->where('document_category_id', '=', $request->type);
-        // }
-
-        // if ((isset($request->date_from) && isset($request->date_to)) && ($request->date_from != '' && $request->date_to != '')) {
-        //     $documents->whereDate('created_at', '>=', date($request->date_from))->whereDate('created_at', '<=', date($request->date_to));
-        // }
-
-        // if (isset($request->user) && $request->user != '') {
-        //     $documents->whereHas('documentTracking', function ($q) use ($request) {
-        //         $q->where('user_id', '=', $request->user);
-        //     });
-        // }
-        // $documents = $documents->orderBy('created_at', 'desc')->get();
 
         $document_codes = DocumentDetail::where('user_id', null)->get();
 
