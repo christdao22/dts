@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Facades\DataTables as FacadesDataTables;
 
 class DocumentController extends Controller
 {
@@ -690,8 +691,9 @@ class DocumentController extends Controller
     {
         if ($request->ajax()) {
             $user = auth()->user();
+            $searchValue = $request->search['value'];
 
-            $documentsQuery = DB::table('document_details')
+            $documents = DB::table('document_details')
                 ->join('terminals', 'document_details.terminal_id', '=', 'terminals.id')
                 ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
                 ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
@@ -724,9 +726,16 @@ class DocumentController extends Controller
                 })
                 ->when($request->filled('user'), function ($query) use ($request) {
                     $query->where('document_trackings.user_id', $request->user);
-                });
-
-            $documents = $documentsQuery->orderBy('document_details.created_at', 'desc')->get();
+                })
+                ->when($searchValue, function ($query) use ($searchValue) {
+                    $query->where('document_details.document_code', 'like', "%{$searchValue}%")
+                    ->orWhere('document_details.name_of_client', 'like', "%{$searchValue}%")
+                    ->orWhere('document_details.contact', 'like', "%{$searchValue}%")
+                    ->orWhere('terminals.terminal_name', 'like', "%{$searchValue}%")
+                    ->orWhere('document_categories.category_name', 'like', "%{$searchValue}%");
+                })
+                ->orderBy('document_details.created_at', 'desc')
+                ->get();
 
             return DataTables::of($documents)
                 ->addIndexColumn()
@@ -740,13 +749,10 @@ class DocumentController extends Controller
                 })
                 ->editColumn('terminal', function($document) {
                     return isset($document->terminal_name)? $document->terminal_name : '';
-
                 })
                 ->editColumn('created_at', function($document) {
                     return formatDateTime($document->created_at);
-
                 })
-
                 ->editColumn('status', function($document) {
                     if($document->status == 'completed') {
                         $status = '<span class="badge rounded-pill bg-success">Completed/Release</span>';
@@ -784,7 +790,8 @@ class DocumentController extends Controller
                     return $actionBtn;
                 })
                 ->rawColumns(['created_at', 'terminal', 'status', 'from', 'category', 'action'])
-                ->toJson();
+                ->skipAutoFilter()
+                ->make(true);
         }
     }
 

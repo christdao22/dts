@@ -198,6 +198,7 @@ return [
         Barryvdh\DomPDF\ServiceProvider::class,
         // Milon\Barcode\BarcodeServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
+        Yajra\DataTables\ButtonsServiceProvider::class,
     ],
 
     /*

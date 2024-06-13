@@ -228,52 +228,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- @foreach ($documents as $document)
-                                <tr>
-                                    <td><strong>{{ $document->document_code }}</strong></td>
-                                    <td>{!! $document->document_category_id != null?
-                                        $document->document_category->category_name : "<b>Others: </b>" .
-                                        $document->type
-                                        !!}</td>
-                                    <td>{{ $document->name_of_client }} <br>
-                                        {{ $document->contact != ''? '(' . $document->contact . ')':'' }}</td>
-                                    <td>{{ $document->description}}</td>
-                                    <td>{{ isset($document->terminal->terminal_name)? $document->terminal->terminal_name : '' }}
-                                    </td>
-                                    <td>{{ formatDateTime($document->created_at) }}</td>
-                                    <td>
-                                        @if ($document->documentTracking->status == 'completed')
-                                        <span class="badge rounded-pill bg-success">Completed/Release</span>
-                                        @elseif (!$document->documentTracking->is_received)
-                                        <span class="badge rounded-pill bg-secondary">Pending receive</span>
-                                        @else
-                                        <span class="badge rounded-pill bg-warning">In progress</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="d-flex justify-content-end gap-1">
-                                            <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="Track"
-                                                href="{{ route('web.find', 'query='.$document->document_code) }}"><i
-                                                    class="ri-route-line"></i></a>
-                                            @if (!$document->documentTracking->is_received && $document->user_id ==
-                                            Auth::user()->id)
-                                            <button class="btn btn-danger deleteBtn" data-bs-id={{ $document->id }}><i
-                                                    class="ri-delete-bin-line"></i>
-                                                <form id="delete_form_{{ $document->id }}"
-                                                    action="{{ route('document.destroy', $document->id) }}"
-                                                    method="POST" enctype="multipart/form-data">
-                                                    @method('DELETE')
-                                                    @csrf
-                                                </form>
-                                            </button>
-                                            <a class="btn btn-primary editButton"
-                                                data-bs-id='{{ $document->id }}'>EDIT</a>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach --}}
                             </tbody>
                         </table>
                     </div>
@@ -461,7 +415,7 @@
         function () {
             if (window.jQuery) {
                 $(document).ready(function () {
-                    initializeDataTable('#datatable-codes');
+                    var table = initializeDataTable('#datatable-codes');
                     handleModalCategoryChange('#createModal', '#category_id', '#type');
                     handleModalCategoryChange('#editModal', '#editCategory_id', '#editType');
                     handleModalCategoryChange('#addDocumentModal', '#add_category_id', '#add_type');
@@ -565,6 +519,14 @@
                             }
                         });
                     });
+
+                    // $(document).on('keyup', "input[type='search']", function(e) {
+                    //     e.preventDefault();
+                    // });
+
+                    // $('#searchBox').on('keyup', function() {
+                    //     table.search(this.value).draw();
+                    // });
                 })
             }
 
@@ -615,7 +577,11 @@
                             d.user = $('#filterUser').val();
                         }
                     },
-                    columns: columns
+                    columns: columns,
+                    dom: 'Bfrtip', // This is where you enable the buttons extension
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ]
                 });
             }
 
