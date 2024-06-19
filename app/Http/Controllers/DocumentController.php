@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Facades\DataTables as FacadesDataTables;
 
 class DocumentController extends Controller
 {
@@ -664,26 +665,14 @@ class DocumentController extends Controller
     {
         if ($request->ajax()) {
             $user = auth()->user();
-            $searchValue = $request->search['value'];
+            $searchValue = $request->search['value'] ?? null;
+            $length = $request->length ?? 10;
+            $start = $request->start ?? 0;
 
-            $documents = DB::table('document_details')
+            $baseQuery = DB::table('document_details')
                 ->join('terminals', 'document_details.terminal_id', '=', 'terminals.id')
                 ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
                 ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
-                ->select(
-                    'document_details.id',
-                    'document_details.document_code',
-                    'document_details.name_of_client',
-                    'document_details.contact',
-                    'document_details.description',
-                    'document_details.type',
-                    'document_details.created_at',
-                    'document_details.document_category_id',
-                    'document_details.user_id',
-                    'document_trackings.status',
-                    'document_trackings.is_received',
-                    'terminals.terminal_name',
-                    'document_categories.category_name')
                 ->whereNotNull('document_details.user_id')
                 ->when(!$user->can_view_all, function ($query) use ($user) {
                     $query->where('document_details.user_id', $user->id);
@@ -701,13 +690,38 @@ class DocumentController extends Controller
                     $query->where('document_trackings.user_id', $request->user);
                 })
                 ->when($searchValue, function ($query) use ($searchValue) {
-                    $query->where('document_details.document_code', 'like', "%{$searchValue}%")
-                    ->orWhere('document_details.name_of_client', 'like', "%{$searchValue}%")
-                    ->orWhere('document_details.contact', 'like', "%{$searchValue}%")
-                    ->orWhere('terminals.terminal_name', 'like', "%{$searchValue}%")
-                    ->orWhere('document_categories.category_name', 'like', "%{$searchValue}%");
-                })
+                    $query->where(function ($subQuery) use ($searchValue) {
+                        $subQuery->where('document_details.document_code', 'like', "%{$searchValue}%")
+                            ->orWhere('document_details.name_of_client', 'like', "%{$searchValue}%")
+                            ->orWhere('document_details.contact', 'like', "%{$searchValue}%")
+                            ->orWhere('terminals.terminal_name', 'like', "%{$searchValue}%")
+                            ->orWhere('document_categories.category_name', 'like', "%{$searchValue}%");
+                    });
+                });
+
+            $totalRecords = DB::table('document_details')
+                    ->whereNotNull('user_id')
+                    ->count('id');
+
+            $filteredRecords = $baseQuery->count('document_details.id');
+
+            $documents = $baseQuery->select(
+                    'document_details.id',
+                    'document_details.document_code',
+                    'document_details.name_of_client',
+                    'document_details.contact',
+                    'document_details.description',
+                    'document_details.type',
+                    'document_details.created_at',
+                    'document_details.document_category_id',
+                    'document_details.user_id',
+                    'document_trackings.status',
+                    'document_trackings.is_received',
+                    'terminals.terminal_name',
+                    'document_categories.category_name')
                 ->orderBy('document_details.created_at', 'desc')
+                ->offset($start)
+                ->limit($length)
                 ->get();
 
             return DataTables::of($documents)
@@ -763,9 +777,11 @@ class DocumentController extends Controller
                     return $actionBtn;
                 })
                 ->rawColumns(['created_at', 'terminal', 'status', 'from', 'category', 'action'])
+                ->with('recordsTotal', $totalRecords)
+                ->with('recordsFiltered', $filteredRecords)
                 ->skipAutoFilter()
+                ->skipPaging(true)
                 ->make(true);
         }
     }
-
 }

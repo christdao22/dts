@@ -2,6 +2,32 @@
 use App\Models\DocumentTracking;
 use App\Models\Outgoing;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
+function totalDocQuery() {
+    $userId = auth()->id();
+    $terminal_id = isset(auth()->user()->terminal->id) ? auth()->user()->terminal->id : false;
+
+    if ($terminal_id == false) return 0;
+
+    $results = DB::table('document_trackings')
+    ->selectRaw('
+        (SELECT COUNT(id) FROM document_trackings WHERE terminal_id = ? AND status = ?) as received_count,
+        (SELECT COUNT(id) FROM document_trackings WHERE terminal_id = ? AND status = ?) as incoming_count,
+        (SELECT COUNT(id) FROM outgoings WHERE user_id = ?) as outgoing_count
+    ', [
+        $terminal_id, 'received',
+        $terminal_id, 'incoming',
+        $userId,
+    ])
+    ->first();
+
+    return [
+        'received_count' => $results->received_count,
+        'incoming_count' => $results->incoming_count,
+        'outgoing_count' => $results->outgoing_count,
+    ];
+}
 
 function receivedTotal()
 {

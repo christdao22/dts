@@ -45,16 +45,14 @@
                 <div class="card-body">
                     @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1)
                     <div class="d-flex flex-row-reverse gap-2">
-                        <button class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Create
-                            Documents</button>
+                        <button class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Create Documents</button>
                         <form action="{{ route('document.generateCode') }}" method="get">
                             @csrf
-                            <button
-                                title="This button generates a code for you to obtain first and then add it when you're ready to create a document."
-                                class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light"
-                                data-bs-toggle="modal" data-bs-target="#generatedCode"><i class="ri-dashboard-line"></i>
+                            <button title="This button generates a code for you to obtain first and then add it when you're ready to create a document."
+                                class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light"><i class="ri-dashboard-line"></i>
                                 Generate Code</button>
-                        </form><button class="btn btn-success mb-3" data-bs-toggle="modal"
+                        </form>
+                        <button class="btn btn-success mb-3" data-bs-toggle="modal"
                             data-bs-target="#guestDocumentModal">Add Document</button>
                     </div>
                     <div class="modal" id="createModal">
@@ -186,7 +184,7 @@
                                                                 class="ri-edit-line"></i></a>
                                                         <button class="btn btn-danger codeDeleteBtn"
                                                             data-bs-id={{ $code->id }}><i
-                                                            class="ri-delete-bin-line"></i>
+                                                                class="ri-delete-bin-line"></i>
                                                             <form id="code_delete_form_{{ $code->id }}"
                                                                 action="{{ route('document.deleteGuestCode', $code->id) }}"
                                                                 method="POST" enctype="multipart/form-data">
@@ -213,7 +211,8 @@
                     </div>
                     @endif
                     <div class="">
-                        <table id="document-datatable" class="col-md-10 table table-striped table-bordered dt-responsive"
+                        <table id="document-datatable"
+                            class="col-md-10 table table-striped table-bordered dt-responsive"
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead>
                                 <tr>
@@ -224,7 +223,8 @@
                                     <th>TO</th>
                                     <th>DATE</th>
                                     <th>STATUS</th>
-                                    <th><i class="ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top" title="Action"></i></th>
+                                    <th><i class="ri-settings-2-line" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Action"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -237,7 +237,6 @@
         </div> <!-- end col -->
     </div> <!-- end row -->
 
-    {{-- Confirm Delete --}}
     <div class="modal" id="confirmModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -254,7 +253,7 @@
             </div>
         </div>
     </div>
-    {{-- Edit Modal --}}
+
     <div class="modal" id="editModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -331,7 +330,7 @@
             </div>
         </div>
     </div>
-    {{-- Edit Searched Doc Modal --}}
+
     <div class="modal" id="addDocumentModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -411,181 +410,156 @@
 </div>
 
 <script defer>
-    window.addEventListener('load',
-        function () {
-            if (window.jQuery) {
-                $(document).ready(function () {
-                    var table = initializeDataTable('#datatable-codes');
-                    handleModalCategoryChange('#createModal', '#category_id', '#type');
-                    handleModalCategoryChange('#editModal', '#editCategory_id', '#editType');
-                    handleModalCategoryChange('#addDocumentModal', '#add_category_id', '#add_type');
-                    initDtServerSide("#document-datatable", "{{ route('document.getAllDocuments') }}", [
-                        {data: 'document_code',     name: 'CODE'},
-                        {data: 'category',          name: 'TYPE'},
-                        {data: 'from',              name: 'FROM'},
-                        {data: 'description',       name: 'DESCRIPTION'},
-                        {data: 'terminal',          name: 'TO'},
-                        {data: 'created_at',        name: 'DATE'},
-                        {data: 'status',            name: 'STATUS'},
-                        {data: 'action',            name: 'action',  orderable: false, searchable: false}
-                    ]);
-
-
-                    $(document).on('click', '.deleteBtn', function() {
-                        var id = $(this).data('bs-id');
-                        $('#confirmModal').modal('show');
-                        $('#confirmDelete').on('click', function () {
-                            $('#delete_form_' + id).submit()
-                        });
-                    });
-
-                    $(document).on('click', '.codeDeleteBtn', function() {
-                        var id = $(this).data('bs-id');
-                        $('#confirmModal').modal('show');
-                        $('#confirmDelete').on('click', function () {
-                            $('#code_delete_form_' + id).submit()
-                        });
-                    });
-
-                    $(document).on('click', '.editButton', function () {
-                        let id = $(this).data('bs-id');
-                        $.ajax({
-                            url: '/document/getDocument/' + id,
-                            method: 'GET',
-                            dataType: 'json',
-                            success: function (data) {
-                                $('#editCategory_id').val(data.documents
-                                    .document_category_id !== null ?
-                                    data.documents.document_category_id : 'others');
-                                $('#editType').val(data.documents.type);
-                                $('#editCode').val(data.documents.document_code);
-                                $('#editName_of_client').val(data.documents
-                                    .name_of_client);
-                                $('#editDescription').val(data.documents.description);
-                                $('#editTerminal_id').val(data.documents.terminal_id);
-                                $('#editContact').val(data.documents.contact);
-                                $('#editType').parent().toggleClass('d-none', data
-                                    .documents
-                                    .document_category_id !== null);
-                                $('#editModal').modal('show');
-                                $("#editForm").attr("action", `/document/update-edit/${id}`);
-
-                                $('#updateBtn').off('click').on('click',
-                                    function () {
-                                        if (validateForm(['#add_name_of_client',
-                                                '#add_category_id',
-                                                '#add_terminal_id'
-                                            ])) {
-
-                                            $("#editForm").submit();
-                                        }
-                                    });
-                            },
-                            error: function (xhr, status, error) {
-                                console.error('Error fetching data:', error);
-                            }
-                        });
-                    });
-
-                    $(document).on('click', '.editCodeModal', function (e) {
-
-                        let id = $(this).data('bs-id');
-                        $.ajax({
-                            url: '/document/getDocument/' + id,
-                            method: 'GET',
-                            dataType: 'json',
-                            success: function (data) {
-                                $('#add_document_code').text(data.documents
-                                    .document_code);
-                                $('#add_name_of_client').val(data.documents
-                                    .name_of_client);
-                                $('#add_contact').val(data.documents.contact);
-                                $('#add_description').val(data.documents.description);
-                                $('#guestDocumentModal').modal('hide');
-                                $('#addDocumentModal').modal('show');
-                                $("#codeEditForm").attr("action", `/document/storeGuestCreate/${id}`);
-                                $('#codeUpdateBtn').off('click').on('click',
-                                    function () {
-                                        if (validateForm(['#add_name_of_client',
-                                                '#add_category_id',
-                                                '#add_terminal_id'
-                                            ])) {
-                                            $("#codeEditForm").submit();
-                                        }
-                                    });
-                            },
-                            error: function (xhr, status, error) {
-                                console.error('Error fetching data:', error);
-                            }
-                        });
-                    });
-
-                    // $(document).on('keyup', "input[type='search']", function(e) {
-                    //     e.preventDefault();
-                    // });
-
-                    // $('#searchBox').on('keyup', function() {
-                    //     table.search(this.value).draw();
-                    // });
-                })
-            }
-
-            if("{{ session('addDocumentModal') }}" == 'true') {
+    window.addEventListener('load', function () {
+        initJQuery(function () {
+            if ("{{ session('addDocumentModal') }}" == 'true') {
                 $('#guestDocumentModal').modal('show')
             }
 
-            function initializeDataTable(selector) {
-                $(selector).DataTable();
-            }
+            var table = initializeDataTable('#datatable-codes');
+            handleModalCategoryChange('#createModal', '#category_id', '#type');
+            handleModalCategoryChange('#editModal', '#editCategory_id', '#editType');
+            handleModalCategoryChange('#addDocumentModal', '#add_category_id', '#add_type');
 
-            function handleModalCategoryChange(modalSelector, categorySelector, typeSelector) {
-                $(modalSelector).on('shown.bs.modal', function () {
-                    $(categorySelector).on('change', function () {
-                        $(typeSelector).parent().toggleClass('d-none', $(this).val() !== 'others');
-                    });
+            initDtServerSide({
+                selector: "#document-datatable",
+                route: "{{ route('document.getAllDocuments') }}",
+                columns: [{
+                        data: 'document_code',
+                        name: 'CODE'
+                    },
+                    {
+                        data: 'category',
+                        name: 'TYPE'
+                    },
+                    {
+                        data: 'from',
+                        name: 'FROM'
+                    },
+                    {
+                        data: 'description',
+                        name: 'DESCRIPTION'
+                    },
+                    {
+                        data: 'terminal',
+                        name: 'TO'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'DATE'
+                    },
+                    {
+                        data: 'status',
+                        name: 'STATUS'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                additionalData: function (d) {
+                    d.type = $('#filterType').val();
+                    d.date_from = $('#filterDateFrom').val();
+                    d.date_to = $('#filterDateTo').val();
+                    d.user = $('#filterUser').val();
+                }
+            });
+
+            initClick('.deleteBtn', function () {
+                var id = $(this).data('bs-id');
+                $('#confirmModal').modal('show');
+                $('#confirmDelete').off('click').on('click', function () {
+                    $('#delete_form_' + id).submit();
                 });
-            }
+            })
 
-            function validateForm(requiredFields) {
-                let isValid = true;
+            initClick('.codeDeleteBtn', function () {
+                var id = $(this).data('bs-id');
+                $('#confirmModal').modal('show');
+                $('#confirmDelete').off('click').on('click', function () {
+                    $('#code_delete_form_' + id).submit()
+                });
+            })
 
-                // Check each required field
-                requiredFields.forEach(function (selector) {
-                    if ($(selector).val() === '' || $(selector).val() === null) {
-                        isValid = false;
-                        $(selector).addClass(
-                            'is-invalid'); // Add Bootstrap's invalid class to highlight empty fields
-                    } else {
-                        $(selector).removeClass(
-                            'is-invalid'); // Remove the invalid class if the field is not empty
+            initClick('.editButton', function () {
+                let id = $(this).data('bs-id');
+                $.ajax({
+                    url: '/document/getDocument/' + id,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#editCategory_id').val(data.documents
+                            .document_category_id !== null ?
+                            data.documents.document_category_id : 'others');
+                        $('#editType').val(data.documents.type);
+                        $('#editCode').val(data.documents.document_code);
+                        $('#editName_of_client').val(data.documents
+                            .name_of_client);
+                        $('#editDescription').val(data.documents.description);
+                        $('#editTerminal_id').val(data.documents.terminal_id);
+                        $('#editContact').val(data.documents.contact);
+                        $('#editType').parent().toggleClass('d-none', data
+                            .documents
+                            .document_category_id !== null);
+                        $('#editModal').modal('show');
+                        $("#editForm").attr("action",
+                            `/document/update-edit/${id}`);
+
+                        $('#updateBtn').off('click').on('click',
+                            function () {
+                                if (validateForm(['#add_name_of_client',
+                                        '#add_category_id',
+                                        '#add_terminal_id'
+                                    ])) {
+
+                                    $("#editForm").submit();
+                                }
+                            });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching data:', error);
                     }
                 });
+            })
 
-                return isValid;
-            }
+            initClick('.editCodeModal', function (e) {
 
-            function initDtServerSide(selector, route, columns) {
-                var table = $(selector).DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: route,
-                        data: function (d) {
-                            d.type = $('#filterType').val();
-                            d.date_from = $('#filterDateFrom').val();
-                            d.date_to = $('#filterDateTo').val();
-                            d.user = $('#filterUser').val();
-                        }
+                let id = $(this).data('bs-id');
+                $.ajax({
+                    url: '/document/getDocument/' + id,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#add_document_code').text(data.documents
+                            .document_code);
+                        $('#add_name_of_client').val(data.documents
+                            .name_of_client);
+                        $('#add_contact').val(data.documents.contact);
+                        $('#add_description').val(data.documents.description);
+                        $('#guestDocumentModal').modal('hide');
+                        $('#addDocumentModal').modal('show');
+                        $("#codeEditForm").attr("action",
+                            `/document/storeGuestCreate/${id}`);
+                        $('#codeUpdateBtn').off('click').on('click',
+                            function () {
+                                if (validateForm(['#add_name_of_client',
+                                        '#add_category_id',
+                                        '#add_terminal_id'
+                                    ])) {
+                                    $("#codeEditForm").submit();
+                                }
+                            });
                     },
-                    columns: columns,
-                    dom: 'Bfrtip', // This is where you enable the buttons extension
-                    buttons: [
-                        'copy', 'csv', 'excel', 'pdf', 'print'
-                    ]
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                    }
                 });
-            }
+            })
 
-        }, false);
+        });
+    }, false);
 
 </script>
 @endsection
