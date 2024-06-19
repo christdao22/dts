@@ -700,8 +700,9 @@ class DocumentController extends Controller
                 });
 
             $totalRecords = DB::table('document_details')
-                    ->whereNotNull('user_id')
-                    ->count('id');
+                ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->whereNotNull('document_details.user_id')
+                ->count('document_details.id');
 
             $filteredRecords = $baseQuery->count('document_details.id');
 
