@@ -122,7 +122,7 @@ function initTypingChecker(selector, func) {
     $(selector).on('keyup', function () {
         clearTimeout(typingTimer);
 
-        typingTimer = setTimeout(func, 300);
+        typingTimer = setTimeout(func, 250);
     });
 
     $(selector).on('keydown', function () {
