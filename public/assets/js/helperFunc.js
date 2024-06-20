@@ -141,3 +141,30 @@ function initTypingChecker(selector, func) {
 function validateKey(obj, key, fallback) {
     return key in obj ? obj[key] : fallback
 }
+
+function initExcerpt() {
+    initClick('.see-more', function (e) {
+        e.preventDefault();
+        var excerpt = this.previousElementSibling.previousElementSibling;
+        var fullText = this.previousElementSibling;
+        if (fullText.classList.contains('d-none')) {
+            fullText.classList.remove('d-none');
+            excerpt.classList.add('d-none');
+            this.textContent = 'See less';
+        } else {
+            fullText.classList.add('d-none');
+            excerpt.classList.remove('d-none');
+            this.textContent = 'See more';
+        }
+    })
+}
+
+function initDtDelete(btnSelector, formSelector) {
+    initClick(btnSelector, function () {
+        var id = $(this).data('bs-id');
+        $('#confirmModal').modal('show');
+        $('#confirmDelete').off('click').on('click', function () {
+            $(formSelector + id).submit();
+        });
+    })
+}

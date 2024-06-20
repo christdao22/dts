@@ -777,7 +777,10 @@ class DocumentController extends Controller
 
                     return $actionBtn;
                 })
-                ->rawColumns(['created_at', 'terminal', 'status', 'from', 'category', 'action'])
+                ->addColumn('description', function ($document) {
+                    return make_excerpt($document->description, 25);
+                })
+                ->rawColumns(['created_at', 'terminal', 'status', 'from', 'description', 'category', 'action'])
                 ->with('recordsTotal', $totalRecords)
                 ->with('recordsFiltered', $filteredRecords)
                 ->skipAutoFilter()

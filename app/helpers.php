@@ -132,3 +132,42 @@ function formatDateTime($date)
 
     return $formattedDateTime;
 }
+
+// function make_excerpt($text, $length = 100, $suffix = '...')
+// {
+//     if (strlen($text) <= $length) {
+//         return $text;
+//     }
+
+//     $excerpt = substr($text, 0, $length);
+
+//     $lastSpace = strrpos($excerpt, ' ');
+//     if ($lastSpace !== false) {
+//         $excerpt = substr($excerpt, 0, $lastSpace);
+//     }
+
+//     return $excerpt . $suffix;
+// }
+
+function make_excerpt($text, $length = 100, $suffix = '...')
+{
+    if (strlen($text) <= $length) return $text;
+
+    $excerpt = substr($text, 0, $length);
+
+    $lastSpace = strrpos($excerpt, ' ');
+    if ($lastSpace !== false) {
+        $excerpt = substr($excerpt, 0, $lastSpace);
+    }
+
+    $fullText = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+    $excerpt = htmlspecialchars($excerpt, ENT_QUOTES, 'UTF-8');
+
+    return <<<HTML
+        <span class="excerpt">{$excerpt}{$suffix}<br></span>
+        <span class="full-text d-none">{$fullText}</span>
+        <a href="#" class="see-more">See more</a>
+        HTML;
+}
+
+

@@ -467,21 +467,8 @@
                 }
             });
 
-            initClick('.deleteBtn', function () {
-                var id = $(this).data('bs-id');
-                $('#confirmModal').modal('show');
-                $('#confirmDelete').off('click').on('click', function () {
-                    $('#delete_form_' + id).submit();
-                });
-            })
-
-            initClick('.codeDeleteBtn', function () {
-                var id = $(this).data('bs-id');
-                $('#confirmModal').modal('show');
-                $('#confirmDelete').off('click').on('click', function () {
-                    $('#code_delete_form_' + id).submit()
-                });
-            })
+            initDtDelete('.deleteBtn', '#delete_form_')
+            initDtDelete('.codeDeleteBtn', '#code_delete_form_')
 
             initClick('.editButton', function () {
                 let id = $(this).data('bs-id');
@@ -558,6 +545,7 @@
                 });
             })
 
+            initExcerpt();
         });
     }, false);
 
