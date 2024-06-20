@@ -24,10 +24,10 @@ function initializeDataTable(selector) {
  * typeSelector
  * }
  */
-function handleModalCategoryChange(obj) {
-    $(obj.modalSelector).on('shown.bs.modal', function () {
-        $(obj.categorySelector).on('change', function () {
-            $(obj.typeSelector).parent().toggleClass('d-none', $(this).val() !== 'others');
+function handleModalCategoryChange(modalSelector, categorySelector, typeSelector) {
+    $(modalSelector).on('shown.bs.modal', function () {
+        $(categorySelector).on('change', function () {
+            $(typeSelector).parent().toggleClass('d-none', $(this).val() !== 'others');
         });
     });
 }
