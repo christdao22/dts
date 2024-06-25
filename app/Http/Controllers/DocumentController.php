@@ -48,7 +48,6 @@ class DocumentController extends Controller
                 Alert::error('oppss', 'No record found...');
                 return view('document.tracked');
             }
-            // dd($documentTracking);
         } catch (\Exception $e) {
             Alert::error('Something went wrong', 'Please try again...');
             return view('document.tracked');
@@ -80,8 +79,6 @@ class DocumentController extends Controller
             Alert::error('Something went wrong', 'Please try again...');
             return view('tracked');
         }
-
-        //   dd($documentTraces);
         return view('tracked', compact('documentTraces', 'documentTracking', 'documentDetail'));
     }
 
@@ -664,7 +661,6 @@ class DocumentController extends Controller
             return redirect()->back()->with('success', $latestId);
 
         } catch (\Exception $e) {
-            dd($e);
             Alert::error('oppss', 'Please try again...');
             return redirect()->back();
         }
