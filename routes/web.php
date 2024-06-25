@@ -69,8 +69,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('deleteGuestCode/{id}', [DocumentController::class, 'deleteGuestCode'])->name('document.deleteGuestCode');
 
         // Ajax
-        Route::get('/getAllDocuments', [DocumentController::class, 'getAllDocuments'])->name('document.getAllDocuments');
-
+        Route::get('/dtAllDocuments', [DocumentController::class, 'dtAllDocuments'])->name('document.dtAllDocuments');
+        Route::get('/dtIncoming', [DocumentController::class, 'dtIncoming'])->name('document.dtIncoming');
     });
 
     // Admin

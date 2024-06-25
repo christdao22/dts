@@ -168,3 +168,13 @@ function initDtDelete(btnSelector, formSelector) {
         });
     })
 }
+
+function initDtReceive(btnSelector, formSelector) {
+    initClick(btnSelector, function () {
+        var id = $(this).data('bs-id');
+        $('#confirmModal').modal('show');
+        $('#confirmDelete').off('click').on('click', function () {
+            $(formSelector + id).submit();
+        });
+    })
+}

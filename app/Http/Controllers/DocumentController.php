@@ -12,6 +12,7 @@ use App\Models\ReceivedHistory;
 use App\Models\Remark;
 use App\Models\Terminal;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -132,24 +133,26 @@ class DocumentController extends Controller
     {
         $this->maintenance();
 
-        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
 
-        $documentTrackings = [];
-        $terminal = Terminal::where('user_id', auth()->user()->id)->first();
+        // $documentTrackings = [];
+        // $terminal = Terminal::where('user_id', auth()->user()->id)->first();
 
-        if ($terminal == null) {
-            return view('document.incoming', compact('documentTrackings'));
-        }
+        // if ($terminal == null) {
+        //     return view('document.incoming', compact('documentTrackings'));
+        // }
 
-        $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
-            ->where('status', 'incoming')
-            ->with('user.terminal', 'documentDetail.document_category', 'remark');
+        // $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
+        //     ->where('status', 'incoming')
+        //     ->with('user.terminal', 'documentDetail.document_category', 'remark');
 
-        $documentTrackings = $this->filter($request, $documentTrackings);
-        $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
+        // $documentTrackings = $this->filter($request, $documentTrackings);
+        // $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
 
-        return view('document.incoming', compact('documentTrackings', 'filters'));
+        // return view('document.incoming', compact('documentTrackings', 'filters'));
+
+        return view('document.incoming', compact('filters'));
+
     }
 
     public function receivedHistory(Request $request)
@@ -455,24 +458,48 @@ class DocumentController extends Controller
 
     public function filter($request, $object)
     {
+        $searchValue = $request->search['value'] ?? null;
 
-        if (isset($request->filterType) && $request->filterType != '') {
-            $object->whereHas('documentDetail', function ($q) use ($request) {
-                $q->where('document_category_id', '=', $request->filterType);
-            });
-        }
+        $object->when($request->filled('type'), function ($query) use ($request) {
+                    $query->where('document_details.document_category_id', $request->type);
+                })
+                ->when($request->filled('date_from') && $request->filled('date_to'), function ($query) use ($request) {
+                    $dateFrom = Carbon::parse($request->date_from);
+                    $dateTo = Carbon::parse($request->date_to)->addDay();
+                    $query->whereBetween('document_details.created_at', [$dateFrom, $dateTo]);
+                })
+                ->when($request->filled('user'), function ($query) use ($request) {
+                    $query->where('document_trackings.user_id', $request->user);
+                })
+                ->when($searchValue, function ($query) use ($searchValue) {
+                    $query->where(function ($subQuery) use ($searchValue) {
+                        $subQuery->where('document_details.document_code', 'like', "%{$searchValue}%")
+                            ->orWhere('document_details.name_of_client', 'like', "%{$searchValue}%")
+                            ->orWhere('document_details.contact', 'like', "%{$searchValue}%")
+                            ->orWhere('terminals.terminal_name', 'like', "%{$searchValue}%")
+                            ->orWhere('document_categories.category_name', 'like', "%{$searchValue}%");
+                    });
+                });
 
-        if ((isset($request->filterDateFrom) && isset($request->filterDateTo)) && ($request->filterDateFrom != '' && $request->filterDateTo != '')) {
-            $object->whereHas('documentDetail', function ($q) use ($request) {
-                $q->whereDate('created_at', '>=', date($request->filterDateFrom))->whereDate('created_at', '<=', date($request->filterDateTo));
-            });
-        }
 
-        if (isset($request->filterUser) && $request->filterUser != '') {
-            $object->whereHas('user', function ($q) use ($request) {
-                $q->where('id', '=', $request->filterUser);
-            });
-        }
+
+        // if (isset($request->filterType) && $request->filterType != '') {
+        //     $object->whereHas('documentDetail', function ($q) use ($request) {
+        //         $q->where('document_category_id', '=', $request->filterType);
+        //     });
+        // }
+
+        // if ((isset($request->filterDateFrom) && isset($request->filterDateTo)) && ($request->filterDateFrom != '' && $request->filterDateTo != '')) {
+        //     $object->whereHas('documentDetail', function ($q) use ($request) {
+        //         $q->whereDate('created_at', '>=', date($request->filterDateFrom))->whereDate('created_at', '<=', date($request->filterDateTo));
+        //     });
+        // }
+
+        // if (isset($request->filterUser) && $request->filterUser != '') {
+        //     $object->whereHas('user', function ($q) use ($request) {
+        //         $q->where('id', '=', $request->filterUser);
+        //     });
+        // }
 
         return $object;
     }
@@ -661,14 +688,12 @@ class DocumentController extends Controller
         });
     }
 
-    public function getAllDocuments(Request $request)
+    public function dtAllDocuments(Request $request)
     {
         if ($request->ajax()) {
             $user = auth()->user();
-            $searchValue = $request->search['value'] ?? null;
             $length = $request->length ?? 10;
             $start = $request->start ?? 0;
-
             $baseQuery = DB::table('document_details')
                 ->join('terminals', 'document_details.terminal_id', '=', 'terminals.id')
                 ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
@@ -676,28 +701,9 @@ class DocumentController extends Controller
                 ->whereNotNull('document_details.user_id')
                 ->when(!$user->can_view_all, function ($query) use ($user) {
                     $query->where('document_details.user_id', $user->id);
-                })
-                ->when($request->filled('type'), function ($query) use ($request) {
-                    $query->where('document_details.document_category_id', $request->type);
-                })
-                ->when($request->filled('date_from') && $request->filled('date_to'), function ($query) use ($request) {
-                    $query->whereBetween('document_details.created_at', [
-                        date($request->date_from),
-                        date($request->date_to),
-                    ]);
-                })
-                ->when($request->filled('user'), function ($query) use ($request) {
-                    $query->where('document_trackings.user_id', $request->user);
-                })
-                ->when($searchValue, function ($query) use ($searchValue) {
-                    $query->where(function ($subQuery) use ($searchValue) {
-                        $subQuery->where('document_details.document_code', 'like', "%{$searchValue}%")
-                            ->orWhere('document_details.name_of_client', 'like', "%{$searchValue}%")
-                            ->orWhere('document_details.contact', 'like', "%{$searchValue}%")
-                            ->orWhere('terminals.terminal_name', 'like', "%{$searchValue}%")
-                            ->orWhere('document_categories.category_name', 'like', "%{$searchValue}%");
-                    });
                 });
+
+            $baseQuery = $this->filter($request, $baseQuery);
 
             $totalRecords = DB::table('document_details')
                 ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
@@ -786,6 +792,95 @@ class DocumentController extends Controller
                 ->skipAutoFilter()
                 ->skipPaging(true)
                 ->make(true);
+        }
+    }
+
+    public function dtIncoming(Request $request) {
+        if ($request->ajax()) {
+            $length = $request->length ?? 10;
+            $start = $request->start ?? 0;
+
+            $baseQuery = DB::table('document_trackings')
+                ->join('document_details', 'document_trackings.document_detail_id', '=', 'document_details.id')
+                ->join('users', 'document_trackings.user_id', '=', 'users.id')
+                ->leftJoin('terminals', 'users.id', '=', 'terminals.user_id')
+                ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->leftJoin('remarks', 'document_trackings.remark_id', '=', 'remarks.id')
+                ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
+                ->where('document_trackings.status', 'incoming');
+
+            $baseQuery = $this->filter($request, $baseQuery);
+
+            $totalRecords = DB::table('document_trackings')
+                // ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
+                ->where('document_trackings.status', 'incoming')
+                ->count('document_trackings.id');
+
+            // $filteredRecords = $baseQuery->count('document_details.id');
+
+
+            $documents = $baseQuery->select(
+                'document_details.id',
+                'document_details.document_code',
+                'document_details.name_of_client',
+                'document_details.contact',
+                'document_details.description',
+                'document_details.type',
+                'document_details.created_at',
+                'document_details.document_category_id',
+                'document_details.user_id',
+                'document_trackings.status',
+                'terminals.terminal_name',
+                'document_categories.category_name',
+                'remarks.remarks')
+                ->orderBy('document_details.created_at', 'desc')
+                ->offset($start)
+                ->limit($length)
+                ->get();
+
+            return DataTables::of($documents)
+                ->addIndexColumn()
+                ->editColumn('category', function ($document) {
+                    return $document->document_category_id != null ?
+                    $document->category_name : "<b>Others: </b>" .
+                    $document->type;
+                })
+                ->editColumn('from', function ($document) {
+                    return $document->name_of_client . '<br>' . ($document->contact != '' ? '(' . $document->contact . ')' : '');
+                })
+                ->editColumn('terminal', function ($document) {
+                    return isset($document->terminal_name) ? $document->terminal_name : '';
+                })
+                ->editColumn('created_at', function ($document) {
+                    return formatDateTime($document->created_at);
+                })
+                ->addColumn('action', function ($document) {
+                    $actionBtn = '<button class="btn btn-warning viewBtn" href="javascript:void(0)"
+                                data-bs-id="' . $document->id . '">
+                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Show"><i
+                                                class="ri ri-eye-fill"></i></span>
+                                    </button>
+                                    <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="Track"
+                                        href="' . route("web.find", 'query='.$document->document_code) . '"><i
+                                            class="ri-route-line"></i></a>
+                                    <button class="btn btn-success receivedBtn" data-bs-id="' . $document->id . '"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Receive"><i
+                                            class=" ri-mail-add-line"></i></button>';
+
+                    return $actionBtn;
+                })
+                ->addColumn('description', function ($document) {
+                    return make_excerpt($document->description, 25);
+                })
+                ->rawColumns(['created_at', 'terminal', 'from', 'description', 'category', 'action'])
+                ->with('recordsTotal', $totalRecords)
+                // ->with('recordsFiltered', $filteredRecords)
+                ->skipAutoFilter()
+                ->skipPaging(true)
+                ->make(true);
+
         }
     }
 }

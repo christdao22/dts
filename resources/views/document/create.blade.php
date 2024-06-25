@@ -423,7 +423,7 @@
 
             initDtServerSide({
                 selector: "#document-datatable",
-                route: "{{ route('document.getAllDocuments') }}",
+                route: "{{ route('document.dtAllDocuments') }}",
                 columns: [{
                         data: 'document_code',
                         name: 'CODE'
@@ -510,7 +510,6 @@
                     }
                 });
             })
-
             initClick('.editCodeModal', function (e) {
 
                 let id = $(this).data('bs-id');
