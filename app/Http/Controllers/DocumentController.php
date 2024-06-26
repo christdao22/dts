@@ -691,8 +691,8 @@ class DocumentController extends Controller
             $length = $request->length ?? 10;
             $start = $request->start ?? 0;
             $baseQuery = DB::table('document_details')
-                ->join('terminals', 'document_details.terminal_id', '=', 'terminals.id')
-                ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
+            ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
+            ->join('terminals', 'document_trackings.terminal_id', '=', 'terminals.id')
                 ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
                 ->whereNotNull('document_details.user_id')
                 ->when(!$user->can_view_all, function ($query) use ($user) {
