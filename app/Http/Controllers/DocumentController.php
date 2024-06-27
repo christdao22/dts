@@ -434,12 +434,14 @@ class DocumentController extends Controller
                 ->when($request->filled('user'), function ($query) use ($request) {
                     $query->where('document_trackings.user_id', $request->user);
                 })
+
                 ->when($searchValue, function ($query) use ($searchValue) {
                     $query->where(function ($subQuery) use ($searchValue) {
                         $subQuery->where('document_details.document_code', 'like', "%{$searchValue}%")
                             ->orWhere('document_details.name_of_client', 'like', "%{$searchValue}%")
                             ->orWhere('document_details.contact', 'like', "%{$searchValue}%")
                             ->orWhere('terminals.terminal_name', 'like', "%{$searchValue}%")
+                            ->orWhere('document_trackings.status', 'like', "%{$searchValue}%")
                             ->orWhere('document_categories.category_name', 'like', "%{$searchValue}%");
                     });
                 });
