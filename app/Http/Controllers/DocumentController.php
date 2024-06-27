@@ -66,6 +66,7 @@ class DocumentController extends Controller
                 $documentTraces = DocumentTrace::where('document_detail_id', $documentDetail->id)->with('user.terminal', 'documentDetail')->get();
                 $documentLatest = DocumentTrace::where('document_detail_id', $documentDetail->id)->with('user.terminal', 'documentDetail')->latest()->first();
                 $data = $documentLatest->user->terminal->id;
+
                 // throw new Exception('Something went wrong');
                 $documentTracking = DocumentTracking::where('document_detail_id', $documentDetail->id)->with('user', 'documentDetail', 'terminal')->first();
                 if ($data == $documentTracking->terminal->id && $documentTracking->status == "incoming") {
@@ -90,14 +91,10 @@ class DocumentController extends Controller
     public function allDocuments(Request $request)
     {
         $this->maintenance();
-
-        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
-
         $documentTrackings = DocumentTracking::where('terminal_id', auth()->user()->office_id)
             ->where('status', 'received')
             ->with('user', 'documentDetail');
-
         $documentTrackings = $this->filter($request, $documentTrackings);
         $documentTrackings = $documentTrackings->get();
 
@@ -107,9 +104,7 @@ class DocumentController extends Controller
     public function received(Request $request)
     {
         $this->maintenance();
-
         $documentTrackings = [];
-        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
         $terminals = $this->getTerminals();
 
@@ -129,34 +124,14 @@ class DocumentController extends Controller
     public function incoming(Request $request)
     {
         $this->maintenance();
-
         $filters = $this->getFilters();
 
-        // $documentTrackings = [];
-        // $terminal = Terminal::where('user_id', auth()->user()->id)->first();
-
-        // if ($terminal == null) {
-        //     return view('document.incoming', compact('documentTrackings'));
-        // }
-
-        // $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
-        //     ->where('status', 'incoming')
-        //     ->with('user.terminal', 'documentDetail.document_category', 'remark');
-
-        // $documentTrackings = $this->filter($request, $documentTrackings);
-        // $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
-
-        // return view('document.incoming', compact('documentTrackings', 'filters'));
-
         return view('document.incoming', compact('filters'));
-
     }
 
     public function receivedHistory(Request $request)
     {
         $this->maintenance();
-
-        // ** use to get the data for filters dropdown
         $filters = $this->getFilters();
         $receivedHistories = ReceivedHistory::with('user.terminal', 'documentDetail.document_category', 'remark');
         $receivedHistories = $this->filter($request, $receivedHistories);
@@ -172,8 +147,6 @@ class DocumentController extends Controller
     public function outgoing(Request $request)
     {
         $this->maintenance();
-
-        // ** use to get the data for filters dropdown
         $terminals = $this->getTerminals();
         $filters = $this->getFilters();
 
@@ -259,10 +232,6 @@ class DocumentController extends Controller
                     'document_category_id' => $request->category_id == 'others' ? null : $request->category_id,
                     'contact' => $request->contact,
                     'created_at' => count($generated_data) != 0 ? date($generated_data[0]->created_at) : date('Y-m-d H:i:s'),
-
-                    // 'is_check_by_dm'    => $request->is_check_by_dm == 'on'
-                    // 'transaction_type'  =>  1, // to identify if simple, complex, highly technical
-                    // 'is_verified'       => false // used to check if na verified na ba ni DM
                 ]);
 
                 $generated_code_query->delete();
@@ -323,7 +292,6 @@ class DocumentController extends Controller
                     $documentTracking->save();
 
                     $documentDetail = DocumentDetail::FindOrFail($id);
-                    // $documentDetail->is_check_by_dm = $request->is_check_by_dm == 'on';
                     $documentDetail->save();
 
                     $documentTrace = DocumentTrace::where('document_detail_id', '=', $id)->latest()->first();
@@ -348,7 +316,6 @@ class DocumentController extends Controller
                     DocumentTrace::create([
                         'user_id' => auth()->user()->id,
                         'document_detail_id' => $documentTracking->id,
-                        // 'remark_id'          => $remark->id
                     ]);
 
                     ReceivedHistory::create([
@@ -478,32 +445,12 @@ class DocumentController extends Controller
                     });
                 });
 
-
-
-        // if (isset($request->filterType) && $request->filterType != '') {
-        //     $object->whereHas('documentDetail', function ($q) use ($request) {
-        //         $q->where('document_category_id', '=', $request->filterType);
-        //     });
-        // }
-
-        // if ((isset($request->filterDateFrom) && isset($request->filterDateTo)) && ($request->filterDateFrom != '' && $request->filterDateTo != '')) {
-        //     $object->whereHas('documentDetail', function ($q) use ($request) {
-        //         $q->whereDate('created_at', '>=', date($request->filterDateFrom))->whereDate('created_at', '<=', date($request->filterDateTo));
-        //     });
-        // }
-
-        // if (isset($request->filterUser) && $request->filterUser != '') {
-        //     $object->whereHas('user', function ($q) use ($request) {
-        //         $q->where('id', '=', $request->filterUser);
-        //     });
-        // }
-
         return $object;
     }
 
     public function generateDocumentNumber()
     {
-        $number = mt_rand(100000, 999999); // better than rand()
+        $number = mt_rand(100000, 999999);
 
         // call the same function if the barcode exists already
         if ($this->documentNumberExists($number)) {
@@ -808,13 +755,9 @@ class DocumentController extends Controller
             $baseQuery = $this->filter($request, $baseQuery);
 
             $totalRecords = DB::table('document_trackings')
-                // ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
                 ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
                 ->where('document_trackings.status', 'incoming')
                 ->count('document_trackings.id');
-
-            // $filteredRecords = $baseQuery->count('document_details.id');
-
 
             $documents = $baseQuery->select(
                 'document_details.id',
