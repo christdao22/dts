@@ -42,7 +42,7 @@
                 <div class="d-flex">
                     <!-- LOGO -->
                     <div class="navbar-brand-box">
-                        <a href="#" class="logo logo-light">
+                        <a href="/" class="logo logo-light">
                             <span class="logo-sm">
                                 <img src="{{ asset('assets/images/cdo_dts_sm.png') }}" alt="logo-sm-light" height="30">
                             </span>

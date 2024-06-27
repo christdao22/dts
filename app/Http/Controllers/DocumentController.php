@@ -17,7 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 use Yajra\DataTables\DataTables;
-use Yajra\DataTables\Facades\DataTables as FacadesDataTables;
 
 class DocumentController extends Controller
 {
@@ -479,7 +478,7 @@ class DocumentController extends Controller
     }
 
     /**
-     * Complete to Forward
+     * Change from Complete to Forward
      */
     public function undoActionComplete(Request $request, string $id)
     {
