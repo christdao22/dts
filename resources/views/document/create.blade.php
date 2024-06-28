@@ -45,15 +45,15 @@
                 <div class="card-body">
                     @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1)
                     <div class="d-flex flex-row-reverse gap-2">
-                        <button class="btn btn-info mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Create Documents</button>
+                        <button class="btn btn-info mb-3 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createModal"><i class="ri-add-box-line"></i> Create Documents</button>
                         <form action="{{ route('document.generateCode') }}" method="get">
                             @csrf
                             <button title="This button generates a code for you to obtain first and then add it when you're ready to create a document."
                                 class="btn btn-warning mb-3 d-flex align-items-center gap-2 text-light"><i class="ri-dashboard-line"></i>
                                 Generate Code</button>
                         </form>
-                        <button class="btn btn-success mb-3" data-bs-toggle="modal"
-                            data-bs-target="#guestDocumentModal">Add Document</button>
+                        <button class="btn btn-success mb-3 d-flex align-items-center gap-2" data-bs-toggle="modal"
+                            data-bs-target="#guestDocumentModal"><i class="ri-user-add-line"></i> Document Code</button>
                     </div>
                     <div class="modal" id="createModal">
                         <div class="modal-dialog">

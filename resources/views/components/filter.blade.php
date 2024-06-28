@@ -63,10 +63,10 @@
         </div>
     </div>
     <div class="d-flex justify-content-end w-100 gap-2">
-        <a href="{{route($route)}}" class="btn btn-danger w-auto col-sm-12">
-            <i class='ri-delete-bin-2-line'></i> Clear Filter
+        <a href="{{route($route)}}" class="btn btn-danger w-auto col-sm-12 d-flex align-items-center gap-2">
+            <i class='ri-delete-bin-2-line'></i> Clear
         </a>
-        <button type='submit' class="btn btn-primary w-auto col-sm-12">
+        <button type='submit' class="btn btn-primary w-auto col-sm-12 d-flex align-items-center gap-2">
             <i class='ri-filter-2-line'></i> Filter
         </button>
     </div>
