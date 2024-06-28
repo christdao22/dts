@@ -17,9 +17,29 @@
     <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <!-- App Css-->
     <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+    <!-- Template Main CSS File -->
+    <link href="assets2/css/style.css" rel="stylesheet">
 </head>
 
-<body class="auth-body-bg">
+<body class="auth-body-bg position-relative">
+    <header id="header" class="fixed-top">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a href="{{ url('/') }}">
+                <img class="home-logo" src="{{ asset('assets/images/home_logo.png') }}" alt="DEPED CDO Logo">
+            </a>
+            <nav id="navbar" class="navbar">
+                <ul>
+                    @if (auth()->user())
+                    <li><a class="nav-link scrollto" href="{{ route('document.incoming') }}">Dashboard</a></li>
+                    @else
+                    <li><a class="nav-link scrollto" href="{{ route('login') }}">Login</a></li>
+                    <li><a class="nav-link scrollto" href="{{ route('register') }}">Register</a></li>
+                    @endif
+                </ul>
+                <i class="ri-menu-line mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+        </div>
+    </header><!-- End Header -->
     <div class=""></div>
     <div class="wrapper-page">
         <div class="container-fluid p-0">
@@ -33,10 +53,7 @@
                                     alt="Header Avatar">
                             </div>
                         </a>
-                        {{-- <h5 class="text-muted text-center font-size-28"><b>Document Tracking System</b></h5> --}}
                     </div>
-
-                    {{-- <h4 class="text-muted text-center font-size-18"><b>Register</b></h4> --}}
 
                     <div class="p-2">
                         <form action="{{ route('guestStore') }}" method="POST" enctype="multipart/form-data">
@@ -95,7 +112,8 @@
                                         <label for="terminal_name" class="form-label">Terminal Name</label>
                                         {{-- <small>(This will be the name of your office terminal and can be used to forward the documents.)</small> --}}
                                         <input type="text" name="terminal_name" id="terminal_name" class="form-control"
-                                            placeholder="Enter terminal name..." value="{{ old('terminal_name') }}" required>
+                                            placeholder="Enter terminal name..." value="{{ old('terminal_name') }}"
+                                            required>
                                         @error('terminal_name')
                                         <div class="alert alert-danger mt-2">{{ $message }}</div>
                                         @enderror
@@ -153,7 +171,7 @@
         <!-- end container -->
     </div>
     <!-- end -->
-     @include('sweetalert::alert')
+    @include('sweetalert::alert')
 
 
     <!-- JAVASCRIPT -->

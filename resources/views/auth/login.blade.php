@@ -17,10 +17,30 @@
     <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <!-- App Css-->
     <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
-
+            <!-- Template Main CSS File -->
+    <link href="assets2/css/style.css" rel="stylesheet">
 </head>
 
-<body class="auth-body-bg">
+<body class="auth-body-bg position-relative">
+            <!-- ======= Header ======= -->
+        <header id="header" class="fixed-top">
+            <div class="container d-flex align-items-center justify-content-between">
+                <a href="{{ url('/') }}">
+                    <img class="home-logo" src="{{ asset('assets/images/home_logo.png') }}" alt="DEPED CDO Logo">
+                </a>
+                <nav id="navbar" class="navbar">
+                    <ul>
+                        @if (auth()->user())
+                        <li><a class="nav-link scrollto" href="{{ route('document.incoming') }}">Dashboard</a></li>
+                        @else
+                        <li><a class="nav-link scrollto" href="{{ route('login') }}">Login</a></li>
+                        <li><a class="nav-link scrollto" href="{{ route('register') }}">Register</a></li>
+                        @endif
+                    </ul>
+                    <i class="ri-menu-line mobile-nav-toggle"></i>
+                </nav><!-- .navbar -->
+            </div>
+        </header><!-- End Header -->
     <div class="wrapper-page">
         <div class="container-fluid p-0">
             <div class="card">
