@@ -463,7 +463,7 @@
                     d.type = $('#filterType').val();
                     d.date_from = $('#filterDateFrom').val();
                     d.date_to = $('#filterDateTo').val();
-                    d.user = $('#filterUser').val();
+                    d.status = $('#filterStatus').val();
                 }
             });
 

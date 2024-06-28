@@ -425,7 +425,9 @@ class DocumentController extends Controller
                 ->when($request->filled('user'), function ($query) use ($request) {
                     $query->where('document_trackings.user_id', $request->user);
                 })
-
+                ->when($request->filled('status'), function ($query) use ($request) {
+                    $query->where('document_trackings.status', $request->status);
+                })
                 ->when($searchValue, function ($query) use ($searchValue) {
                     $query->where(function ($subQuery) use ($searchValue) {
                         $subQuery->where('document_details.document_code', 'like', "%{$searchValue}%")

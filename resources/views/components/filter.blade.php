@@ -13,6 +13,25 @@
                     @endforeach
                 </select>
         </div>
+        @if (request()->is('document/all'))
+        <div class="form-group col-md-6 col-sm-12 mb-2">
+            <label for="filterStatus">Status</label>
+            <select name="filterStatus" id="filterStatus" class="form-select">
+                <option value="" selected>
+                    All
+                </option>
+                <option value="completed" {{ request()->get('filterStatus') ==  'completed'? 'selected':'' }}>
+                    Completed
+                </option>
+                <option value="received" {{ request()->get('filterStatus') ==  'received'? 'selected':'' }}>
+                    Received
+                </option>
+                <option value="incoming" {{ request()->get('filterStatus') == 'incoming'? 'selected':'' }}>
+                    Incoming
+                </option>
+            </select>
+        </div>
+        @else
         <div class="form-group col-md-6 col-sm-12 mb-2">
             <label for="filterUser">Forwarded by</label>
             <select name="filterUser" id="filterUser" class="form-select">
@@ -29,6 +48,8 @@
                 @endforeach
             </select>
         </div>
+        @endif
+
 
     </div>
     <div class="row">
