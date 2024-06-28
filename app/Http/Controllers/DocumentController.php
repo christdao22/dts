@@ -426,7 +426,12 @@ class DocumentController extends Controller
                     $query->where('document_trackings.user_id', $request->user);
                 })
                 ->when($request->filled('status'), function ($query) use ($request) {
-                    $query->where('document_trackings.status', $request->status);
+                    if($request->status == 'pending receive') {
+                        $query->where('document_trackings.status', 'incoming');
+                        $query->where('document_trackings.is_received', 0);
+                    } else {
+                        $query->where('document_trackings.status', $request->status);
+                    }
                 })
                 ->when($searchValue, function ($query) use ($searchValue) {
                     $query->where(function ($subQuery) use ($searchValue) {

@@ -24,10 +24,10 @@
                     Completed
                 </option>
                 <option value="received" {{ request()->get('filterStatus') ==  'received'? 'selected':'' }}>
-                    Received
+                    In progress
                 </option>
-                <option value="incoming" {{ request()->get('filterStatus') == 'incoming'? 'selected':'' }}>
-                    Incoming
+                <option value="pending receive" {{ request()->get('filterStatus') == 'pending receive'? 'selected':'' }}>
+                    Pending receive
                 </option>
             </select>
         </div>
