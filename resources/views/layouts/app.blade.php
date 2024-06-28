@@ -189,12 +189,6 @@
                                 <span>TRACK DOCUMENTS</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="\assets\forms\DEPEDCDO-001-F01.pdf" target='_blank' class=" waves-effect">
-                                <i class="ri-file-download-line"></i>
-                                <span>DOWNLOAD FORM</span>
-                            </a>
-                        </li>
                         <li class="menu-title">Settings</li>
                         <li>
                             <a href="{{ route('user.profile') }}" class=" waves-effect">
