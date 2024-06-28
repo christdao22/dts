@@ -28,7 +28,6 @@ Route::get('/', function () {
 
     return view('welcome', compact('categories'));
 });
-// Route::get('/register', function () { return view('welcome'); });
 
 // Auth Route
 Auth::routes();

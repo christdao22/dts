@@ -40,6 +40,7 @@
                     </form>
                     @if (isset($documentTraces))
                     <div style="margin-top: 25px;">
+                        Document Code: <b>{!! $documentDetail->document_code !!}</b><br>
                         Document Type: <b>{!! $documentDetail->document_category_id != null? $documentDetail->document_category->category_name : "Others - " . $documentDetail->type !!}</b>
                         <br>
                         Name of Client: <b>{{ $documentDetail->name_of_client }}</b>
@@ -72,24 +73,7 @@
                         @endforeach
 
                         @if (isset($documentTracking))
-                        @if ($documentTracking->status == "rejected")
-                        <div class="cd-timeline-block" style="border: 10px solid blue;">
-                            <div class="cd-timeline-img cd-danger">
-                                <i class="mdi mdi-adjust"></i>
-                            </div> <!-- cd-timeline-img -->
-                            <div class="cd-timeline-content">
-                                <h3>{{ strtoupper($documentTracking->status) }}</h3>
-                                <p class="m-b-20 text-muted font-14">at
-                                    {{ strtoupper(isset($documentTrace->user->terminal->terminal_name)? $documentTrace->user->terminal->terminal_name:'')  }}
-                                </p>
-                                <p class="mb-0 text-muted font-14">by
-                                    {{ Str::ucfirst($documentTracking->user->first_name) }}
-                                    {{ strtoupper(substr($documentTracking->user->middle_name,0,1)) }}.
-                                    {{ ucfirst($documentTracking->user->last_name) }} </p>
-                                <span class="cd-date">{{ formatDateTime($documentTracking->updated_at) }}</span>
-                            </div> <!-- cd-timeline-content -->
-                        </div> <!-- cd-timeline-block -->
-                        @elseif ($documentTracking->status == "incoming")
+                        @if ($documentTracking->status == "incoming")
                         <div class="cd-timeline-block">
                             <div class="cd-timeline-img cd-danger {{ bgColorStatus($documentTracking->status) }}">
                                 <i class="mdi mdi-adjust"></i>

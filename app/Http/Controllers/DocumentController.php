@@ -190,11 +190,7 @@ class DocumentController extends Controller
 
     public function tracked()
     {
-        $documentTrackings = DocumentTracking::where('terminal_id', auth()->user()->office_id)
-            ->where('status', 'rejected')
-            ->with('user', 'documentDetail')
-            ->get();
-        return view('document.tracked', compact('documentTrackings'));
+        return view('document.tracked');
     }
 
     public function create(Request $request)
@@ -342,11 +338,6 @@ class DocumentController extends Controller
                     ]);
 
                     Alert::success('Completed', '');
-                } elseif ($request->status === "rejected") {
-                    $documentTracking = DocumentTracking::FindOrFail($id);
-                    $documentTracking->user_id = auth()->user()->id;
-                    $documentTracking->status = $request->status;
-                    $documentTracking->save();
                 }
             });
         } catch (\Exception $e) {
