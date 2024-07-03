@@ -11,6 +11,9 @@
                         {{ Str::ucfirst(strtolower($type->category_name)) }}
                     </option>
                     @endforeach
+                    <option value="others" {{ request()->get('filterType') ==  'others'? 'selected':'' }}>
+                        Others
+                    </option>
                 </select>
         </div>
         @if (request()->is('document/all'))

@@ -415,7 +415,11 @@ class DocumentController extends Controller
         $searchValue = $request->search['value'] ?? null;
 
         $object->when($request->filled('type'), function ($query) use ($request) {
-                    $query->where('document_details.document_category_id', $request->type);
+                    if($request->type != "others"){
+                            $query->where('document_details.document_category_id', $request->type);
+                    } else {
+                            $query->where('document_details.document_category_id', null);
+                    }
                 })
                 ->when($request->filled('date_from') && $request->filled('date_to'), function ($query) use ($request) {
                     $dateFrom = Carbon::parse($request->date_from);
@@ -639,7 +643,7 @@ class DocumentController extends Controller
             $baseQuery = DB::table('document_details')
             ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
             ->join('terminals', 'document_trackings.terminal_id', '=', 'terminals.id')
-                ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
                 ->whereNotNull('document_details.user_id')
                 ->when(!$user->can_view_all, function ($query) use ($user) {
                     $query->where('document_details.user_id', $user->id);
@@ -648,7 +652,7 @@ class DocumentController extends Controller
             $baseQuery = $this->filter($request, $baseQuery);
 
             $totalRecords = DB::table('document_details')
-                ->join('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
                 ->whereNotNull('document_details.user_id')
                 ->count('document_details.id');
 
