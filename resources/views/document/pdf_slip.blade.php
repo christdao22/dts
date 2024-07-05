@@ -7,12 +7,11 @@
 
     <title>DepEd - CDO | Print Slip</title>
     <style>
-        @page { size: 8.5in 13in; margin: 0; }
+        @page { size: 8.5in 13in; margin: 1; }
 
         * { box-sizing: border-box; padding: 0; margin: 0; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 8px; border: 1px solid black; }
-
         .d-flex { display: flex; }
         .justify-content-center { justify-content: center; }
         .align-items-center { align-items: center; }
@@ -20,8 +19,8 @@
         .text-center { text-align: center; }
         .border { border: 1px solid black; padding: 10px }
 
-        .container { font-size: 8px; display: flex;  height: 100vh; justify-content: center; }
-        .section { height: 50vh; width: 100%; padding: 15px; max-width: min-content; }
+        .container { font-size: 8px; display: flex;  height: 90vh; justify-content: center;  }
+        .section { height: 50vh; width: 60%; padding: 15px; max-width: min-content; }
         .section:first-child { border: 1px solid black;  }
         .header { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .trans-code { font-size: 18px; font-weight: 700; }
@@ -128,10 +127,10 @@
                         </div> --}}
                     </div>
                     <p style="margin-top: 10px; line-height: 12px; font-size: 9px;">
-                        <strong>Please:</strong>_________________________________________________________________________________ <br>
-                        _______________________________________________________________________________________
-                        _______________________________________________________________________________________
-                        _______________________________________________________________________________________
+                        <strong>Please:</strong>_________________________________________________________________________ <br>
+                        _______________________________________________________________________________
+                        _______________________________________________________________________________
+                        _______________________________________________________________________________
                     </p>
 
                     <p class="text-center" style="margin-top: 25px; font-size: 9px;">
@@ -185,11 +184,11 @@
     <script>
         window.print()
 
-        document.addEventListener("DOMContentLoaded", function(){
-            setTimeout(function(){
-                window.close();
-            }, 120000); // 2 minutes = 120,000 milliseconds
-        });
+        // document.addEventListener("DOMContentLoaded", function(){
+        //     setTimeout(function(){
+        //         window.close();
+        //     }, 120000); // 2 minutes = 120,000 milliseconds
+        // });
     </script>
 </body>
 
