@@ -184,6 +184,12 @@
 
     <script>
         window.print()
+
+        document.addEventListener("DOMContentLoaded", function(){
+            setTimeout(function(){
+                window.close();
+            }, 120000); // 2 minutes = 120,000 milliseconds
+        });
     </script>
 </body>
 
