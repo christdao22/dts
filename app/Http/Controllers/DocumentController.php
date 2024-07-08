@@ -722,7 +722,7 @@ class DocumentController extends Controller
                                 </form>
                             </button>
                             <a href="javascript:void(0)" class="btn btn-primary editButton"
-                                data-bs-id="' . $document->id . '">EDIT</a>
+                                data-bs-id="' . $document->id . '"><i class="ri-edit-2-line"></i></a>
                             ' : '') . '
                         </div>
                     ';
@@ -825,4 +825,6 @@ class DocumentController extends Controller
 
         }
     }
+
 }
+
