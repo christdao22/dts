@@ -44,25 +44,25 @@
                 </div>
                 <div class="card-body">
                     @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1)
-                    <div class="d-flex justify-content-between">
-                        <div class="d-flex gap-0 mb-3 " id="show_all_toogle">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex gap-0 " id="show_all_toogle">
                             <input type="radio" class="btn-check rounded-end" name="is_show_docs" value="0" id="hideDocuments" autocomplete="off">
-                            <label class="btn btn-outline-secondary " for="hideDocuments" style="border-radius: .25rem 0 0 .25rem !important; border-right: 0;"
+                            <label class="btn btn-outline-secondary mb-0" for="hideDocuments" style="border-radius: .25rem 0 0 .25rem !important; border-right: 0;"
                                 data-bs-toggle="tooltip" data-bs-placement="top" title="Click to display only the documents you have created.">Hide</label>
                             <input type="radio" class="btn-check" name="is_show_docs" value="1" id="showDocuments" autocomplete="off" checked>
-                            <label class="btn btn-outline-info" for="showDocuments" style="border-radius: 0 .25rem .25rem 0 !important; border-left: 0;"
+                            <label class="btn btn-outline-info mb-0" for="showDocuments" style="border-radius: 0 .25rem .25rem 0 !important; border-left: 0;"
                                 data-bs-toggle="tooltip" data-bs-placement="top" title="Click to display all documents created within the system.">Show All</label>
                         </div>
-                        <div class="d-flex flex-row-reverse gap-2  mb-3">
-                            <button class="btn btn-info d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createModal"><i class="ri-add-box-line"></i> Create Documents</button>
+                        <div class="d-flex flex-row-reverse gap-2 ">
+                            <button class="btn btn-info d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createModal"><i class="ri-add-box-line"></i> <span class="d-none d-md-block">Create Documents</span> </button>
                             <form action="{{ route('document.generateCode') }}" method="get">
                                 @csrf
                                 <button title="This button generates a code for you to obtain first and then add it when you're ready to create a document."
                                     class="btn btn-warning d-flex align-items-center gap-2 text-light h-100"><i class="ri-dashboard-line"></i>
-                                    Generate Code</button>
+                                    <span class="d-none d-md-block">Generate Code</span> </button>
                             </form>
                             <button class="btn btn-success d-flex align-items-center gap-2" data-bs-toggle="modal"
-                                data-bs-target="#guestDocumentModal"><i class="ri-user-add-line"></i> Document Code</button>
+                                data-bs-target="#guestDocumentModal"><i class="ri-user-add-line"></i> <span class="d-none d-md-block">Document Code</span></button>
                         </div>
                     </div>
                     <div class="modal" id="createModal">
