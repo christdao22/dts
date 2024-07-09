@@ -85,7 +85,7 @@
                                                     'type'        : 'text',
                                                     'is_required' : false,
                                                     'placeholder' : '******',
-                                                    'small'        : 'Leave empty if you dont have document code'}" />
+                                                    'small'        : 'Leave this field empty if you do not have a document code.'}" />
 
                                                 <div class="form-group">
                                                     <label class="form-label" for="category_id"><b>Document Type
