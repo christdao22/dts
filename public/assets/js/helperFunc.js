@@ -104,6 +104,10 @@ function initDtServerSide(obj) {
         dt.search(dtInputSelector.val()).draw();
     });
 
+    $('#filterType, #filterDateFrom, #filterDateTo, #filterStatus, #filterUser').on('change', function() {
+        dt.ajax.reload();
+    });
+
     return dt;
 }
 

@@ -65,7 +65,8 @@
             <input type="date" name="filterDateTo" id="filterDateTo" class="form-control" value="{{ request()->get('filterDateTo') != ''? request()->get('filterDateTo'):'' }}">
         </div>
     </div>
-    <div class="d-flex justify-content-end w-100 gap-2">
+    @if (!Route::is('document.create') && !Route::is('document.incoming'))
+        <div class="d-flex justify-content-end w-100 gap-2">
         <a href="{{route($route)}}" class="btn btn-danger w-auto col-sm-12 d-flex align-items-center gap-2">
             <i class='ri-delete-bin-2-line'></i> Clear
         </a>
@@ -73,4 +74,5 @@
             <i class='ri-filter-2-line'></i> Filter
         </button>
     </div>
+    @endif
 </form>

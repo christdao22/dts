@@ -643,17 +643,22 @@ class DocumentController extends Controller
             $baseQuery = DB::table('document_details')
             ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
             ->join('terminals', 'document_trackings.terminal_id', '=', 'terminals.id')
-                ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
-                ->whereNotNull('document_details.user_id')
-                ->when(!$user->can_view_all, function ($query) use ($user) {
-                    $query->where('document_details.user_id', $user->id);
-                });
+            ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+            ->whereNotNull('document_details.user_id')
+            ->when($request->is_show_docs == '0', function ($query) use ($user) {
+                $query->where('document_details.user_id', $user->id);
+            });
 
             $baseQuery = $this->filter($request, $baseQuery);
 
             $totalRecords = DB::table('document_details')
+                ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
+                ->join('terminals', 'document_trackings.terminal_id', '=', 'terminals.id')
                 ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
                 ->whereNotNull('document_details.user_id')
+                ->when($request->is_show_docs == '0', function ($query) use ($user) {
+                    $query->where('document_details.user_id', $user->id);
+                })
                 ->count('document_details.id');
 
             $filteredRecords = $baseQuery->count('document_details.id');
