@@ -8,27 +8,27 @@
     }
 
     td:nth-child(2) {
-        width: 20%;
+        width: 15%;
     }
 
     td:nth-child(3) {
-        width: 20%;
+        width: 15%;
     }
 
     td:nth-child(4) {
-        width: 20%;
+        width: 15%;
     }
 
     td:nth-child(5) {
-        width: 10%;
+        width: 15%;
     }
 
     td:nth-child(6) {
-        width: 10%;
+        width: 15%;
     }
 
     td:nth-child(7) {
-        width: 10%;
+        width: 15%;
     }
 
 </style>
@@ -48,7 +48,7 @@
                             <tr>
                                 <th>CODE</th>
                                 <th>TYPE</th>
-                                <th>NAME OF CLIENT</th>
+                                <th>FROM</th>
                                 <th>DESCRIPTION</th>
                                 <th>DATE/TIME</th>
                                 <th>REMARKS</th>
@@ -157,7 +157,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Confirm Complete Modal --}}
+
                                 <div class="modal fade" id="completeModal-{{ $documentTracking->id }}" tabindex="-1"
                                     aria-labelledby="completeModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">

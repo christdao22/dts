@@ -640,6 +640,7 @@ class DocumentController extends Controller
             $user = auth()->user();
             $length = $request->length ?? 10;
             $start = $request->start ?? 0;
+
             $baseQuery = DB::table('document_details')
             ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
             ->join('terminals', 'document_trackings.terminal_id', '=', 'terminals.id')
@@ -649,18 +650,10 @@ class DocumentController extends Controller
                 $query->where('document_details.user_id', $user->id);
             });
 
+            $totalRecords = $baseQuery->count('document_details.id');
+
             $baseQuery = $this->filter($request, $baseQuery);
-
-            $totalRecords = DB::table('document_details')
-                ->join('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
-                ->join('terminals', 'document_trackings.terminal_id', '=', 'terminals.id')
-                ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
-                ->whereNotNull('document_details.user_id')
-                ->when($request->is_show_docs == '0', function ($query) use ($user) {
-                    $query->where('document_details.user_id', $user->id);
-                })
-                ->count('document_details.id');
-
+            // Count filtered records
             $filteredRecords = $baseQuery->count('document_details.id');
 
             $documents = $baseQuery->select(
@@ -760,12 +753,14 @@ class DocumentController extends Controller
                 ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
                 ->where('document_trackings.status', 'incoming');
 
-            $baseQuery = $this->filter($request, $baseQuery);
-
             $totalRecords = DB::table('document_trackings')
                 ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
                 ->where('document_trackings.status', 'incoming')
                 ->count('document_trackings.id');
+
+            $baseQuery = $this->filter($request, $baseQuery);
+
+            $filteredRecords  = $baseQuery->count('document_trackings.id');
 
             $documents = $baseQuery->select(
                 'document_details.id',
@@ -823,12 +818,94 @@ class DocumentController extends Controller
                 })
                 ->rawColumns(['created_at', 'terminal', 'from', 'description', 'category', 'action'])
                 ->with('recordsTotal', $totalRecords)
-                // ->with('recordsFiltered', $filteredRecords)
+                ->with('recordsFiltered', $filteredRecords)
                 ->skipAutoFilter()
                 ->skipPaging(true)
                 ->make(true);
 
         }
+    }
+
+    public function dtReceived(Request $request) {
+        if ($request->ajax()) {
+            $length = $request->length ?? 10;
+            $start = $request->start ?? 0;
+
+            $baseQuery = DB::table('document_trackings')
+                ->join('document_details', 'document_trackings.document_detail_id', '=', 'document_details.id')
+                ->join('users', 'document_trackings.user_id', '=', 'users.id')
+                ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->leftJoin('remarks', 'document_trackings.remark_id', '=', 'remarks.id')
+                ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
+                ->where('document_trackings.status', 'received');
+
+
+            $totalRecords = DB::table('document_trackings')
+                ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
+                ->where('document_trackings.status', 'received')
+                ->count('document_trackings.id');
+
+            $baseQuery = $this->filter($request, $baseQuery);
+            $filteredRecords = $baseQuery->count('document_trackings.id');
+
+            $documents = $baseQuery->select(
+                'document_details.id',
+                'document_details.document_code',
+                'document_details.name_of_client',
+                'document_details.contact',
+                'document_details.description',
+                'document_details.type',
+                'document_details.created_at',
+                'document_details.document_category_id',
+                'document_details.user_id',
+                'document_trackings.status',
+                'document_categories.category_name',
+                'remarks.remarks')
+                ->orderBy('document_details.created_at', 'desc')
+                ->offset($start)
+                ->limit($length)
+                ->get();
+
+            return DataTables::of($documents)
+                ->addIndexColumn()
+                ->editColumn('category', function ($document) {
+                    return $document->document_category_id != null ?
+                    $document->category_name : "<b>Others: </b>" .
+                    $document->type;
+                })
+                ->editColumn('from', function ($document) {
+                    return $document->name_of_client . '<br>' . ($document->contact != '' ? '(' . $document->contact . ')' : '');
+                })
+                ->editColumn('date_time', function ($document) {
+                    return formatDateTime($document->created_at);
+                })
+                ->addColumn('action', function ($document) {
+                    $actionBtn = '<button type="button" class="btn btn-warning" href="javascript:void(0)"
+                                data-bs-id="' . $document->id . '"><i
+                                            class="ri-share-forward-2-fill" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Forward"></i></button>
+                                    <a class="btn btn-info"
+                                        href="' . route('web.find', 'query='.$document->document_code) . '"><i
+                                            class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Track"></i></a>
+                                    <button type="button" class="btn btn-success"href="javascript:void(0)"
+                                        data-bs-id="' . $document->id . '"><i
+                                            class=" ri-check-fill" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Complete"></i></button>';
+
+                    return $actionBtn;
+                })
+                ->addColumn('description', function ($document) {
+                    return make_excerpt($document->description, 25);
+                })
+                ->rawColumns(['created_at', 'terminal', 'from', 'description', 'category', 'action'])
+                ->with('recordsTotal', $totalRecords)
+                ->with('recordsFiltered', $filteredRecords)
+                ->skipAutoFilter()
+                ->skipPaging(true)
+                ->make(true);
+        }
+
     }
 
 }

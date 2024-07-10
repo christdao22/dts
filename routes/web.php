@@ -70,6 +70,8 @@ Route::middleware(['auth'])->group(function () {
         // Ajax
         Route::get('/dtAllDocuments', [DocumentController::class, 'dtAllDocuments'])->name('document.dtAllDocuments');
         Route::get('/dtIncoming', [DocumentController::class, 'dtIncoming'])->name('document.dtIncoming');
+        Route::get('/dtReceived', [DocumentController::class, 'dtReceived'])->name('document.dtReceived');
+
     });
 
     // Admin
