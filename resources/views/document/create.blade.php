@@ -176,6 +176,7 @@
                                             <tr>
                                                 <th>CODE</th>
                                                 <th>Client's Name</th>
+                                                <th>Description</th>
                                                 <th><i class=" ri-settings-2-line" data-bs-toggle="tooltip"
                                                         data-bs-placement="top" title="Action"></i></th>
                                             </tr>
@@ -183,10 +184,11 @@
                                         <tbody>
                                             @foreach ($document_codes as $code)
                                             <tr>
-                                                <td><strong>{{ $code->document_code }}</strong></td>
-                                                <td><strong class="text-uppercase">{{ $code->name_of_client }}</strong>
+                                                <td class="w-25"><strong>{{ $code->document_code }}</strong></td>
+                                                <td class="w-25"><strong class="text-uppercase">{{ $code->name_of_client }}</strong>
+                                                <td class="w-25"><strong class="text-uppercase">{{ $code->description }}</strong>
                                                 </td>
-                                                <td>
+                                                <td class="w-25">
                                                     <div class="d-flex justify-content-end gap-1">
                                                         <a class="btn btn-primary editCodeModal"
                                                             data-bs-id='{{ $code->id }}' data-bs-toggle="tooltip"
