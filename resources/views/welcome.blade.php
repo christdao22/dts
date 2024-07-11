@@ -82,7 +82,7 @@
                                                 <input id="name_of_client" class="form-control" type="text"
                                                     @error('name_of_client') is-invalid @enderror name="name_of_client"
                                                     value="{{ old('name_of_client') }}" required
-                                                    autocomplete="name_of_client" autofocus
+                                                    autocomplete="off" autofocus
                                                     placeholder="Agency/Clients/School Name">
                                             </div>
                                         </div>
@@ -90,7 +90,7 @@
                                             <div class="col-12">
                                                 <input id="contact" class="form-control" type="text" @error('contact')
                                                     is-invalid @enderror name="contact" value="{{ old('contact') }}"
-                                                    required autocomplete="contact" autofocus
+                                                    required autofocus autocomplete="off"
                                                     placeholder="Contact Number">
                                             </div>
                                         </div>
