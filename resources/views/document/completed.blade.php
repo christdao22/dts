@@ -83,12 +83,12 @@
                                 <td>{{ formatDateTime($documentTracking->documentDetail->updated_at) }}</td>
                                 <td>{{ $documentTracking->remark->remarks }}</td>
                                 <td class="d-flex gap-1">
-                                    @if (auth()->user()->is_admin)
+                                    {{-- @if (auth()->user()->is_admin) --}}
                                         <button type="button" class="btn btn-warning text-white forwardBtn" data-bs-toggle="modal" data-bs-id={{ $documentTracking->id }}
                                         data-bs-target="#forwardModal"><i
                                             class="ri-arrow-left-right-fill" data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="Change"></i></button>
-                                    @endif
+                                    {{-- @endif --}}
                                     <a class="btn btn-info"
                                         href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
                                             class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
