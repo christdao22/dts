@@ -70,42 +70,69 @@
                     <div class="col-lg-5 order-1 order-lg-2" data-aos="zoom-in" data-aos-delay="200">
                         <div class="card">
                             <div class="card-body">
-                                <div class="text-center mt-4">
-                                    <h3>Create Document</h3>
+                                <div class="text-center mt-2 mb-4">
+                                    <h3 style="color: #0097a7; font-weight: 700; font-size: 2rem;">Create Tracking Number</h3>
                                 </div>
                                 <div class="">
-                                    <form class="form-horizontal mt-3" method="POST"
-                                        action="{{ route('guest.guestCreate') }}">
+                                    <form class="form-horizontal mt-4" id="create-form" action="{{ route('guest.guestCreate') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="form-group mb-3 row">
                                             <div class="col-12">
+                                                <small>(Please fill in your name, agency, or school name below.)</small>
                                                 <input id="name_of_client" class="form-control" type="text"
                                                     @error('name_of_client') is-invalid @enderror name="name_of_client"
-                                                    value="{{ old('name_of_client') }}" required
-                                                    autocomplete="off" autofocus
-                                                    placeholder="Agency/Clients/School Name">
+                                                    value="{{ old('name_of_client') }}"
+                                                    autocomplete="off"
+                                                    placeholder="Enter your details">
                                             </div>
                                         </div>
                                         <div class="form-group mb-3 row">
                                             <div class="col-12">
                                                 <input id="contact" class="form-control" type="text" @error('contact')
-                                                    is-invalid @enderror name="contact" value="{{ old('contact') }}"
-                                                    required autofocus autocomplete="off"
-                                                    placeholder="Contact Number">
+                                                    is-invalid @enderror name="contact" value="{{ old('contact') }}" autocomplete="off"
+                                                    placeholder="Contact number (optional)">
                                             </div>
                                         </div>
-                                        <div class="form-group mb-3 row">
+                                        <div class="form-group mb-3 row" id="category_radio_group">
                                             <div class="col-12">
-                                                <input id="description" class="form-control" type="text"
-                                                    @error('description') is-invalid @enderror name="description"
-                                                    value="{{ old('description') }}" required autocomplete="description"
-                                                    autofocus placeholder="Subject">
+                                                <small>(Please select the type of document you will submit to the receiving office.)</small>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="category_radio" type="radio" id="regular" value="regular" checked>
+                                                    <label class="form-check-label" for="regular">
+                                                        Regular Transaction
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" name="category_radio" type="radio" id="separation" value="separation" >
+                                                    <label class="form-check-label" for="separation">
+                                                        Separation of Service
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="form-group mb-3 text-center row mt-5 pt-1">
+                                         <div class="form-group mb-3 row d-none" id="separation_desc">
                                             <div class="col-12">
-                                                <button class="btn btn-info text-white w-100 waves-effect waves-light"
-                                                    type="submit">Create</button>
+                                                <select name="separation_desc" class="form-select" >
+                                                    <option value="" selected>Select Category</option>
+                                                    <option value="Retirement">Retirement</option>
+                                                    <option value="Resignation">Resignation</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group mb-3 row" id="regular_desc">
+                                            <div class="col-12">
+                                                <input class="form-control" type="text"
+                                                    @error('regular_desc') is-invalid @enderror name="regular_desc"
+                                                    value="{{ old('regular_desc') }}" autocomplete="regular_desc"
+                                                    placeholder="Enter the title of the file to be received">
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group mb-3 text-center row mt-4 pt-1">
+                                            <div class="col-12">
+                                                <button id="create_btn" class="btn btn-info text-white w-100 waves-effect waves-light"
+                                                    type="button">Create</button>
                                             </div>
                                         </div>
                                     </form>
@@ -137,16 +164,17 @@
     <!-- Vendor JS Files -->
     <script src="assets2/vendor/aos/aos.js"></script>
     <script src="assets2/vendor/bootstrap/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{{ asset('assets/libs/jquery/jquery.min.js') }}" ></script>
 
     <!-- Template Main JS File -->
-    <script>
+    <script defer>
         if ('{{ session("success") }}' == 'true') {
             window.open(window.location.href + 'printPDF/{{ session("code") }}', '_blank');
         }
-
     </script>
     <script src="assets2/js/main.js" defer></script>
-
 </body>
 
 </html>
+
+

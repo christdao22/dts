@@ -170,4 +170,8 @@ function make_excerpt($text, $length = 100, $suffix = '...')
         HTML;
 }
 
+function time_ago($date) {
+    return Carbon::parse($date)->diffForHumans();
+}
+
 

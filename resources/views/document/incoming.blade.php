@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
     td:nth-child(1) {
@@ -70,43 +69,6 @@
     </div> <!-- end col -->
 </div> <!-- end row -->
 
-<div class="modal" id="showModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title secondary">Document Details</h5>
-                <button type="button" class="btn-close"
-                    data-bs-dismiss="modal"></button>
-            </div>
-            <form action="#" method="POST" enctype="multipart/form-data">
-                @method('PATCH')
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <div class="mb-4">
-                            <p class="form-label"><strong>Type: </strong> <span id="category"></span> </p>
-                            <p class="form-label"><strong>Document Code:</strong> <span id="code"></span> </p>
-                            <p class="form-label"><strong>Name of Client:</strong> <span id="name_of_client"></span> </p>
-                            <p class="form-label"><strong>Contact No:</strong> <span id="contact"></span> </p>
-                            <p class="form-label"><strong>Description:</strong> <span id="description"></span> </p>
-                            <p class="form-label"><strong>Remarks:</strong> <span id="remarks"></span> </p>
-                        </div>
-                        <div class="mb-4">
-                            <input type="text" value="received" name="status"
-                                class="form-control" hidden>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success">Received</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script defer>
     window.addEventListener('load', function () {
         initJQuery(function () {
@@ -158,33 +120,6 @@
             });
 
             initExcerpt();
-
-            initClick('.viewBtn', function () {
-                var id = $(this).data('bs-id');
-
-                $.ajax({
-                    url: '/document/getDocument/' + id,
-                    method: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        $('#category').text(data.documents
-                            .document_category_id !== null ?
-                            data.documents.document_category.category_name : 'Others - ' + data.documents.type);
-                        $('#code').text(data.documents.document_code);
-                        $('#name_of_client').text(data.documents.name_of_client);
-                        $('#contact').text(data.documents.contact);
-                        $('#description').text(data.documents.description);
-                        $('#remarks').text(data.documents.document_tracking.remark.remarks);
-
-                        $("#showModal form").attr("action", `/document/update/${data.documents.id}`);
-
-                        $('#showModal').modal('show');
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error fetching data:', error);
-                    }
-                });
-            });
 
             initClick('.receivedBtn', function() {
                 const id = $(this).data('bs-id');

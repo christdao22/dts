@@ -58,7 +58,7 @@
                             <form action="{{ route('document.generateCode') }}" method="get">
                                 @csrf
                                 <button title="This button generates a code for you to obtain first and then add it when you're ready to create a document."
-                                    class="btn btn-warning d-flex align-items-center gap-2 text-light h-100"><i class="ri-dashboard-line"></i>
+                                    class="btn btn-warning d-flex align-items-center gap-2 text-white h-100"><i class="ri-dashboard-line "></i>
                                     <span class="d-none d-md-block">Generate Code</span> </button>
                             </form>
                             <button class="btn btn-success d-flex align-items-center gap-2" data-bs-toggle="modal"

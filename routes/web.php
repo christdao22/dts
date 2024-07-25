@@ -6,7 +6,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UsersController;
-use App\Models\DocumentCategory;
+use App\Models\User;
+use App\Notifications\SeparationOfServiceNotif;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,9 +26,7 @@ use Illuminate\Support\Facades\Auth;
 
 // Home
 Route::get('/', function () {
-    $categories = DocumentCategory::get()->sortBy('category_name');
-
-    return view('welcome', compact('categories'));
+    return view('welcome');
 });
 
 // Auth Route
@@ -95,8 +95,3 @@ Route::post('/guestStore', [UsersController::class, 'guestStore'])->name('guestS
 Route::post('/guestCreate', [DocumentController::class, 'guestCreate'])->name('guest.guestCreate');
 
 Route::get('/printPDF/{id}',[DocumentController::class, 'printPDF'])->name('printPDF');
-
-
-
-
-

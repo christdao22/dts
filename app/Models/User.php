@@ -81,4 +81,8 @@ class User extends Authenticatable
     public function document_category() {
         return $this->hasOne(DocumentCategory::class);
     }
+
+    public function notifications() {
+        return $this->belongsTo(Notification::class);
+    }
 }

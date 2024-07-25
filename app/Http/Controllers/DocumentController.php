@@ -7,11 +7,13 @@ use App\Models\DocumentDetail;
 use App\Models\DocumentTrace;
 use App\Models\DocumentTracking;
 use App\Models\GeneratedCode;
+use App\Models\Notification;
 use App\Models\Outgoing;
 use App\Models\ReceivedHistory;
 use App\Models\Remark;
 use App\Models\Terminal;
 use App\Models\User;
+use App\Notifications\SeparationOfServiceNotif;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -103,19 +105,19 @@ class DocumentController extends Controller
     public function received(Request $request)
     {
         $this->maintenance();
-        $documentTrackings = [];
         $filters = $this->getFilters();
         $terminals = $this->getTerminals();
 
-        $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
-        if ($terminal != null) {
-            $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
-                ->where('status', 'received')
-                ->with('user', 'documentDetail', 'remark');
+        $documentTrackings = [];
+        // $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
+        // if ($terminal != null) {
+        //     $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
+        //         ->where('status', 'received')
+        //         ->with('user', 'documentDetail', 'remark');
 
-            $documentTrackings = $this->filter($request, $documentTrackings);
-            $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
-        }
+        //     $documentTrackings = $this->filter($request, $documentTrackings);
+        //     $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
+        // }
 
         return view('document.received', compact('documentTrackings', 'terminals', 'filters'));
     }
@@ -536,23 +538,46 @@ class DocumentController extends Controller
     {
         try {
             $document_code = $this->generateDocumentNumber();
-            DB::transaction(function () use ($request, $document_code) {
-                DocumentDetail::create([
+            $detail = DB::transaction(function () use ($request, $document_code) {
+
+                $description = $request->separation_desc != null ? $request->separation_desc : $request->regular_desc;
+                return DocumentDetail::create([
                     'document_code' => $document_code,
                     'name_of_client' => $request->name_of_client,
-                    'description' => $request->description,
+                    'description' => $description,
                     'contact' => $request->contact,
                     'created_at' => date('Y-m-d H:i:s'),
                 ]);
             });
 
+            if ($request->separation_desc != null) {
+                $usersToBeNotified = [1, 26];
+                $time = Carbon::parse($detail->created_at)->diffForHumans();
+                $message = $request->name_of_client . ' has submitted a request for ' . $detail->description . '.';
+
+                Notification::insert(
+                    array_map(function ($userId) use ($message, $detail) {
+                        return ['user_id' => $userId, 'document_detail_id' => $detail->id, 'action' => $message, 'created_at' => now()];
+                    }, $usersToBeNotified)
+                );
+
+                foreach ($usersToBeNotified as $userId) {
+                    $totalUnread = Notification::where('user_id', $userId)->where('read_at', null)->count();
+                    if ($user = User::find($userId)) {
+                        $user->notify(new SeparationOfServiceNotif($message, $time, $totalUnread));
+                    }
+                }
+            }
+
             Alert::success($document_code, 'Successfully Created')->persistent('Dismiss');
+
             return redirect()->back()->with([
                 'success' => 'true',
                 'code' => $document_code,
             ]);
 
         } catch (\Exception $e) {
+            dd($e);
             Alert::error('oppss', 'Please try again...');
             return redirect()->back();
         }
@@ -880,7 +905,7 @@ class DocumentController extends Controller
                     return formatDateTime($document->created_at);
                 })
                 ->addColumn('action', function ($document) {
-                    $actionBtn = '<button type="button" class="btn btn-warning" href="javascript:void(0)"
+                    $actionBtn = '<button type="button" class="forwardBtn btn btn-warning " href="javascript:void(0)"
                                 data-bs-id="' . $document->id . '"><i
                                             class="ri-share-forward-2-fill" data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="Forward"></i></button>
@@ -888,7 +913,7 @@ class DocumentController extends Controller
                                         href="' . route('web.find', 'query='.$document->document_code) . '"><i
                                             class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="Track"></i></a>
-                                    <button type="button" class="btn btn-success"href="javascript:void(0)"
+                                    <button type="button" class="completeBtn btn btn-success"href="javascript:void(0)"
                                         data-bs-id="' . $document->id . '"><i
                                             class=" ri-check-fill" data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="Complete"></i></button>';

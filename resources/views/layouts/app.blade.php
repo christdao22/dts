@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8" />
     <title>DepEd-CDO | Document Tracking System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,17 +20,20 @@
         rel="stylesheet" type="text/css" />
 
     <!-- Icons Css -->
-    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 
     @if ($theme == 'dark')
-        <link href="{{ asset('assets/css/bootstrap-dark.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
-        <link href="{{ asset('assets/css/app-dark.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/css/bootstrap-dark.min.css') }}" id="bootstrap-style" rel="stylesheet"
+        type="text/css" />
+    <link href="{{ asset('assets/css/app-dark.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
     @else
-        <!-- Bootstrap Css -->
-        <link href="{{ asset('assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
-        <!-- App Css-->
-        <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
+    <!-- Bootstrap Css -->
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
     @endif
+
+    @livewireStyles
 </head>
 
 <body data-topbar="dark" data-sidebar="dark" data-bs-theme="dark">
@@ -63,15 +65,18 @@
                     <button href="" id="dark_mode_btn" class="btn btn-primary-outline text-size-50">
                         <i class="{{ $theme == 'dark'? 'ri-sun-line':'ri-moon-line' }} h2 text-white"></i>
                     </button>
+
+                    <livewire:notification-component />
+
                     <div class="dropdown d-inline-block user-dropdown">
                         <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="rounded-circle header-profile-user"
-                                    src="{{ asset('assets/images/users/user-profile-icon-free-vector.jpg') }}"
-                                    alt="Header Avatar">
-                            {{-- <span
-                                class="d-none d-xl-inline-block ms-1 me-2">{{ Str::ucfirst(Auth::user()->first_name) }} {!! auth()->user()->is_active? '<span class="text-success">(Active)</span>':'<span class="text-danger">(Inactive)</span>' !!}</span> --}}
-                                <span class="d-none d-xl-inline-block ms-1 me-2">{{ Str::ucfirst(Auth::user()->first_name) }} </span>
+                            <img class="rounded-circle header-profile-user"
+                                src="{{ asset('assets/images/users/user-profile-icon-free-vector.jpg') }}"
+                                alt="Header Avatar">
+                            <span
+                                class="d-none d-xl-inline-block ms-1 me-2">{{ Str::ucfirst(Auth::user()->first_name) }}
+                            </span>
                             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">
@@ -118,9 +123,9 @@
                         @endif
                         <p class="mt-1 d-flex align-items-center justify-content-center gap-2">
                             @if (auth()->user()->is_active)
-                                <i class="ri-record-circle-line mt-0 text-success"></i> Online
+                            <i class="ri-record-circle-line mt-0 text-success"></i> Online
                             @else
-                                <i class="ri-record-circle-line mt-0 text-secondary"></i> Offline
+                            <i class="ri-record-circle-line mt-0 text-secondary"></i> Offline
                             @endif
 
                         </p>
@@ -136,7 +141,7 @@
                         @if (Auth::user()->is_admin == 1 || Auth::user()->can_create == 1 || Auth::user()->can_view_all
                         == 1)
                         <li>
-                            <a href="{{ route('document.create') }}" class=" waves-effect"><span
+                            <a href="{{ route('document.create') }}" class=" waves-effect"><span ~
                                     class="badge bg-warning float-end"></span>
                                 <i class="ri-dashboard-line"></i>
                                 <span>ALL DOCUMENTS</span>
@@ -254,20 +259,87 @@
                     </div>
                 </div>
             </footer>
-
         </div>
         <!-- end main content-->
 
-    </div>
-    <!-- END layout-wrapper -->
+        <div class="toast-container position-fixed top-0 end-0 mr-3" style="z-index: 1001; top: 80px !important; margin-right: 23px !important;">
+            <div id="notifToast" class="toast bg-info text-white h-100" role="alert" aria-live="assertive" aria-atomic="true"
+                style="height: 125px;">
+                <div class="toast-header">
+                    <strong class="me-auto text-black">Notification</strong>
+                    <small id="notifTime" >1 second ago</small>
+                </div>
+                <div class="toast-body d-flex flex-row align-items-center justify-content-between pt-4 pb-4 " >
+                    <div class="d-flex align-items-center">
+                        <i class="ri-notification-2-fill border p-3 rounded-circle border-white" style="width: 50px; height: 50px; line-height: 0; display: flex; justify-content: center; align-items: center; font-size: 25px;"></i>
+                        <p id="notifMessage" class="mb-0 ms-3 fw-normal text-white"> </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        {{-- Modal --}}
+        <div class="modal" id="showModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title secondary">Document Details</h5>
+                        <button type="button" class="btn-close"
+                            data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="#" method="POST" enctype="multipart/form-data">
+                        @method('PATCH')
+                        @csrf
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <div class="mb-4">
+                                    <p class="form-label d-none  row"><strong class="col-4">Type: </strong> <span id="category" class="col-8"></span> </p>
+                                    <p class="form-label row"><strong class="col-4">Document Code:</strong> <span id="code" class="col-8"></span> </p>
+                                    <p class="form-label row"><strong class="col-4">Name of Client:</strong> <span id="name_of_client" class="col-8"></span> </p>
+                                    <p class="form-label row"><strong class="col-4">Contact No:</strong> <span id="contact" class="col-8"></span> </p>
+                                    <p class="form-label row"><strong class="col-4">Description:</strong> <span id="description" class="col-8"></span> </p>
+                                    <p class="form-label d-none row"><strong class="col-4">Remarks:</strong> <span id="remarks" class="col-8"></span> </p>
+                                </div>
+                                <div class="mb-4">
+                                    <input type="text" value="received" name="status"
+                                        class="form-control" hidden>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer d-none">
+                            <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Close</button>
+                             <button type="submit" class="btn btn-success">Received</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- END layout-wrapper -->
+    </div>
     @include('sweetalert::alert')
 
     <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
 
+    {{-- Notification --}}~
+    <script src="{{ mix('js/app.js') }}"></script>
+    <script>
+        Echo.private('App.Models.User.{{ auth()->user()->id }}')
+            .notification((notification) => {
+                $("#notifMessage").text(notification.message);
+                $("#notifTime").text(notification.time);
+                $("#totalUnread").text(notification.totalUnread);
+                $("#notifToast").toast("show");
+                $(".notif-indicator").removeClass("d-none");
+            });
+
+    </script>
+
     <!-- JAVASCRIPT -->
-    <script src="{{ asset('assets/libs/jquery/jquery.min.js') }}" ></script>
+    <script src="{{ asset('assets/libs/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/metismenu/metisMenu.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/simplebar/simplebar.min.js') }}" defer></script>
@@ -282,8 +354,10 @@
     <script src="{{ asset('assets/libs/jszip/jszip.min.js') }}" defer></script>
 
     <!-- Responsive examples -->
-    <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}" defer></script>
-    <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}" defer></script>
+    <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}" defer>
+    </script>
+    <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}" defer>
+    </script>
 
     <!-- Datatable init js -->
     <script src="{{ asset('assets/js/pages/datatables.init.min.js') }}" defer></script>
@@ -292,12 +366,57 @@
     <script src="{{ asset('assets/js/app.js') }}" defer></script>
     <script src="{{ asset('assets/js/helperFunc.js') }}" defer></script>
     <script defer>
-        window.onload = function() {
+        window.onload = function () {
             if (window.jQuery) {
                 $(document).ready(function () {
+
+                    initClick('#notifButton', function (event) {
+                        $('.notif-panel .dropdown-menu').toggleClass('show');
+                    })
+
+                    initClick(document, function (event) {
+                        if (!$(event.target).closest('.notif-panel').length && !$(event.target).closest('#showModal').length) {
+                            $('.notif-panel .dropdown-menu').removeClass('show');
+                        }
+                    })
+
+                    initClick('.notif-item, .viewBtn', function () {
+                        var id = $(this).data('bs-id');
+                        $(this).removeClass('bg-light');
+
+                        $.ajax({
+                            url: '/document/getDocument/' + id,
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                $('#showModal #code').text(data.documents.document_code);
+                                $('#showModal #name_of_client').text(data.documents.name_of_client);
+                                $('#showModal #contact').text(data.documents.contact != null? data.documents.contact : 'N/A');
+                                $('#showModal #description').text(data.documents.description);
+
+                                if('{{ Route::currentRouteName() == "document.incoming" }}' == 1 && data.documents.document_tracking != null) {
+                                    $('#showModal #category').text(data.documents
+                                        .document_category_id !== null ?
+                                        data.documents.document_category.category_name : 'Others - ' + data.documents.type);
+                                    $('#showModal #remarks').text(data.documents.document_tracking.remark.remarks);
+                                    $("#showModal form").attr("action", `/document/update/${data.documents.id}`);
+
+                                    $('#showModal .form-label').has('#category').removeClass('d-none');
+                                    $('#showModal .form-label').has('#remarks').removeClass('d-none');
+                                    $('#showModal .modal-footer').removeClass('d-none')
+                                }
+
+                                $('#showModal').modal('show');
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching data:', error);
+                            }
+                        });
+                    });
+
                     $('#datatable-buttons').DataTable();
 
-                    $('#dark_mode_btn').on('click', function() {
+                    $('#dark_mode_btn').on('click', function () {
                         $('i', this).toggleClass('ri-sun-line ri-moon-line');
 
                         var theme = $('i', this).hasClass('ri-sun-line') ? 'dark' : 'light';
@@ -308,15 +427,14 @@
 
                     function setCookie(name, value) {
                         var d = new Date();
-                        d.setTime(d.getTime() + (365*24*60*60*1000));
+                        d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
                         var expires = "expires=" + d.toUTCString();
                         document.cookie = `${name}=${value};${expires};path=/;`;
                     }
                 });
             }
-
-
         }
+
     </script>
 
     <script src="{{ asset('assets/libs/pdfmake/build/pdfmake.min.js') }}" defer></script>
@@ -324,6 +442,8 @@
     <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}" defer></script>
     <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }}" defer></script>
+
+    @livewireScripts
 </body>
 
 </html>

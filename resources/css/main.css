@@ -1,0 +1,8 @@
+.notif-panel .dropdown-menu {
+    min-width: 500px;
+}
+
+.notif-panel .notif-icon {
+    min-width: 50px;
+    min-height: 50px;
+}

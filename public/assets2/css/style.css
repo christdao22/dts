@@ -1863,5 +1863,6 @@ section {
     font-size: 30px;
 }
 
-.welcome-content {
+.form-check-label {
+    font-size: 90%;
 }
