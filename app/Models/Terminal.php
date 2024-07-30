@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class Terminal extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'terminal_name',
@@ -32,5 +33,9 @@ class Terminal extends Model
 
     public function outgoings() {
         return $this->hasMany(Terminal::class);
+    }
+
+    public function notifications() {
+        return $this->belongsTo(Notification::class);
     }
 }

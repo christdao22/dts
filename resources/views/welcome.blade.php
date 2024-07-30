@@ -78,7 +78,7 @@
                                         @csrf
                                         <div class="form-group mb-3 row">
                                             <div class="col-12">
-                                                <small>(Please fill in your name, agency, or school name below.)</small>
+                                                <small>Please fill in your name, agency, or school name below.</small>
                                                 <input id="name_of_client" class="form-control" type="text"
                                                     @error('name_of_client') is-invalid @enderror name="name_of_client"
                                                     value="{{ old('name_of_client') }}"
@@ -95,7 +95,7 @@
                                         </div>
                                         <div class="form-group mb-3 row" id="category_radio_group">
                                             <div class="col-12">
-                                                <small>(Please select the type of document you will submit to the receiving office.)</small>
+                                                <small>Please select the type of document you will submit to the receiving office.</small>
                                                 <div class="form-check">
                                                     <input class="form-check-input" name="category_radio" type="radio" id="regular" value="regular" checked>
                                                     <label class="form-check-label" for="regular">

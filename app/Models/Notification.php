@@ -11,14 +11,14 @@ class Notification extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
+        'terminal_id',
         'action',
         'read_at',
         'created_at',
         'document_detail_id'
     ];
 
-    public function user() {
-        return $this->hasMany(User::class);
+    public function terminal() {
+        return $this->hasMany(Terminal::class);
     }
 }

@@ -52,7 +52,7 @@
                             <tr>
                                 <th>CODE</th>
                                 <th>TYPE</th>
-                                <th>FROM</th>
+                                <th>NAME OF CLIENT</th>
                                 <th>DESCRIPTION</th>
                                 <th>FORWARDED BY</th>
                                 <th>DATE/TIME COMPLETED</th>

@@ -209,8 +209,6 @@
                                                             title="Print"
                                                             href="{{ route('printPDF', $code->document_code ) }}"
                                                             target="_blank"></a>
-
-
                                                     </div>
                                                 </td>
                                             </tr>
@@ -230,7 +228,7 @@
                                 <tr>
                                     <th>CODE</th>
                                     <th>TYPE</th>
-                                    <th>FROM</th>
+                                    <th>NAME OF CLIENT</th>
                                     <th>DESCRIPTION</th>
                                     <th>TO</th>
                                     <th>DATE</th>

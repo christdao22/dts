@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('terminal_id');
             $table->unsignedInteger('document_detail_id');
             $table->string('action');
             $table->timestamp('read_at')->nullable();

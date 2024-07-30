@@ -13,7 +13,7 @@ use App\Models\ReceivedHistory;
 use App\Models\Remark;
 use App\Models\Terminal;
 use App\Models\User;
-use App\Notifications\SeparationOfServiceNotif;
+use App\Notifications\SystemNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -109,15 +109,6 @@ class DocumentController extends Controller
         $terminals = $this->getTerminals();
 
         $documentTrackings = [];
-        // $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
-        // if ($terminal != null) {
-        //     $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
-        //         ->where('status', 'received')
-        //         ->with('user', 'documentDetail', 'remark');
-
-        //     $documentTrackings = $this->filter($request, $documentTrackings);
-        //     $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
-        // }
 
         return view('document.received', compact('documentTrackings', 'terminals', 'filters'));
     }
@@ -134,15 +125,8 @@ class DocumentController extends Controller
     {
         $this->maintenance();
         $filters = $this->getFilters();
-        $receivedHistories = ReceivedHistory::with('user.terminal', 'documentDetail.document_category', 'remark');
-        $receivedHistories = $this->filter($request, $receivedHistories);
-        $receivedHistories = $receivedHistories->get();
 
-        $receivedHistories = $receivedHistories->filter(function ($r) {
-            return $r->user->office_id == auth()->user()->office_id;
-        });
-
-        return view('document.received_histories', compact('receivedHistories', 'filters'));
+        return view('document.received_histories', compact('filters'));
     }
 
     public function outgoing(Request $request)
@@ -151,15 +135,7 @@ class DocumentController extends Controller
         $terminals = $this->getTerminals();
         $filters = $this->getFilters();
 
-        $documentTrackings = Outgoing::with('user.terminal', 'documentDetail.documentTracking', 'documentDetail.document_category', 'terminal', 'remark')->where('user_id', auth()->user()->id);
-        $documentTrackings = $this->filter($request, $documentTrackings);
-        $documentTrackings = $documentTrackings->orderBy('created_at', 'desc')->get();
-
-        $documentTrackings->filter(function ($o) {
-            return $o->user->office_id == auth()->user()->office_id;
-        });
-
-        return view('document.outgoing', compact('documentTrackings', 'filters', 'terminals'));
+        return view('document.outgoing', compact('filters', 'terminals'));
     }
 
     public function completed(Request $request)
@@ -169,9 +145,10 @@ class DocumentController extends Controller
         $documentTrackings = [];
         $terminals = $this->getTerminals();
         $filters = $this->getFilters();
+        $user = auth()->user();
 
-        if (!auth()->user()->is_admin) {
-            $terminal = Terminal::with('user')->where('user_id', auth()->user()->id)->first();
+        if (!$user->is_admin) {
+            $terminal = Terminal::with('user')->where('user_id', $user->id)->first();
 
             if ($terminal != null) {
                 $documentTrackings = DocumentTracking::where('terminal_id', $terminal->id)
@@ -217,10 +194,12 @@ class DocumentController extends Controller
             $document_code = $request->document_code != '' ? $request->document_code : $this->generateDocumentNumber();
 
             DB::transaction(function () use ($request, $document_code) {
+                $user = auth()->user();
+
                 $generated_code_query = GeneratedCode::where('document_code', $document_code);
                 $generated_data = $generated_code_query->get();
                 $documentDetail = DocumentDetail::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'document_code' => $document_code,
                     'type' => $request->type,
                     'name_of_client' => $request->name_of_client,
@@ -237,30 +216,35 @@ class DocumentController extends Controller
                     'remarks' => $request->remarks,
                 ]);
 
-                DocumentTracking::create([
+                $documentTracking = DocumentTracking::create([
                     'id' => $documentDetail->id,
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'document_detail_id' => $documentDetail->id,
                     'terminal_id' => $request->terminal,
                     'remark_id' => $remark->id,
                     'status' => 'incoming',
+                    'created_at' => now(),
                 ]);
 
                 DocumentTrace::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'document_detail_id' => $documentDetail->id,
                     'remark_id' => $remark->id,
                 ]);
 
                 ReceivedHistory::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'document_detail_id' => $documentDetail->id,
                     'remark_id' => $remark->id,
                 ]);
+
+                toast('Successfully created...', 'success');
+
+                incomingNotif($documentDetail->id, $documentTracking->created_at, $request->terminal);
             });
+
             $latestId = DocumentDetail::orderBy('created_at', 'desc')->pluck('id')->first();
 
-            toast('Successfully created...', 'success');
             return redirect()->back()->with('success', $latestId);
 
         } catch (\Exception $e) {
@@ -276,20 +260,20 @@ class DocumentController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $id) {
+                $user = auth()->user();
+
                 if ($request->status === "incoming") {
                     $remark = Remark::create([
                         'remarks' => $request->remarks,
                     ]);
 
                     $documentTracking = DocumentTracking::FindOrFail($id);
-                    $documentTracking->user_id = auth()->user()->id;
+                    $documentTracking->user_id = $user->id;
                     $documentTracking->status = $request->status;
                     $documentTracking->terminal_id = $request->terminal_id;
                     $documentTracking->remark_id = $remark->id;
+                    $documentTracking->updated_at = now();
                     $documentTracking->save();
-
-                    $documentDetail = DocumentDetail::FindOrFail($id);
-                    $documentDetail->save();
 
                     $documentTrace = DocumentTrace::where('document_detail_id', '=', $id)->latest()->first();
                     $documentTrace->remark_id = $remark->id;
@@ -297,29 +281,37 @@ class DocumentController extends Controller
 
                     Outgoing::create([
                         'document_detail_id' => $documentTracking->id,
-                        'user_id' => auth()->user()->id,
+                        'user_id' => $user->id,
                         'terminal_id' => $request->terminal_id,
                         'remark_id' => $remark->id,
                     ]);
 
                     Alert::success('Forwarded', '');
+                    incomingNotif($documentTracking->id, $documentTracking->updated_at, $documentTracking->terminal_id);
 
                 } elseif ($request->status === "received") {
                     $documentTracking = DocumentTracking::with('documentDetail')->FindOrFail($id);
+
+                    $prevUserId = $documentTracking->user_id;
+
                     $documentTracking->status = $request->status;
                     $documentTracking->is_received = 1;
-
                     $documentTracking->save();
+
                     DocumentTrace::create([
-                        'user_id' => auth()->user()->id,
+                        'user_id' => $user->id,
                         'document_detail_id' => $documentTracking->id,
                     ]);
 
                     ReceivedHistory::create([
-                        'user_id' => auth()->user()->id,
+                        'user_id' => $user->id,
                         'document_detail_id' => $documentTracking->id,
                         'remark_id' => $documentTracking->remark_id,
                     ]);
+
+                    $updateOutgoingStatus = Outgoing::where('user_id', $prevUserId)->where('document_detail_id', $id)->first();
+                    $updateOutgoingStatus->is_received = 1;
+                    $updateOutgoingStatus->save();
 
                     Alert::success('Received', '');
                 } elseif ($request->status === "completed") {
@@ -333,7 +325,7 @@ class DocumentController extends Controller
                     $documentTracking->save();
 
                     DocumentTrace::create([
-                        'user_id' => auth()->user()->id,
+                        'user_id' => $user->id,
                         'document_detail_id' => $documentTracking->id,
                         'status' => $request->status,
                         'remark_id' => $remark->id,
@@ -361,11 +353,14 @@ class DocumentController extends Controller
                 $documentDetail->terminal_id = $request->terminal_id;
                 $documentDetail->contact = $request->contact;
                 $documentDetail->document_category_id = $request->category_id == 'others' ? null : $request->category_id;
+                $documentDetail->updated_at = now();
                 $documentDetail->save();
 
                 $tracking = DocumentTracking::find($id);
                 $tracking->terminal_id = $request->terminal_id;
                 $tracking->save();
+
+                incomingNotif($documentDetail->id, $documentDetail->updated_at, $documentDetail->terminal_id);
             });
         } catch (\Exception $e) {
             Alert::error('Ooppss', 'Please try again...');
@@ -496,6 +491,7 @@ class DocumentController extends Controller
         $documentTracking->status = 'incoming';
         $documentTracking->user_id = $documentTrace->user_id;
         $documentTracking->terminal_id = $request->terminal_id;
+        $documentTracking->updated_at = now();
         $documentTracking->save();
 
         $remark = Remark::FindOrFail($documentTracking->remark_id);
@@ -510,6 +506,9 @@ class DocumentController extends Controller
         ]);
 
         Alert::success('Forwarded Successfully', '');
+
+        incomingNotif($documentTracking->id, $documentTracking->updated_at, $documentTracking->terminal_id);
+
         return redirect()->back();
     }
 
@@ -520,6 +519,7 @@ class DocumentController extends Controller
     {
         $documentTracking = DocumentTracking::FindOrFail($id);
         $documentTracking->terminal_id = $request->terminal_id;
+        $documentTracking->updated_at = Carbon::now();
         $documentTracking->save();
 
         $outgoing = Outgoing::where('document_detail_id', '=', $documentTracking->id)->latest()->first();
@@ -531,6 +531,9 @@ class DocumentController extends Controller
         $remark->save();
 
         Alert::success('Successfully Changed', '');
+
+        incomingNotif($documentTracking->id, $documentTracking->updated_at, $documentTracking->terminal_id);
+
         return redirect()->back();
     }
 
@@ -550,21 +553,23 @@ class DocumentController extends Controller
                 ]);
             });
 
+            // Notification
             if ($request->separation_desc != null) {
-                $usersToBeNotified = [1, 26];
+                // Adminstrator, Receiving, Personnel Section, Payroll, and Admin Office
+                $terminalsToBeNotified = [1, 19, 54, 48, 25];
                 $time = Carbon::parse($detail->created_at)->diffForHumans();
                 $message = $request->name_of_client . ' has submitted a request for ' . $detail->description . '.';
 
                 Notification::insert(
-                    array_map(function ($userId) use ($message, $detail) {
-                        return ['user_id' => $userId, 'document_detail_id' => $detail->id, 'action' => $message, 'created_at' => now()];
-                    }, $usersToBeNotified)
+                    array_map(function ($terminalId) use ($message, $detail) {
+                        return ['terminal_id' => $terminalId, 'document_detail_id' => $detail->id, 'action' => $message, 'created_at' => now()];
+                    }, $terminalsToBeNotified)
                 );
 
-                foreach ($usersToBeNotified as $userId) {
-                    $totalUnread = Notification::where('user_id', $userId)->where('read_at', null)->count();
-                    if ($user = User::find($userId)) {
-                        $user->notify(new SeparationOfServiceNotif($message, $time, $totalUnread));
+                foreach ($terminalsToBeNotified as $terminalId) {
+                    $totalUnread = Notification::where('terminal_id', $terminalId)->whereNull('read_at')->count('id');
+                    if ($terminal = Terminal::find($terminalId)) {
+                        $terminal->notify(new SystemNotification($message, $time, $totalUnread));
                     }
                 }
             }
@@ -577,7 +582,6 @@ class DocumentController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            dd($e);
             Alert::error('oppss', 'Please try again...');
             return redirect()->back();
         }
@@ -595,8 +599,9 @@ class DocumentController extends Controller
     {
         try {
             DB::transaction(function () use ($request, $id) {
+                $user = auth()->user();
                 $documentDetail = DocumentDetail::find($id);
-                $documentDetail->user_id = auth()->user()->id;
+                $documentDetail->user_id = $user->id;
                 $documentDetail->name_of_client = $request->add_name_of_client;
                 $documentDetail->contact = $request->add_contact;
                 $documentDetail->description = $request->add_description;
@@ -609,26 +614,30 @@ class DocumentController extends Controller
                     'remarks' => $request->add_remarks,
                 ]);
 
-                DocumentTracking::create([
+                $documentTracking = DocumentTracking::create([
                     'id' => $documentDetail->id,
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'document_detail_id' => $documentDetail->id,
                     'terminal_id' => $request->add_terminal_id,
                     'remark_id' => $remark->id,
                     'status' => 'incoming',
+                    'created_at' => now(),
                 ]);
 
                 DocumentTrace::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'document_detail_id' => $documentDetail->id,
                     'remark_id' => $remark->id,
                 ]);
 
                 ReceivedHistory::create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'document_detail_id' => $documentDetail->id,
                     'remark_id' => $remark->id,
                 ]);
+
+                incomingNotif($documentDetail->id, $documentTracking->created_at, $request->add_terminal_id);
+
             });
             $latestId = DocumentDetail::orderBy('created_at', 'desc')->pluck('id')->first();
 
@@ -678,8 +687,9 @@ class DocumentController extends Controller
             $totalRecords = $baseQuery->count('document_details.id');
 
             $baseQuery = $this->filter($request, $baseQuery);
-            // Count filtered records
-            $filteredRecords = $baseQuery->count('document_details.id');
+
+            $isRequestExist = checkIfRequestExist($request, ['value', 'type', 'others', 'date_from', 'date_to', 'user','status']);
+            $filteredRecords = $isRequestExist? $baseQuery->count('document_details.id') : $totalRecords;
 
             $documents = $baseQuery->select(
                     'document_details.id',
@@ -727,7 +737,7 @@ class DocumentController extends Controller
 
                     return $status;
                 })
-                ->addColumn('action', function ($document) {
+                ->addColumn('action', function ($document) use ($user) {
                     $actionBtn = '
                         <div class="d-flex justify-content-end gap-1">
                             <a class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -735,7 +745,7 @@ class DocumentController extends Controller
                                 href="' . route('web.find', ['query' => $document->document_code]) . '">
                                 <i class="ri-route-line"></i>
                             </a>
-                            ' . (!$document->is_received && $document->user_id == auth()->user()->id ? '
+                            ' . (!$document->is_received && $document->user_id == $user->id ? '
                             <button class="btn btn-danger deleteBtn" data-bs-id="' . $document->id . '">
                                 <i class="ri-delete-bin-line"></i>
                                 <form id="delete_form_' . $document->id . '"
@@ -769,17 +779,19 @@ class DocumentController extends Controller
             $length = $request->length ?? 10;
             $start = $request->start ?? 0;
 
+            $terminal = auth()->user()->terminal;
+
             $baseQuery = DB::table('document_trackings')
                 ->join('document_details', 'document_trackings.document_detail_id', '=', 'document_details.id')
                 ->join('users', 'document_trackings.user_id', '=', 'users.id')
                 ->leftJoin('terminals', 'users.id', '=', 'terminals.user_id')
                 ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
                 ->leftJoin('remarks', 'document_trackings.remark_id', '=', 'remarks.id')
-                ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
+                ->where('document_trackings.terminal_id', $terminal->id)
                 ->where('document_trackings.status', 'incoming');
 
             $totalRecords = DB::table('document_trackings')
-                ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
+                ->where('document_trackings.terminal_id', $terminal->id)
                 ->where('document_trackings.status', 'incoming')
                 ->count('document_trackings.id');
 
@@ -856,17 +868,19 @@ class DocumentController extends Controller
             $length = $request->length ?? 10;
             $start = $request->start ?? 0;
 
+            $terminal = auth()->user()->terminal;
+
             $baseQuery = DB::table('document_trackings')
                 ->join('document_details', 'document_trackings.document_detail_id', '=', 'document_details.id')
                 ->join('users', 'document_trackings.user_id', '=', 'users.id')
                 ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
                 ->leftJoin('remarks', 'document_trackings.remark_id', '=', 'remarks.id')
-                ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
+                ->where('document_trackings.terminal_id', $terminal->id)
                 ->where('document_trackings.status', 'received');
 
 
             $totalRecords = DB::table('document_trackings')
-                ->where('document_trackings.terminal_id', auth()->user()->terminal->id)
+                ->where('document_trackings.terminal_id', $terminal->id)
                 ->where('document_trackings.status', 'received')
                 ->count('document_trackings.id');
 
@@ -933,5 +947,173 @@ class DocumentController extends Controller
 
     }
 
+    public function dtReceivedHistory(Request $request) {
+        if ($request->ajax()) {
+
+            $length = $request->length ?? 10;
+            $start = $request->start ?? 0;
+
+            $baseQuery = DB::table('received_histories')
+                ->join('users', 'received_histories.user_id', '=', 'users.id')
+                ->join('terminals', 'users.id', '=', 'terminals.user_id')
+                ->join('document_details', 'received_histories.document_detail_id', '=', 'document_details.id')
+                ->leftJoin('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
+                ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->leftJoin('remarks', 'received_histories.remark_id', '=', 'remarks.id')
+                ->where('received_histories.user_id', auth()->user()->id);
+
+            $totalRecords = DB::table('received_histories')
+                ->where('received_histories.user_id', auth()->user()->id)
+                ->count('id');
+
+            $baseQuery = $this->filter($request, $baseQuery);
+            $filteredRecords = $baseQuery->count('received_histories.id');
+
+            $documents = $baseQuery->select(
+                'received_histories.id',
+                'document_details.document_code',
+                'document_details.name_of_client',
+                'document_details.contact',
+                'document_details.description',
+                'document_details.type',
+                'document_details.created_at',
+                'document_details.document_category_id',
+                'document_categories.category_name',
+                'remarks.remarks',
+                'received_histories.created_at as received_at')
+                ->orderBy('received_histories.created_at', 'desc')
+                ->offset($start)
+                ->limit($length)
+                ->get();
+
+            return DataTables::of($documents)
+                ->addIndexColumn()
+                ->editColumn('category', function ($document) {
+                    return $document->document_category_id != null ?
+                    $document->category_name : "<b>Others: </b>" .
+                    $document->type;
+                })
+                ->editColumn('from', function ($document) {
+                    return $document->name_of_client . '<br>' . ($document->contact != '' ? '(' . $document->contact . ')' : '');
+                })
+                ->editColumn('created_at', function ($document) {
+                    return formatDateTime($document->created_at);
+                })
+                ->editColumn('received_at', function ($document) {
+                    return formatDateTime($document->received_at);
+                })
+                ->addColumn('action', function ($document) {
+                    $actionBtn = '<a class="btn btn-info"
+                                        href="' . route('web.find', 'query='.$document->document_code) . '"><i
+                                            class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Track"></i></a>';
+
+                    return $actionBtn;
+                })
+                ->addColumn('description', function ($document) {
+                    return make_excerpt($document->description, 25);
+                })
+                ->rawColumns(['from', 'description', 'category', 'action'])
+                ->with('recordsTotal', $totalRecords)
+                ->with('recordsFiltered', $filteredRecords)
+                ->skipAutoFilter()
+                ->skipPaging(true)
+                ->make(true);
+        }
+
+    }
+
+    public function dtOutgoing(Request $request) {
+        if ($request->ajax()) {
+
+            $length = $request->length ?? 10;
+            $start = $request->start ?? 0;
+
+
+            $baseQuery = DB::table('outgoings')
+                ->join('document_details', 'outgoings.document_detail_id', '=', 'document_details.id')
+                ->leftJoin('document_trackings', 'document_details.id', '=', 'document_trackings.document_detail_id')
+                ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
+                ->leftJoin('terminals', 'outgoings.terminal_id', '=', 'terminals.id')
+                ->leftJoin('remarks', 'outgoings.remark_id', '=', 'remarks.id')
+                ->where('outgoings.user_id', auth()->user()->id);
+
+            $totalRecords = DB::table('outgoings')
+                ->where('outgoings.user_id', auth()->user()->id)
+                ->count('id');
+
+            $baseQuery = $this->filter($request, $baseQuery);
+            $filteredRecords = $baseQuery->count('outgoings.id');
+
+            $documents = $baseQuery->select(
+                'outgoings.id',
+                'document_details.id as details_id',
+                'document_details.document_code',
+                'document_details.name_of_client',
+                'document_details.contact',
+                'document_details.description',
+                'document_details.type',
+                'document_details.created_at',
+                'document_details.document_category_id',
+                'document_categories.category_name',
+                'remarks.remarks',
+                'terminals.terminal_name',
+                'document_trackings.status',
+                'outgoings.created_at as forwarded_at',
+                'outgoings.is_received')
+                ->orderBy('outgoings.created_at', 'desc')
+                ->offset($start)
+                ->limit($length)
+                ->get();
+
+
+            return DataTables::of($documents)
+                ->addIndexColumn()
+                ->editColumn('category', function ($document) {
+                    return $document->document_category_id != null ?
+                    $document->category_name : "<b>Others: </b>" .
+                    $document->type;
+                })
+                ->editColumn('from', function ($document) {
+                    return $document->name_of_client . ' <br>' . ($document->contact != '' ? '(' . $document->contact . ')' : '');
+                })
+                ->editColumn('created_at', function ($document) {
+                    return formatDateTime($document->created_at);
+                })
+                ->editColumn('forwarded_at', function ($document) {
+                    return formatDateTime($document->forwarded_at);
+                })
+                ->editColumn('terminal', function ($document) {
+                    return $document->terminal_name;
+                })
+                ->addColumn('action', function ($document) {
+                    $actionBtn = '';
+
+                    if($document->is_received == 0) {
+                        $actionBtn = '<button type="button" class="btn btn-warning text-white forwardBtn" data-bs-id="' . $document->details_id . '"><i
+                                            class="ri-arrow-left-right-fill" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Change"></i></button> ';
+                    }
+
+                    $actionBtn .= '<a class="btn btn-info"
+                                        href="' . route('web.find', 'query='.$document->document_code) . '"><i
+                                            class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Track"></i></a>';
+                    return $actionBtn;
+                })
+                ->addColumn('description', function ($document) {
+                    return make_excerpt($document->description, 25);
+                })
+                ->rawColumns(['to', 'description', 'category', 'action'])
+                ->with('recordsTotal', $totalRecords)
+                ->with('recordsFiltered', $filteredRecords)
+                ->skipAutoFilter()
+                ->skipPaging(true)
+                ->make(true);
+        }
+
+    }
 }
+
+
 

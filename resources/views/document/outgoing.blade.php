@@ -59,7 +59,7 @@
                     <x-filter :$filters route='document.outgoing'/>
                 </div>
                 <div class="card-body">
-                    <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
+                    <table id="document-datatable" class="table table-striped table-bordered dt-responsive"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr>
@@ -67,7 +67,6 @@
                                 <th>TYPE</th>
                                 <th>NAME OF CLIENT</th>
                                 <th>DESCRIPTION</th>
-                                <th>FORWARDED BY</th>
                                 <th>TO</th>
                                 <th>DATE CREATED</th>
                                 <th>DATE FORWARDED</th>
@@ -78,48 +77,6 @@
                         </thead>
 
                         <tbody>
-                            @php
-                                $latestCodes = [];
-                            @endphp
-                            @foreach ($documentTrackings as $documentTracking)
-                                {{-- {{ dd($documentTracking) }} --}}
-                                @php
-                                    $code = $documentTracking->documentDetail->document_code;
-                                    $isLatest = !isset($latestCodes[$code]);
-                                    if ($isLatest) {
-                                        $latestCodes[$code] = $code;
-                                    }
-                                @endphp
-                                <tr>
-                                    <td><strong>{{ $documentTracking->documentDetail->document_code }}</strong></td>
-                                    <td>{!! $documentTracking->documentDetail->document_category_id != null?
-                                        $documentTracking->documentDetail->document_category->category_name : "<b>Others: </b>" . $documentTracking->documentDetail->type
-                                        !!}</td>
-                                    <td>{{ $documentTracking->documentDetail->name_of_client }} <br> {{ $documentTracking->documentDetail->contact != ''? '(' . $documentTracking->documentDetail->contact . ')':'' }}</td>
-                                    <td>{{ $documentTracking->documentDetail->description }}</td>
-                                    <td>{{ strtoupper($documentTracking->user->terminal->terminal_name) }}<br>-
-                                        {{ Str::ucfirst(strtolower($documentTracking->user->first_name)) }}
-                                        {{ Str::ucfirst(strtolower(Str::substr($documentTracking->user->middle_name, 0, 1))) }}.
-                                        {{ Str::ucfirst(strtolower($documentTracking->user->last_name)) }}</td>
-                                    <td>{{ strtoupper($documentTracking->terminal->terminal_name) }}</td>
-                                    <td>{{ formatDateTime($documentTracking->documentDetail->created_at) }}</i></td>
-                                    <td>{{ formatDateTime($documentTracking->created_at) }}</i></td>
-                                    <td>{{ $documentTracking->remark->remarks }}</i></td>
-                                    <td class="d-flex gap-2">
-                                        @if ($documentTracking->documentDetail->documentTracking->status == 'incoming' && $isLatest)
-                                            <button type="button" class="btn btn-warning text-white" data-bs-toggle="modal"
-                                            data-bs-target="#forwardModal-{{ $documentTracking->id }}"><i
-                                                class="ri-arrow-left-right-fill" data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="Change"></i></button>
-                                        @endif
-                                        <a class="btn btn-info"
-                                            href="{{ route('web.find', 'query='.$documentTracking->documentDetail->document_code) }}"><i
-                                                class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="Track"></i></a>
-                                    </td>
-                                </tr>
-                                <x-forward-modal :$documentTracking :$terminals routeName='document.changeForward'/>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -129,6 +86,149 @@
     </div> <!-- end col -->
 </div> <!-- end row -->
 
+<div class="modal fade" id="forwardModal" tabindex="-1"  aria-labelledby="forwardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forwardModalLabel">Document Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="#" method="POST" enctype="multipart/form-data">
+                @method('PATCH')
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <div class="mb-4">
+                            <p class="form-label row"><strong class="col-4">Type: </strong> <span
+                                    id="category" class="col-8"></span> </p>
+                            <p class="form-label row"><strong class="col-4">Document Code:</strong> <span id="code"
+                                    class="col-8"></span> </p>
+                            <p class="form-label row"><strong class="col-4">Name of Client:</strong> <span
+                                    id="name_of_client" class="col-8"></span> </p>
+                            <p class="form-label row"><strong class="col-4">Contact No:</strong> <span id="contact"
+                                    class="col-8"></span> </p>
+                            <p class="form-label row"><strong class="col-4">Description:</strong> <span
+                                    id="description" class="col-8"></span> </p>
+                        </div>
+                    </div>
+                    <div class="mb-4" id="secondary-select-container">
+                        <label class="form-label"><b>Forward: </b></label>
+                        <select name="terminal_id" class="form-control" required id="terminal_id">
+                            <option value="" selected="true" disabled>Select... </option>
+                            @foreach ($terminals as $terminal)
+                            <option value="{{ $terminal->id }}">
+                                {!! strtoupper($terminal->terminal_name) !!} - {!!
+                                ucfirst(strtolower($terminal->user->first_name)) !!} {!!
+                                ucfirst(strtolower($terminal->user->last_name)) !!}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="remarks">Remarks</label>
+                        <textarea name="remarks" id="remarks" cols="30" rows="5"
+                            class="form-control"></textarea>
+                    </div>
+                    <input type="text" value="incoming" name="status" class="form-control" hidden>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Forward</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script defer>
+    window.addEventListener('load', function () {
+        initJQuery(function () {
+
+            initDtServerSide({
+                selector: "#document-datatable",
+                route: "{{ route('document.dtOutgoing') }}",
+                columns: [{
+                        data: 'document_code',
+                        name: 'CODE'
+                    },
+                    {
+                        data: 'category',
+                        name: 'TYPE'
+                    },
+                    {
+                        data: 'from',
+                        name: 'NAME OF CLIENT'
+                    },
+                    {
+                        data: 'description',
+                        name: 'DESCRIPTION'
+                    },
+                    {
+                        data: 'terminal',
+                        name: 'TO'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'DATE CREATED'
+                    },
+                    {
+                        data: 'forwarded_at',
+                        name: 'DATE FORWARDED'
+                    },
+                    {
+                        data: 'remarks',
+                        name: 'REMARKS'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                additionalData: function (d) {
+                    d.type = $('#filterType').val();
+                    d.date_from = $('#filterDateFrom').val();
+                    d.date_to = $('#filterDateTo').val();
+                    d.user = $('#filterUser').val();
+                }
+            });
+
+            initClick('.forwardBtn', function () {
+                var id = $(this).data('bs-id');
+
+                $.ajax({
+                    url: '/document/getDocument/' + id,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        var docs = data.documents;
+                        $('#code').text(docs.document_code);
+                        $('#name_of_client').text(docs.name_of_client);
+                        $('#contact').text(docs.contact !=
+                            null ? docs.contact : 'N/A');
+                        $('#description').text(docs.description);
+                        $('#category').text(docs.document_category_id !== null ?
+                            docs.document_category.category_name :
+                            'Others - ' + docs.type);
+                        $('#remarks').val(docs.document_tracking.remark.remarks);
+
+                        $("#forwardModal form").attr("action",
+                            `/document/changeForward/${docs.id}`);
+
+                        $('#forwardModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                    }
+                });
+            });
+
+            initExcerpt();
+        });
+    }, false);
+</script>
 @endsection
 
 

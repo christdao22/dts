@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Notification;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -14,7 +13,7 @@ class NotificationComponent extends Component
 
     public $totalUnread = 0;
     public $perPage = 10;
-    public $userId;
+    public $terminalId;
 
     protected $listeners = ['load-more' => 'loadMore'];
 
@@ -23,17 +22,15 @@ class NotificationComponent extends Component
         $this->perPage += 10;
     }
 
-
     public function mount() {
-        $this->userId = auth()->user()->id;
-        $this->updateNotifications();
+        $this->terminalId = auth()->user()->terminal->id;
     }
 
     public function updateNotifications() {
-        $this->totalUnread = DB::table('notifications')->whereNull('read_at')->where('id', $this->userId)->count('id');
+        $this->totalUnread = $this->getTotalUnread();
 
         return DB::table('notifications')
-            ->where('user_id', $this->userId)
+            ->where('terminal_id', $this->terminalId)
             ->orderBy('created_at', 'desc')
             ->cursorPaginate($this->perPage);
     }
@@ -49,10 +46,17 @@ class NotificationComponent extends Component
                 if ($notificationItem) {
                     $notificationItem->read_at = $notification->read_at;
                 }
-
-                $this->totalUnread = DB::table('notifications')->whereNull('read_at')->where('id', $this->userId)->count('id');
             }
         }
+    }
+
+    public function markAllAsRead() {
+        DB::table('notifications')->where('terminal_id', $this->terminalId)->update(['read_at' => now()->startOfDay()->format('Y-m-d H:i:s')]);
+        $this->totalUnread = $this->getTotalUnread();
+    }
+
+    public function getTotalUnread() {
+        return DB::table('notifications')->whereNull('read_at')->where('terminal_id', $this->terminalId)->count('id');
     }
 
     public function render()

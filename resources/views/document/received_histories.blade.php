@@ -1,11 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- <div class="container-fluid">
-
-   <h1>This is admin</h1>
-
-</div> --}}
 <style>
     /* You can use nth-child(1), nth-child(2), etc., to target specific columns */
     /* For this example, let's adjust the width of the first and second columns */
@@ -54,7 +49,7 @@
                     <x-filter :$filters route='document.receivedHistory'/>
                 </div>
                 <div class="card-body">
-                    <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive"
+                    <table id="document-datatable" class="table table-striped table-bordered dt-responsive"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr>
@@ -62,7 +57,6 @@
                                 <th>TYPE</th>
                                 <th>NAME OF CLIENT</th>
                                 <th>DESCRIPTION</th>
-                                <th>RECEIVED BY</th>
                                 <th>DATE CREATED</th>
                                 <th>DATE RECEIVED</th>
                                 <th>REMARKS</th>
@@ -70,30 +64,6 @@
                                         title="Action"></i></th>
                             </tr>
                         </thead>
-
-                        <tbody>
-                            @foreach ($receivedHistories as $receivedHistory)
-                            <tr>
-                                <td><strong>{{ $receivedHistory->documentDetail->document_code }}</strong></td>
-                                <td>{!! $receivedHistory->documentDetail->document_category_id != null?
-                                    $receivedHistory->documentDetail->document_category->category_name : "<b>Others: </b>" . $receivedHistory->documentDetail->type
-                                    !!}</td>
-                                <td>{{ $receivedHistory->documentDetail->name_of_client }} <br> {{ $receivedHistory->documentDetail->contact != ''? '(' . $receivedHistory->documentDetail->contact . ')':'' }}</td>
-                                <td>{{ $receivedHistory->documentDetail->description }}</td>
-                                <td>{{ strtoupper($receivedHistory->user->terminal->terminal_name) }}<br>-
-                                    {{ Str::ucfirst(strtolower($receivedHistory->user->first_name)) }}
-                                    {{ Str::ucfirst(strtolower(Str::substr($receivedHistory->user->middle_name, 0, 1))) }}.
-                                    {{ Str::ucfirst(strtolower($receivedHistory->user->last_name)) }}</td>
-                                <td>{{ formatDateTime($receivedHistory->documentDetail->created_at) }}</i></td>
-                                <td>{{ formatDateTime($receivedHistory->created_at) }}</td>
-                                <td>{{ $receivedHistory->remark->remarks }}</td>
-                                <td class="d-flex gap-1">
-                                    <a class="btn btn-info" href="{{ route('web.find', 'query='.$receivedHistory->documentDetail->document_code) }}"><i class="ri-route-line" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Track"></i></a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
 
@@ -101,4 +71,58 @@
         </div>
     </div> <!-- end col -->
 </div> <!-- end row -->
+
+<script defer>
+    window.addEventListener('load', function () {
+        initJQuery(function () {
+            initDtServerSide({
+                selector: "#document-datatable",
+                route: "{{ route('document.dtReceivedHistory') }}",
+                columns: [{
+                        data: 'document_code',
+                        name: 'CODE'
+                    },
+                    {
+                        data: 'category',
+                        name: 'TYPE'
+                    },
+                    {
+                        data: 'from',
+                        name: 'FROM'
+                    },
+                    {
+                        data: 'description',
+                        name: 'DESCRIPTION'
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'DATE'
+                    },
+                    {
+                        data: 'received_at',
+                        name: 'DATE'
+                    },
+                    {
+                        data: 'remarks',
+                        name: 'REMARKS'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                additionalData: function (d) {
+                    d.type = $('#filterType').val();
+                    d.date_from = $('#filterDateFrom').val();
+                    d.date_to = $('#filterDateTo').val();
+                    d.user = $('#filterUser').val();
+                }
+            });
+
+            initExcerpt();
+        });
+    }, false);
+</script>
 @endsection

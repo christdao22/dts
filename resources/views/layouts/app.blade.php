@@ -151,7 +151,7 @@
 
                         <li>
                             <a href="{{ route('document.incoming') }}" class=" waves-effect"><span
-                                    class="badge bg-warning float-end">{{  incomingTotal() }}</span>
+                                    class="badge bg-warning float-end" id="incomingTotal">{{  incomingTotal() }}</span>
                                 <i class="ri-mail-unread-line"></i>
                                 <span>INCOMING</span>
                             </a>
@@ -267,7 +267,7 @@
                 style="height: 125px;">
                 <div class="toast-header">
                     <strong class="me-auto text-black">Notification</strong>
-                    <small id="notifTime" >1 second ago</small>
+                    <small id="notifTime" ></small>
                 </div>
                 <div class="toast-body d-flex flex-row align-items-center justify-content-between pt-4 pb-4 " >
                     <div class="d-flex align-items-center">
@@ -320,14 +320,13 @@
         <!-- END layout-wrapper -->
     </div>
     @include('sweetalert::alert')
-
     <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
 
     {{-- Notification --}}~
     <script src="{{ mix('js/app.js') }}"></script>
     <script>
-        Echo.private('App.Models.User.{{ auth()->user()->id }}')
+        Echo.private('App.Models.Terminal.{{ auth()->user()->terminal->id }}')
             .notification((notification) => {
                 $("#notifMessage").text(notification.message);
                 $("#notifTime").text(notification.time);
@@ -382,6 +381,8 @@
 
                     initClick('.notif-item, .viewBtn', function () {
                         var id = $(this).data('bs-id');
+                        var isViewBtnSel = $(this).hasClass('viewBtn');
+
                         $(this).removeClass('bg-light');
 
                         $.ajax({
@@ -389,21 +390,26 @@
                             method: 'GET',
                             dataType: 'json',
                             success: function (data) {
-                                $('#showModal #code').text(data.documents.document_code);
-                                $('#showModal #name_of_client').text(data.documents.name_of_client);
-                                $('#showModal #contact').text(data.documents.contact != null? data.documents.contact : 'N/A');
-                                $('#showModal #description').text(data.documents.description);
+                                var doc = data.documents;
+                                $('#showModal #code').text(doc.document_code);
+                                $('#showModal #name_of_client').text(doc.name_of_client);
+                                $('#showModal #contact').text(doc.contact != null? doc.contact : 'N/A');
+                                $('#showModal #description').text(doc.description);
 
-                                if('{{ Route::currentRouteName() == "document.incoming" }}' == 1 && data.documents.document_tracking != null) {
-                                    $('#showModal #category').text(data.documents
+                                if(isViewBtnSel) {
+                                    $('#showModal #category').text(doc
                                         .document_category_id !== null ?
-                                        data.documents.document_category.category_name : 'Others - ' + data.documents.type);
-                                    $('#showModal #remarks').text(data.documents.document_tracking.remark.remarks);
-                                    $("#showModal form").attr("action", `/document/update/${data.documents.id}`);
+                                        doc.document_category.category_name : 'Others - ' + doc.type);
+                                    $('#showModal #remarks').text(doc.document_tracking.remark.remarks);
+                                    $("#showModal form").attr("action", `/document/update/${doc.id}`);
 
                                     $('#showModal .form-label').has('#category').removeClass('d-none');
                                     $('#showModal .form-label').has('#remarks').removeClass('d-none');
                                     $('#showModal .modal-footer').removeClass('d-none')
+                                } else {
+                                    $('#showModal .form-label').has('#category').addClass('d-none');
+                                    $('#showModal .form-label').has('#remarks').addClass('d-none');
+                                    $('#showModal .modal-footer').addClass('d-none')
                                 }
 
                                 $('#showModal').modal('show');

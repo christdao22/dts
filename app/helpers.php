@@ -1,6 +1,10 @@
 <?php
 use App\Models\DocumentTracking;
+use App\Models\Notification;
 use App\Models\Outgoing;
+use App\Models\Terminal;
+use App\Models\User;
+use App\Notifications\SystemNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -133,22 +137,6 @@ function formatDateTime($date)
     return $formattedDateTime;
 }
 
-// function make_excerpt($text, $length = 100, $suffix = '...')
-// {
-//     if (strlen($text) <= $length) {
-//         return $text;
-//     }
-
-//     $excerpt = substr($text, 0, $length);
-
-//     $lastSpace = strrpos($excerpt, ' ');
-//     if ($lastSpace !== false) {
-//         $excerpt = substr($excerpt, 0, $lastSpace);
-//     }
-
-//     return $excerpt . $suffix;
-// }
-
 function make_excerpt($text, $length = 100, $suffix = '...')
 {
     if (strlen($text) <= $length) return $text;
@@ -174,4 +162,26 @@ function time_ago($date) {
     return Carbon::parse($date)->diffForHumans();
 }
 
+function incomingNotif($doc_id, $time, $to) {
+    $from = auth()->user()->terminal->terminal_name;
 
+    $time = Carbon::parse($time)->diffForHumans();
+    $message = $from . ' has forwarded a document to you.';
+
+    Notification::create([
+        'terminal_id' => $to,
+        'document_detail_id' => $doc_id,
+        'action' => $message,
+        'created_at' => now()
+    ]);
+
+    $totalUnread = Notification::where('terminal_id', $to)->whereNull('read_at')->count('id');
+    if ($terminal = Terminal::find($to)) {
+        $terminal->notify(new SystemNotification($message, $time, $totalUnread));
+    }
+
+}
+
+function checkIfRequestExist($request, $keys) {
+    return $request->anyFilled($keys);
+}

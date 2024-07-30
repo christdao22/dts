@@ -7,7 +7,10 @@
         </span>
     </button>
     <div class="dropdown-menu dropdown-menu-end w-100 h-100 overflow-auto" style="min-height: 580px;" wire:ignore.self>
-        <h2 class="dropdown-header w-100 mb-2 fw-bold">Notification</h2>
+        <div class="dropdown-header w-100 fw-bold d-flex justify-content-between">
+            <P class="">Notification</P>
+            <a href="#" wire:click="markAllAsRead" >Mark all as read</a>
+        </div>
         @forelse ($notifications as $notification)
         <div class="dropdown-divider mt-0 mb-0"></div>
         <a wire:click="readNotification({{ $notification->id }}, '{{ $notification->read_at }}')" class="dropdown-item notif-item d-flex align-items-center justifty-content-between gap-3 pt-3 pb-3 {{ $notification->read_at == null? 'bg-light' : '' }}"
