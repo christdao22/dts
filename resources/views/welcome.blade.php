@@ -105,7 +105,7 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" name="category_radio" type="radio" id="separation" value="separation" >
                                                     <label class="form-check-label" for="separation">
-                                                        Separation of Service
+                                                        Separation from Service
                                                     </label>
                                                 </div>
                                             </div>
