@@ -291,8 +291,7 @@ class DocumentController extends Controller
 
                 } elseif ($request->status === "received") {
                     $documentTracking = DocumentTracking::with('documentDetail')->FindOrFail($id);
-
-                    $prevUserId = $documentTracking->user_id;
+                    $prevTerminalId = $documentTracking->terminal_id;
 
                     $documentTracking->status = $request->status;
                     $documentTracking->is_received = 1;
@@ -309,9 +308,12 @@ class DocumentController extends Controller
                         'remark_id' => $documentTracking->remark_id,
                     ]);
 
-                    $updateOutgoingStatus = Outgoing::where('user_id', $prevUserId)->where('document_detail_id', $id)->first();
-                    $updateOutgoingStatus->is_received = 1;
-                    $updateOutgoingStatus->save();
+                    $updateOutgoingStatus = Outgoing::where('terminal_id', $prevTerminalId)->where('document_detail_id', $id)->where('is_received', false)->first();
+
+                    if($updateOutgoingStatus != null) {
+                        $updateOutgoingStatus->is_received = 1;
+                        $updateOutgoingStatus->save();
+                    }
 
                     Alert::success('Received', '');
                 } elseif ($request->status === "completed") {
