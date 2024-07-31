@@ -65,7 +65,7 @@
             <input type="date" name="filterDateTo" id="filterDateTo" class="form-control" value="{{ request()->get('filterDateTo') != ''? request()->get('filterDateTo'):'' }}">
         </div>
     </div>
-    @if (!Route::is('document.create') && !Route::is('document.incoming'))
+    @if (!Route::is('document.create') && !Route::is('document.incoming') && !Route::is('document.received') && !Route::is('document.outgoing') && !Route::is('document.receivedHistory'))
         <div class="d-flex justify-content-end w-100 gap-2">
         <a href="{{route($route)}}" class="btn btn-danger w-auto col-sm-12 d-flex align-items-center gap-2">
             <i class='ri-delete-bin-2-line'></i> Clear
