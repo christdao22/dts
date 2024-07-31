@@ -871,15 +871,14 @@ class DocumentController extends Controller
             $start = $request->start ?? 0;
 
             $terminal = auth()->user()->terminal;
-
             $baseQuery = DB::table('document_trackings')
                 ->join('document_details', 'document_trackings.document_detail_id', '=', 'document_details.id')
                 ->join('users', 'document_trackings.user_id', '=', 'users.id')
                 ->leftJoin('document_categories', 'document_details.document_category_id', '=', 'document_categories.id')
                 ->leftJoin('remarks', 'document_trackings.remark_id', '=', 'remarks.id')
-                ->where('document_trackings.terminal_id', $terminal->id)
+                ->leftJoin('terminals', 'document_trackings.terminal_id', '=', 'terminals.id')
+                ->where('terminals.id', $terminal->id)
                 ->where('document_trackings.status', 'received');
-
 
             $totalRecords = DB::table('document_trackings')
                 ->where('document_trackings.terminal_id', $terminal->id)
