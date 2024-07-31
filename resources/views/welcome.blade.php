@@ -44,7 +44,7 @@
                         <li><a class="nav-link scrollto" href="{{ route('document.incoming') }}">Dashboard</a></li>
                         @else
                         <li><a class="nav-link scrollto" href="{{ route('login') }}">Login</a></li>
-                        <li><a class="nav-link scrollto" href="{{ route('register') }}">Register</a></li>
+                        {{-- <li><a class="nav-link scrollto" href="{{ route('register') }}">Register</a></li> --}}
                         @endif
                     </ul>
                     <i class="ri-menu-line mobile-nav-toggle"></i>
