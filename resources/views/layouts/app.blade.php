@@ -6,6 +6,7 @@
     <title>DepEd-CDO | Document Tracking System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Deped CDO Tracking System" name="description" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <meta content="Themesdesign" name="author" />
 
     <!-- App favicon -->
