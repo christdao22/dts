@@ -8,6 +8,7 @@ use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,10 @@ use Illuminate\Support\Facades\Auth;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+if (env('APP_ENV') === 'production') {
+    URL::forceSchema('https');
+}
 
 
 // Home
