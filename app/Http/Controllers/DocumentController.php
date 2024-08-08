@@ -762,7 +762,7 @@ class DocumentController extends Controller
 
                             <a class="ri ri-printer-fill btn btn-warning"
                                 data-bs-toggle="tooltip" data-bs-placement="top"
-                                title="Print"
+                                title="Print Slip - 8.5x13 Bonpaper"
                                 href="' . route('printPDF', $document->document_code ) . '"
                                 target="_blank"></a>
                         </div>
