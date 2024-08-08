@@ -759,6 +759,12 @@ class DocumentController extends Controller
                             <a href="javascript:void(0)" class="btn btn-primary editButton"
                                 data-bs-id="' . $document->id . '"><i class="ri-edit-2-line"></i></a>
                             ' : '') . '
+
+                            <a class="ri ri-printer-fill btn btn-warning"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Print"
+                                href="' . route('printPDF', $document->document_code ) . '"
+                                target="_blank"></a>
                         </div>
                     ';
 
